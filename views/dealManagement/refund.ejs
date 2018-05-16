@@ -1,0 +1,685 @@
+<% include ../header.ejs %>
+<style type="text/css">
+	.in {
+		opacity: 0;
+	}
+</style>
+<div id="content" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>交易管理</a>
+			<a href="#" class="current">退款</a>
+		</div>
+		<h1>退款</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+
+		<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+			<a class="btn2" href="/deal/credit" target="liquidation">放款</a>
+			<a class="btn2" href="/deal/pushSingle" target="liquidation">推单</a>
+			<a class="btn2" href="/deal/gatheringDeal" target="liquidation">还款</a>
+			<a class="btn2 cur1" href="/deal/refund" target="liquidation">退款</a>
+			<!--			<a class="btn2" href="/deal/serviceCharge" target="liquidation">服务费</a>
+-->
+			<!--<a  class="btn btn-primary" href="/deal/capitalLoan" class="btn btn-primary" target="liquidation">资金放款</a>-->
+			<a class="btn2" href="/deal/cash" target="liquidation">兑付</a>
+			<a class="btn2" href="/deal/repayearly" target="liquidation">提前还款</a>
+		</div>
+
+		<hr>
+		<div class="row-fluid">
+			<div class="widget-box">
+				<div class="widget-content nopadding">
+					<form class="form-horizontal" method="post" action="">
+						<table class="table table-striped">
+							<tbody>
+								<tr class="odd gradeX">
+									<td width="85" style="white-space: nowrap;">交易时间 :</td>
+									<td width="600" style="white-space: nowrap;">
+										<input type="text" class="input" id="datepicker" readonly="readonly" name="start">
+										<input type="text" class="input" id="datepicker1" readonly="readonly" name="end">
+									</td>
+									<td width="85" style="white-space: nowrap;">时间类型 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" v-model="dataType">
+											<option value="1">创建时间</option>
+											<option value="2">打款时间</option>
+										</select>
+									</td>
+
+								</tr>
+								<tr>
+									<td width="85" style="white-space: nowrap;">业务类型 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" v-model="busType">
+											<option value="1">现金贷</option>
+											<option value="2">商品贷</option>
+										</select>
+									</td>
+									<td width="85" style="white-space: nowrap;">交易订单号 :</td>
+									<td width="" style="white-space: nowrap;">
+										<input type="text" class="input" v-model="transactionFlowNo" oninput="this.value=this.value.replace(/\D/g,'');if(isNaN(value))execCommand('undo');">
+									</td>
+								</tr>
+								<tr class="odd gradeX">
+
+									<td width="85" style="white-space: nowrap;">交易状态 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" v-model="refundStatus">
+											<option value="">所有</option>
+											<option value="1">待审核</option>
+											<option value="2">退款中</option>
+											<option value="3">已退回</option>
+											<option value="4">已退款</option>
+										</select>
+									</td>
+									<td width="85" style="white-space: nowrap;">商户订单号 :</td>
+									<td width="" style="white-space: nowrap;">
+										<input type="text" class="input" name="" v-model="orderId">
+									</td>
+								</tr>
+								<tr class="odd gradeX">
+									<td width="85" style="white-space: nowrap;">账户主体 :</td>
+									<td width="" style="white-space: nowrap;">
+										<!--<select name="" id="" required v-model="payee">-->
+										<select name="" id="" v-model="payee">
+											<option value="">所有</option>
+											<option v-for="bb in licenseList" v-bind:value="bb.id" v-text="bb.enterpriseName"></option>
+										</select>
+									</td>
+									<td width="85" style="white-space: nowrap;">支付渠道 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" v-model="channelId">
+											<option value="">所有</option>
+											<option v-for="bb in zfList" v-bind:value="bb.id" v-text="bb.name"></option>
+										</select>
+									</td>
+
+								</tr>
+								<tr>
+									<td width="85" style="white-space: nowrap;">基础订单号 :</td>
+									<td width="" style="white-space: nowrap;"><input type="text" class="input" name="" v-model="baseOrderId" oninput="this.value=this.value.replace(/\D/g,'');if(isNaN(value))execCommand('undo');"></td>
+									<td width="85" style="white-space: nowrap;">用户账户 :</td>
+									<td width="" style="white-space: nowrap;"><input type="text" class="input" name="" v-model="buyers">
+										<span style="margin-left: 20px">
+											<button type="button" id="submit" class="btn btn-success" @click="listenDate(1)">查找</button>
+	                                    	<button type="button" id="submit" class="btn btn-success" @click="resets()" >重置</button>
+                                    	</span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row-fluid">
+			<div class="span6">
+				<div class="span12">
+					<div class="span-box-one" style="background: rgb(255, 255, 255);">
+						<p><span style="font-size: 28px;" id="tjCount">0</span><br><span style="margin: 0px 10px;">总退款订单数</span></p>
+					</div>
+				</div>
+			</div>
+			<div class="span6">
+				<div class="span12">
+					<div class="span-box-one" style="background: rgb(255, 255, 255);">
+						<p><span style="font-size: 28px;" id="tjAmount">0元</span><br><span style="margin: 0px 10px;">总退款金额</span></p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row-fluid tab-two" style="display: none">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>订单明细</h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>创建时间</th>
+									<th>业务类型</th>
+									<th>交易订单号</th>
+									<th>商户订单号</th>
+									<th>我方账户</th>
+									<th>支付渠道</th>
+									<th>用户</th>
+									<th>银行</th>
+									<th>银行卡</th>
+									<th>退款金额</th>
+									<th>状态</th>
+									<th>备注</th>
+									<th width="100" style="white-space: nowrap;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+								<tr v-for="msg in collectionList">
+									<td>{{msg.createTime | time}}</td>
+									<td v-text="msg.commodityName"></td>
+									<td v-text="msg.transactionFlowNo"></td>
+									<td v-text="msg.orderId"></td>
+									<td v-text="msg.enterpriseName"></td>
+									<td v-text="msg.channelName"></td>
+									<td v-text="msg.buyers"></td>
+									<td v-text="msg.bankName"></td>
+									<td v-text="msg.buyersAccount"></td>
+									<td v-text="msg.refundAmount/100"></td>
+
+									<td v-if="msg.refundStatus=='1'">待审核</td>
+									<td v-else-if="msg.refundStatus=='2'">退款中</td>
+									<td v-else-if="msg.refundStatus=='3'">已退回</td>
+									<td v-else-if="msg.refundStatus=='4'">已退款</td>
+									<td v-else-if="msg.refundStatus=='5'">退款失败</td>
+									<td v-else-if="msg.refundStatus=='0'">初始状态</td>
+									<td v-else></td>
+									<td v-text="msg.refundReason" style="white-space:normal !important; min-width:400px !important;"></td>
+									<td v-if="msg.refundStatus=='1'">
+										<button data-toggle="modal" data-target="#myModal-p" class="btn-info btn-mini float_btn_cen" @click="refund(msg.id)">处理</button>
+										<a href="/basics/particulars" target="liquidation" class="btn_a detailA" @click="tui(msg.appid,msg.orderId)">详情</a>
+									</td>
+									<td v-if="msg.refundStatus=='2'">
+										<a href="/basics/particulars" target="liquidation" class="btn_a detailA" @click="tui(msg.appid,msg.orderId)">详情</a>
+									</td>
+									<td v-if="msg.refundStatus=='3'">
+										<a href="/basics/particulars" target="liquidation" class="btn_a detailA" @click="tui(msg.appid,msg.orderId)">详情</a>
+										<button class="btn-success btn-mini" @click="repayNext(msg.id)">还款到下一期</button>
+									</td>
+									<td v-if="msg.refundStatus=='4'">
+										<a href="/basics/particulars" target="liquidation" class="btn_a detailA" @click="tui(msg.appid,msg.orderId)">详情</a>
+									</td>
+									<td v-if="msg.refundStatus=='5'">
+										<a href="/basics/particulars" target="liquidation" class="btn_a detailA" @click="tui(msg.appid,msg.orderId)">详情</a>
+									</td>
+									<td v-if="msg.refundStatus=='0'">
+										<a href="/basics/particulars" target="liquidation" class="btn_a detailA" @click="tui(msg.appid,msg.orderId)">详情</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="table_toggle1" style="display: none;">暂无数据</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="myModal-p" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel">申请退款</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<input type="hidden" id="druleId" name="druleId">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">创建时间 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="createTime_1" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">商户订单号 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="orderId_1" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">商品名称 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="commodityName_1" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">支付通道 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="channelName_1" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">退款金额 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="amount_1" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">退款户名 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="buyers_1" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">退款方向 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="prompt" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">退款账号 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="buyersAccount_1" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">退款原因 :</label>
+											<div class="controls">
+												<textarea name="" rows="" cols="" disabled v-model="refundReason_1"></textarea>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">附件材料 :</label>
+											<div class="controls">
+												<img v-for="msg in mbTransactionAttList" :src="msg.path" alt="msg.transactionId">
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" id="guanbi" data-dismiss="modal">关闭</button>
+						<button type="button" class="btn btn-primary" @click="back(id_1)">退回</button>
+						<button type="button" class="btn btn-primary" @click="confirmRefund(id_1)">确认退款</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+		<div id="page" style="display: none">
+			<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+		</div>
+	</div>
+
+</div>
+<script src="/javascripts/vue-2.42.js"></script>
+<script src="/javascripts/vue-resource.js"></script>
+<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+<script src="/javascripts/time_filter.js"></script>
+<script src="/javascripts/jquery-ui.js"></script>
+
+<script src="/javascripts/public_page.js"></script>
+<script src="/javascripts/time_filter.js"></script>
+<script src="/javascripts/bootstrap.min.js"></script>
+<script src="/javascripts/jquery.flot.min.js"></script>
+<script src="/javascripts/jquery.flot.pie.min.js"></script>
+<script src="/javascripts/jquery.flot.resize.min.js"></script>
+<script src="/javascripts/matrix.js"></script>
+<script src="/javascripts/jquery.peity.min.js"></script>
+<script>
+	$(function() {
+		//dataTime(1);
+		$("#time_one").click();
+		$(".pay_list").click();
+		$(".enquiries").click();
+	})
+</script>
+<script>
+	function dataTime(num) { ////console.log(num)
+		var yugi = function(num) {
+			var now1 = new Date;
+			var getFullYear = now1.getFullYear();
+			var getMonth = now1.getMonth() + 1;
+			var getDate = now1.getDate();
+			var DateTime1 = getFullYear + "-" + getMonth + "-" + getDate;
+			$("#datepicker1").val(DateTime1)
+			var now = new Date;
+			now.setDate(now.getDate() - num);
+			var getFullYear = now.getFullYear();
+			var getMonth = now.getMonth() + 1;
+			var getDate = now.getDate();
+			var DateTime = getFullYear + "-" + getMonth + "-" + getDate;
+			$("#datepicker").val(DateTime)
+			if(num == "1") {
+				$("#datepicker").val(DateTime);
+				$("#datepicker1").val(DateTime);
+			}
+			var timestamp = new Date();
+			//alert(starttimeHaoMiao);
+			var DateTime_starttimeHaoMiao = DateTime;
+			var DateTime_starttimeHaoMiao1 = DateTime1;
+			var starttimeHaoMiao = (new Date(DateTime_starttimeHaoMiao)).getTime();
+			var starttimeHaoMiao1 = (new Date(DateTime_starttimeHaoMiao1)).getTime();
+			$("#starttimeHaoMiao").val(starttimeHaoMiao)
+			$("#starttimeHaoMiao1").val(starttimeHaoMiao1)
+			return now;
+		}
+		yugi(num);
+	}
+
+	$(function() {
+
+		$("#datepicker").datepicker({
+			changeMonth: true,
+			changeYear: true,
+			yearRange: "1900:2050",
+		})
+		$("#datepicker1").datepicker({
+			changeMonth: true,
+			changeYear: true,
+			yearRange: "1900:2050",
+		})
+	});
+</script>
+
+<script>
+	var total = "";
+	var datasets = "";
+	new Vue({
+		el: '#content',
+		data: {
+			all: 0, //总页数
+			cur: 1, //当前页码
+
+			channelId: "",
+			refundStatus: "",
+			orderId: "",
+			transactionFlowNo: "",
+			payee: "",
+			buyers: "",
+			dataType: "1",
+			start: "",
+			end: "",
+			busType: "1",
+			baseOrderId: "",
+
+			amount_1: "",
+			buyers_1: "",
+			buyersAccount_1: "",
+			buyersIdCard_1: "",
+			buyersPhone_1: "",
+			channelName_1: "",
+			commodityName_1: "",
+			createTime_1: "",
+			id_1: "",
+			orderId_1: "",
+			refundReason_1: "",
+			mbTransactionAttList: "",
+			collectionList: "",
+			licenseList: "",
+			zfList: "",
+			traCount: "",
+			prompt: "",
+		},
+		components: {
+			'vue-nav': pagenav
+		},
+		watch: {
+			cur: function(oldValue, newValue) {
+				// this.data();
+			}
+		},
+		mounted: function() {
+			this.time();
+			this.qyList();
+			this.payList();
+			this.traCountFun(this.cur);
+			this.listenDate(this.cur);
+		},
+		methods: {
+			listenDate: function(data) {
+				var _this = this;
+
+				var channelId = this.channelId;
+				var refundStatus = this.refundStatus;
+				var orderId = this.orderId;
+				var transactionFlowNo = this.transactionFlowNo;
+				var payee = this.payee;
+				var buyers = this.buyers;
+				var dataType = this.dataType;
+				var busType = this.busType;
+				var baseOrderId = this.baseOrderId;
+				var start = parseInt((new Date($("#datepicker").val())).getTime() - 28800000);
+				var end = parseInt((new Date($("#datepicker1").val())).getTime() - 28800000 + 86399000);
+				//var start = $("#datepicker").val();
+				//var end = $("#datepicker1").val();
+				var pageSize = 10;
+
+				if(dataType != "") {
+					if(isNaN(start) || isNaN(end)) {
+						alert("请选择交易时间段");
+						$(".tab-two").hide();
+						$("#page").hide();
+						$("#tjCount").html(0);
+						$("#tjAmount").html(0 + "元");
+						return false;
+					}
+				}
+				if(isNaN(start) == false || isNaN(end) == false) {
+					if(dataType == "") {
+						alert("请选择时间类型");
+						$(".tab-two").hide();
+						$("#page").hide();
+						$("#tjCount").html(0);
+						$("#tjAmount").html(0 + "元");
+						return false;
+					}
+				}
+				if(data == 1) this.traCountFun();
+				$(".loading").show();
+				$(".tab-two").show();
+				$("#page").show();
+				this.$http.post("/deal/bill/jsonRefTra", {
+					"pageNum": data,
+					"pageSize": pageSize,
+					"channelId": channelId,
+					"refundStatus": refundStatus,
+					"orderId": orderId,
+					"transactionFlowNo": transactionFlowNo,
+					"payee": payee,
+					"buyers": buyers,
+					"dateType": dataType,
+					"busType": busType,
+					"baseOrderId": baseOrderId,
+					"start": start,
+					"end": end,
+				}).then(function(res) {
+					$(".loading").hide();
+					if(res.body.code == "D1007") {
+						alert(res.body.msg);
+						return false;
+					}
+					if(res.body.code == "D1006") {
+						alert(res.body.msg);
+						return false;
+					}
+					_this.collectionList = res.body.res.mbTransaction.res;
+					console.log(_this.collectionList)
+					_this.pageTotal = res.body.res.mbTransaction.total;
+					_this.totalNum = res.body.res.totalNum;
+					_this.totalAmount = res.body.res.totalAmount;
+					if(_this.collectionList == "") {
+						$(".table_toggle1").show();
+					} else {
+						$(".table_toggle1").hide();
+					}
+					$(".table_toggle").show();
+					if(data <= 1) {
+						total = Math.ceil(_this.pageTotal / 10);
+					}
+					_this.all = total;
+					_this.cur = data;
+				});
+
+			},
+			time: function() {
+				var seperator1 = "-";
+
+				var startDate = new Date();
+				startDate.setDate(startDate.getDate() - 7);
+				var startYear = startDate.getFullYear();
+				var startMonth = startDate.getMonth() + 1;
+				if(startMonth < 10) startMonth = "0" + startMonth;
+				var startDay = startDate.getDate();
+				if(startDay < 10) startDay = "0" + startDay;
+				var endDate = new Date();
+				var endYear = endDate.getFullYear();
+				var endMonth = endDate.getMonth() + 1;
+				if(endMonth < 10) endMonth = "0" + endMonth;
+				var endDay = endDate.getDate();
+				if(endDay < 10) endDay = "0" + endDay;
+				var currentdate = startYear + seperator1 + startMonth + seperator1 + startDay;
+				var currentdate1 = endYear + seperator1 + endMonth + seperator1 + endDay;
+				$("#datepicker").val(currentdate);
+				$("#datepicker1").val(currentdate1);
+			},
+			resets: function() {
+				$("#datepicker").val("");
+				$("#datepicker1").val("");
+				this.channelId = "";
+				this.refundStatus = "";
+				this.orderId = "";
+				this.transactionFlowNo = "";
+				this.payee = "";
+				this.buyers = "";
+				this.dataType = "";
+				this.busType = "";
+				this.baseOrderId = "";
+				this.start = "";
+				this.end = "";
+
+			},
+			//企业列表查询
+			qyList: function() {
+				var _this = this;
+				this.$http.post("/pay/product/jsonEnt").then(function(res) {
+					// //console.log(res)
+					this.licenseList = res.body.res.enterprise;
+				});
+			},
+			payList: function() {
+				this.$http.post("/deal/mbTransaction/jsonPayCfg").then(function(res) {
+					this.zfList = res.body.res.payChannelConfig;
+				});
+			},
+
+			traCountFun: function(data) {
+				var channelId = this.channelId;
+				var refundStatus = this.refundStatus;
+				var orderId = this.orderId;
+				var transactionFlowNo = this.transactionFlowNo;
+				var payee = this.payee;
+				var buyers = this.buyers;
+				var dataType = this.dataType;
+				var busType = this.busType;
+				var baseOrderId = this.baseOrderId;
+				var start = parseInt((new Date($("#datepicker").val())).getTime() - 28800000);
+				var end = parseInt((new Date($("#datepicker1").val())).getTime() - 28800000 + 86399000);
+				var pageSize = 10;
+				this.$http.post("/deal/bill/jsonRefTraCount", {
+					"pageNum": data,
+					"pageSize": pageSize,
+					"channelId": channelId,
+					"refundStatus": refundStatus,
+					"orderId": orderId,
+					"transactionFlowNo": transactionFlowNo,
+					"payee": payee,
+					"buyers": buyers,
+					"dataType": dataType,
+					"busType": busType,
+					"baseOrderId": baseOrderId,
+					"start": start,
+					"end": end,
+				}).then(function(res) {
+					////console.log(res)
+					$("#tjCount").html(res.body.res.numberAmount.number);
+					$("#tjAmount").html((res.body.res.numberAmount.amount / 100) + "元");
+				});
+			},
+
+			refund: function(id) {
+				this.$http.post("/deal/mbTransaction/oneTra", {
+					"id": id
+				}).then(function(res) {
+					var money = res.body.res.mbTransaction.amount;
+					this.amount_1 = money / 100;
+					var createTime_1 = res.body.res.mbTransaction.createTime;
+					this.createTime_1 = new Date(createTime_1).toLocaleString();
+					this.buyers_1 = res.body.res.mbTransaction.buyers;
+					this.buyersAccount_1 = res.body.res.mbTransaction.buyersAccount;
+					this.buyersIdCard_1 = res.body.res.mbTransaction.buyersIdCard;
+					this.buyersPhone_1 = res.body.res.mbTransaction.buyersPhone;
+					this.channelName_1 = res.body.res.mbTransaction.channelName;
+					this.commodityName_1 = res.body.res.mbTransaction.commodityName;
+					this.id_1 = res.body.res.mbTransaction.id;
+					this.orderId_1 = res.body.res.mbTransaction.orderId;
+					this.refundReason_1 = res.body.res.mbTransaction.refundReason;
+					this.mbTransactionAttList = res.body.res.mbTransaction.mbTransactionAttList;
+					this.prompt = res.body.res.mbTransaction.prompt; //退款方向
+				});
+			},
+			//退回
+			back: function(id) {
+				var _this = this;
+				this.$http.post("/deal/mbTransaction/updateToReturn", {
+					"id": id
+				}).then(function(res) {
+					var code = res.body.code;
+					var msg = res.body.msg;
+					if(code == "0000") {
+						alert(msg);
+					    $("#myModal-p").modal("hide");
+
+						_this.listenDate(this.cur);
+					}else{
+						alert(msg);
+					}
+				});
+			},
+			//确认退款
+			confirmRefund: function(id) {
+				var _this = this;
+				this.$http.post("/deal/mbTransaction/updateToSuccess", {
+					"id": id
+				}).then(function(res) {
+					var code = res.body.code;
+					var msg = res.body.msg;
+					if(code == "0000") {
+						alert(msg);
+						$("#myModal-p").modal("hide");
+
+						_this.listenDate(this.cur);
+					}else{
+						alert(msg);
+					}
+				});
+			},
+
+			tui: function(appid, orderId) {
+				if(appid == "1147483647") {
+					$(".detailA").attr("href", "/basics/particulars1");
+				}
+				sessionStorage.setItem('appid', appid);
+				sessionStorage.setItem('orderId', orderId);
+				sessionStorage.setItem('isOrderId', "1");
+			},
+			repayNext: function(id) {
+				this.$http.post("/risk/mbTransaction/repayNext", {
+					"id": id
+				}).then(function(res) {
+					var code = res.body.code;
+					var msg = res.body.msg;
+					if(code == "0000") {
+						alert(msg);
+					} else {
+						alert(msg);
+					}
+				});
+			},
+
+		},
+	})
+</script>
+
+<!--Real-time-chart-js-->

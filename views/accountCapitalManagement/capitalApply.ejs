@@ -1,0 +1,589 @@
+<% include ../header.ejs %>
+
+<!--交易管理--收款交易查询-->
+
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>统计分析</a>
+			<a href="#" class="current">现金流水分析</a>
+		</div>
+		<h1>现金流水分析</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+        <hr>
+        <div class="row-fluid">
+            <div class="widget-box">
+                <div class="widget-content nopadding">
+                    <form class="form-horizontal" id="signupForm" method="post" action="">
+                        <table class="table table-striped">
+                            <tbody>
+                            <tr class="odd gradeX">
+                               
+									<td>
+										<lable style="width: 80px;display: inline-block;float: left;">统计月份：</lable>
+										<a  class="btn" href="#" @click="datePre()" target="liquidation">上</a>
+								        <span v-text="year"></span><span>年</span><span v-text="month"></span><span>月</span>
+								        <a  class="btn" href="#" @click="dateNext()" target="liquidation">下</a>
+									</td>
+                            </tr>
+                            <tr>
+									<td><lable style="width: 80px;display: inline-block;float: left;">主体：</lable>
+										<button type="button" class="btn btn-primary getAccounts" @click="getAccounts(1)">想就拿</button>
+										<button type="button" class="btn getAccounts" @click="getAccounts(2)">沐金农</button>
+										<button type="button" class="btn getAccounts" @click="getAccounts(3)">喵财有道</button>
+									</td>
+								</tr>
+								
+								<tr>
+									<td style="white-space: nowrap;" class="span5"><lable style="width: 80px;display: inline-block;float: left;">账户名：</lable>
+										<select v-model="ourAccountId" >
+											<option value="0">请选择</option>
+											<option v-for="msg in accounts" v-bind:value="msg.accountId" v-text="msg.accountName"></option>
+										</select>
+									</td>
+								</tr>
+                            </tbody>
+                        </table>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+         
+		<div class="row-fluid tab-two" style="display: none;">
+					<div id="main" style="width: 1000px;height:600px;"></div>
+		</div>
+		<div class="row-fluid tab-two" style="display: none;">
+					<div id="main3" class="span4" style="height:300px;"></div>
+					<div id="main1" class="span8" style="height:300px;"></div>
+		</div>
+		<div class="row-fluid tab-two" style="display: none;">
+					<div id="main4" class="span4" style="height:300px;"></div>
+					<div id="main2" class="span8" style="height:300px;"></div>
+		</div>
+		
+	</div>
+</div>
+
+<% include ../footer.ejs %>
+
+<script src="/javascripts/jquery.min.js"></script>
+<script>
+		$(function(){
+			$(".getAccounts").click(function(){
+				$(this).addClass("btn-primary").siblings().removeClass("btn-primary");
+			})
+		})
+	</script>
+<script>
+	
+	$(function(){
+		// $("#one").click();
+		// $("#submit").click();
+		$("#ADDsubmit").click(function(){
+			$("#shangchuan_list").show();
+			$("#logoUrl").val("");
+			$("#fsUploadProgress").html("");
+		})
+	})
+	function closes(){
+		$("#shangchuan_list").hide();
+	}
+	function dels(e) {
+		    var attrsVal=$("#attrs").val();
+		    var arr=attrsVal.split(',');
+		    arr.splice($(e).parent(".qiniu").index(),1);
+		    var arrs= arr.join(",");
+		    $("#attrs").val(arrs);
+		    $(e).parents(".qiniu").remove();
+		    return arr;
+		}
+</script>
+
+
+<script>
+
+    function dataTime(num) {
+        //console.log(num)
+        var yugi = function(num) {
+            var now1 = new Date;
+            var getFullYear = now1.getFullYear();
+            var getMonth = now1.getMonth() + 1;
+            var getDate = now1.getDate();
+            var DateTime1 = getFullYear + "-" + getMonth + "-" + getDate;
+            $("#datepicker1").val(DateTime1)
+            var now = new Date;
+            now.setDate(now.getDate() - num);
+            var getFullYear = now.getFullYear();
+            var getMonth = now.getMonth() + 1;
+            var getDate = now.getDate();
+            var DateTime = getFullYear + "-" + getMonth + "-" + getDate;
+            $("#datepicker").val(DateTime)
+            if(num == "1") {
+                $("#datepicker").val(DateTime);
+                $("#datepicker1").val(DateTime);
+            }
+            var timestamp = new Date();
+            //alert(starttimeHaoMiao);
+            var DateTime_starttimeHaoMiao = DateTime;
+            var DateTime_starttimeHaoMiao1 = DateTime1;
+            var starttimeHaoMiao = (new Date(DateTime_starttimeHaoMiao)).getTime();
+            var starttimeHaoMiao1 = (new Date(DateTime_starttimeHaoMiao1)).getTime();
+
+            $("#starttimeHaoMiao").val(starttimeHaoMiao)
+            $("#starttimeHaoMiao1").val(starttimeHaoMiao1)
+            return now;
+
+        }
+        yugi(num);
+    }
+
+    $(function() {
+
+        $("#datepicker").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "1900:2050",
+        })
+        $("#datepicker1").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "1900:2050",
+        })
+        /*$("#reset").click(function(){
+         $("#signupForm").find("input,select").val("")
+         })*/
+    });
+
+    dataTime(0);
+</script>
+
+<script src="/javascripts/vue-resource.js"></script>
+<script src="/javascripts/public_page.js"></script>
+<script src="/javascripts/time_filter.js"></script>
+
+<script type="text/javascript" src="/javascripts/bower_components/plupload/js/moxie.js"></script>
+<script type="text/javascript" src="/javascripts/bower_components/plupload/js/plupload.dev.js"></script>
+<script type="text/javascript" src="/javascripts/bower_components/plupload/js/i18n/zh_CN.js"></script>
+<script src="/javascripts/jquery-ui.js"></script>
+
+<!--<script src="/javascripts/highcharts.js"></script>
+-->
+<script src="/javascripts/echarts.min.js"></script>
+<!--<script src="/javascripts/data.js"></script>
+	<script src="/javascripts/highcharts-zh_CN.js"></script>-->
+	<script>
+
+	</script>
+
+<script type="text/javascript">
+
+var total = "";
+	var pageBar = new Vue({
+        el: '#content',
+        data: {
+            all: 0, //总页数
+            cur: 1,//当前页码
+            msg:'',
+
+ourAccountId:'0',
+            year:'',
+            month:'',
+            hasMonth:false,
+            dateOffset:'',
+
+            accounts:'',
+            pageTotal:"",
+            collectionList:"",
+
+            id1:'',
+            time1:'',
+            amount1:'',
+            ourAccountName1:'',
+            ourAccountNo1:'',
+            reciprocalAccountName1:'',
+            reciprocalAccountNo1:'',
+            payType1:"",
+            payTypeStr:"",
+            applyReason:"",
+            
+            main_timeList:"",
+        },
+     
+        watch: {
+            cur: function(oldValue , newValue){
+                // console.log('监听cur前与后的值：');
+                // console.log(arguments);
+            },
+            ourAccountId:function(){
+            	this.listenDate();
+            }
+        
+             },
+        mounted:function(){
+        	this.time();
+            this.getAccounts(1);
+
+		},
+        methods:{
+            listenDate:function(data){
+                var ourAccountId = this.ourAccountId;
+                var year = this.year;
+                var month = this.month;
+                if(ourAccountId==""){
+                	alert("请选择帐户名");
+                	return false;
+                }
+				$(".loading").show();
+            	$(".tab-two").show();
+            	$("#page").show();
+				this.$http.post("/accountCapital/reconciliation/reconciliationManager",{
+                    "ourAccountId": ourAccountId,
+                    "year": year,
+                    "month": month,
+                    "analysis":"true",
+                }).then(function(res){
+                	$(".loading").hide();
+					 //console.log(res);
+					$(".loading").hide();
+					 if(res.body.code=="D1007"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 if(res.body.code=="D1006"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 this.pay_payList = res.body.res.pay.payList;
+					 this.pay_payTypeList = res.body.res.pay.payTypeList;
+					 this.pay_payTypeListAndPay = res.body.res.pay.payTypeListAndPay;
+					 
+					 this.receive_receiveList = res.body.res.receive.receiveList;
+					 this.receive_payTypeList = res.body.res.receive.payTypeList;
+					 this.receive_payTypeListAndReceive = res.body.res.receive.payTypeListAndReceive;
+					 
+					 this.main_payList = res.body.res.main.payList;
+					 this.main_timeList = res.body.res.main.timeList;
+					 this.main_balanceList = res.body.res.main.balanceList;
+					 this.main_receiveList = res.body.res.main.receiveList;
+					 this.main = res.body.res.main;
+					 var main_timeList=this.main_timeList;
+					 var main_payList=this.main_payList;
+					 var main_receiveList=this.main_receiveList;
+					 var main_balanceList=this.main_balanceList;
+					 
+					 var pay_payList=this.pay_payList;
+					 var pay_payTypeList=this.pay_payTypeList;
+					 var pay_payTypeListAndPay=this.pay_payTypeListAndPay;
+					 
+					 
+					 
+					 var receive_receiveList=this.receive_receiveList;
+					 var receive_payTypeList=this.receive_payTypeList;
+					 var receive_payTypeListAndReceive=this.receive_payTypeListAndReceive;
+					  // 基于准备好的dom，初始化echarts实例
+						var myChart = echarts.init(document.getElementById('main'));
+							
+							        option = {title: {
+								        text: '月交易分布',
+								    },
+							    tooltip: {
+							        trigger: 'axis',
+							        axisPointer: {
+							            type: 'cross',
+							            crossStyle: {
+							                color: '#999'
+							            }
+							        }
+							    },
+//							    toolbox: {
+//							        feature: {
+//							            dataView: {show: true, readOnly: false},
+//							            magicType: {show: true, type: ['line', 'bar']},
+//							            restore: {show: true},
+//							            saveAsImage: {show: true}
+//							        }
+//							    },
+							   
+							    xAxis: [
+							        {
+							            type: 'category',
+							            data: main_timeList,
+							            axisPointer: {
+							                type: 'shadow'
+							            }
+							        }
+							    ],
+							    yAxis: [
+							        {
+							            type: 'value',
+							            name: '金额',
+							            min: 0,
+							            //max: 10000000,
+							            //interval: 1000000,
+							            axisLabel: {
+							                formatter: '{value} 元'
+							            }
+							        },
+							        {
+							            type: 'value',
+							            name: '',
+							            min: "0",
+							            //max: 1000000,
+							            //interval:1000000 ,
+							            axisLabel: {
+							                //formatter: '{value} °C'
+							            }
+							        }
+							    ],
+							    series: [
+							    
+							    {
+								            name: '支出',
+								             type:'bar',
+								            data: main_payList
+								        }, {
+								            name: '收入',
+								             type:'bar',
+								            data: main_receiveList
+								        },
+								        {
+								            name:'余额',
+								            type:'line',
+								            yAxisIndex: 1,
+								            data:main_balanceList
+								        }
+							    ]
+							};
+
+					        myChart.setOption(option);
+					        
+					         var myChart1 = echarts.init(document.getElementById('main1'));
+					        option1 = {
+								    title: {
+								        text: '月收入交易分布',
+								    },
+								    tooltip: {
+								        trigger: 'axis',
+								        axisPointer: {
+								            type: 'shadow'
+								        }
+								    },
+								    itemStyle: {   
+							                //通常情况下：
+							                normal:{  
+							                    color: function (params){
+							                        var colorList =['#003366', '#006699', '#4cabce', '#e5323e','b595b6'];
+							                        return colorList[params.dataIndex];
+							                    }
+							                }
+							               },
+								    
+								    grid: {
+								        left: '3%',
+								        right: '4%',
+								        bottom: '3%',
+								        containLabel: true
+								    },
+								    xAxis: {
+								        type: 'value',
+								        boundaryGap: [0, 0.01]
+								    },
+								    yAxis: {
+								        type: 'category',
+								        data: receive_payTypeList
+								    },
+								    series: [
+								    
+								        {
+									            name: '收入金额（元）',
+									            type: 'bar',
+									            data: receive_receiveList
+									        }
+								    ]
+								};
+					        myChart1.setOption(option1);
+
+					        var myChart2 = echarts.init(document.getElementById('main2'));
+					        option2 = {
+								    title: {
+								        text: '月支出交易分布',
+								    },
+								    tooltip: {
+								        trigger: 'axis',
+								        axisPointer: {
+								            type: 'shadow'
+								        }
+								    },
+								    
+								     itemStyle: {   
+							                //通常情况下：
+							                normal:{  
+							                    color: function (params){
+							                        var colorList = ['#003366', '#006699', '#4cabce', '#e5323e','b595b6'];
+							                        return colorList[params.dataIndex];
+							                    }
+							                }
+							               },
+								    grid: {
+								        left: '3%',
+								        right: '4%',
+								        bottom: '3%',
+								        containLabel: true
+								    },
+								    xAxis: {
+								        type: 'value',
+								        boundaryGap: [0, 0.01]
+								    },
+								    yAxis: {
+								        type: 'category',
+								        data: pay_payTypeList
+								    },
+								    series: [
+								    
+								        {
+									            name: '支出金额（元）',
+									            type: 'bar',
+									            data: pay_payList
+									        }
+								    ]
+								};
+					        myChart2.setOption(option2);
+					        
+					        var myChart3 = echarts.init(document.getElementById('main3'));
+					        
+					        option3 = {
+							    title : {
+							        text: '月收入饼状图',
+							        subtext: '',
+							        x:'center'
+							    },
+							    tooltip : {
+							        trigger: 'item',
+							        formatter: "{a} <br/>{b} : {c} ({d}%)"
+							    },
+							    color:['#003366', '#006699', '#4cabce', '#e5323e','b595b6'] ,
+							    legend: {
+							        orient: 'vertical',
+							        left: 'left',
+							        //data: ['直接访问','邮件营销','联盟广告','视频广告','搜索引擎']
+							    },
+							    series : [
+							        {
+							            name: '',
+							            type: 'pie',
+							            radius : '55%',
+							            center: ['50%', '60%'],
+							            data:receive_payTypeListAndReceive,
+							            itemStyle: {
+							                emphasis: {
+							                    shadowBlur: 10,
+							                    shadowOffsetX: 0,
+							                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+							                }
+							            }
+							        }
+							    ]
+							};
+							myChart3.setOption(option3);
+							
+							var myChart4 = echarts.init(document.getElementById('main4'));
+					        
+					        option4 = {
+							    title : {
+							        text: '月支出饼状图',
+							        subtext: '',
+							        x:'center'
+							    },
+							    tooltip : {
+							        trigger: 'item',
+							        formatter: "{a} <br/>{b} : {c} ({d}%)"
+							    },
+							    color:['#003366', '#006699', '#4cabce', '#e5323e','b595b6'] ,
+							    legend: {
+							        orient: 'vertical',
+							        left: 'left',
+							        //data: ['直接访问','邮件营销','联盟广告','视频广告','搜索引擎']
+							    },
+							    series : [
+							        {
+							            name: '',
+							            type: 'pie',
+							            radius : '55%',
+							            center: ['50%', '60%'],
+							            data:pay_payTypeListAndPay,
+							            itemStyle: {
+							                emphasis: {
+							                    shadowBlur: 10,
+							                    shadowOffsetX: 0,
+							                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+							                }
+							            }
+							        }
+							    ]
+							};
+							myChart4.setOption(option4);
+					     
+				});
+	        },
+
+	        time:function(){
+                var endDate = new Date();
+                dateOffset = 0;
+                this.year = endDate.getFullYear();
+                this.month = endDate.getMonth()+1;
+                if(this.month < 10) this.month = this.month;
+            },
+
+            datePre:function(){
+                dateOffset = dateOffset - 1;
+                var endDate = new Date();
+                endDate.setMonth(endDate.getMonth()+dateOffset);
+                this.year = endDate.getFullYear();
+                this.month = endDate.getMonth()+1;
+                if(this.month < 10) this.month = this.month;
+                this.listenDate(1);
+            },
+            dateNext:function(){
+                dateOffset = dateOffset + 1;
+                var endDate = new Date();
+                 endDate.setMonth(endDate.getMonth()+dateOffset);
+                this.year = endDate.getFullYear();
+                this.month = endDate.getMonth()+1;
+                if(this.month < 10) this.month = this.month;
+                this.listenDate(1);
+            },
+	        resets:function(){
+
+                $("#datepicker").val("");
+                $("#datepicker1").val("");
+
+                this.startTime='';
+                this.endTime='';
+                this.payType='';
+                this.status='';
+                this.reciprocalAccountNo='';
+                this.reciprocalAccountName='';
+                this.ourAccountId='';
+                this.orderId='';
+            },
+            getAccounts:function(data){
+            	
+            	var enterpriseType= parseInt(data);
+            	this.$http.post("/accountCapital/reconciliation/getAccounts",{
+                    "enterpriseType": enterpriseType,
+                }).then(function(res){
+                	//console.log(res)
+                	this.ourAccountId=0;
+                	 this.accounts=res.body.res;
+				});
+            },
+
+
+        }
+    })
+</script>

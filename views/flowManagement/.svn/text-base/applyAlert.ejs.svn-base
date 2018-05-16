@@ -1,0 +1,110 @@
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;width: auto;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    提交对账申请
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row-fluid">
+                        <form id="addNewRule">
+                            <div class="widget-content nopadding form-horizontal">
+                                <table class="table table-striped">
+                                    <tbody>
+                                        <tr class="odd gradeX">
+                                            <td width="85" style="white-space: nowrap;">账单时间 :</td>
+                                            <td width="300" style="white-space: nowrap;">{{time1 | time}}</td>
+                                            <td width="85" style="white-space: nowrap;">收支金额 :</td>
+                                            <td width="300" style="white-space: nowrap;" v-text="amount1/100"></td>
+                                        </tr>
+                                        <tr class="odd gradeX">
+                                            <td width="85" style="white-space: nowrap;">我方账户 :</td>
+                                            <td width="" style="white-space: nowrap;" v-text="ourAccountName1"></td>
+                                            <td width="85" style="white-space: nowrap;">对方账户 :</td>
+                                            <td width="" style="white-space: nowrap;">
+                                            	<input type="text" v-model="reciprocalAccountName1"/>
+                                            </td>
+                                        </tr>
+                                        <tr class="odd gradeX">
+                                            <td width="85" style="white-space: nowrap;">我方账号 :</td>
+                                            <td width="" style="white-space: nowrap;" v-text="ourAccountNo1"></td>
+                                            <td width="85" style="white-space: nowrap;">对方账号 :</td>
+                                            <td width="" style="white-space: nowrap;">
+                                            	<input type="text" v-model="reciprocalAccountNo1"/>
+                                            </td>
+                                        </tr>
+                                        <tr class="odd gradeX">
+                                            <td width="85" style="white-space: nowrap;">交易类型 :</td>
+                                            <td width="" style="white-space: nowrap;">
+                                                <select name=""  v-model="payType1" id="alertPayType1">
+                                                    <option value="1" selected v-if="payType1=='1'">用户放款</option>
+                                                    <option value="1" v-else>用户放款</option>
+                                                    <option value="2" selected v-if="payType1=='2'">用户还款</option>
+                                                    <option value="2" v-else>用户还款</option>
+                                                    <option value="3" selected v-if="payType1=='3'">资方放款</option>
+                                                    <option value="3" v-else>资方放款</option>
+                                                    <option value="4" selected v-if="payType1=='4'">资方还款</option>
+                                                    <option value="4" v-else>资方还款</option>
+                                                    <option value="5" selected v-if="payType1=='5'">提现</option>
+                                                    <option value="5" v-else>提现</option>
+                                                    <option value="6" selected v-if="payType1=='6'">充值</option>
+                                                    <option value="6" v-else>充值</option>
+                                                    <option value="7" selected v-if="payType1=='7'">退款</option>
+                                                    <option value="7" v-else>退款</option>
+                                                    <option value="8" selected v-if="payType1=='8'">其它</option>
+                                                    <option value="8" v-else>其它</option>
+                                                </select>
+                                            </td>
+                                            <td width="85" style="white-space: nowrap;">类型说明 :</td>
+                                            <td width="" style="white-space: nowrap;">
+                                                <input type="text" class="input" name="" v-model="payTypeStr" id="alertPayTypeStr">
+                                            </td>
+                                        </tr>
+                                        <tr class="odd gradeX">
+                                            <td width="85" style="white-space: nowrap;">说明 :</td>
+                                            <td width="" style="white-space: nowrap;" colspan="3">
+                                                <textarea name="" rows="" cols="" v-model="applyReason" id="alertApplyReason"></textarea>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="alertBtnSubmit" data-dismiss="modal" @click="applySubmit()">
+                    提交申请
+                </button>
+                <button type="button" class="btn btn-primary" id="alertBtnCannel" data-dismiss="modal" @click="alertCannel()">取消</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal -->
+</div>
+<script>
+    function alertAuditMode(){
+        $("#myModalLabel").html("对账审批");
+        $("#alertBtnCannel").html("驳回");
+        $("#alertBtnSubmit").html("通过");
+        $("#alertPayType1").attr("disabled","true");
+        $("#alertPayTypeStr").attr("readonly","readonly");
+        $("#alertApplyReason").attr("readonly","readonly");
+    }
+    function alertDetailMode(){
+        $("#myModalLabel").html("对账审批");
+        $("#alertBtnCannel").html("退出");
+        $("#alertBtnSubmit").html("通过");
+        $("#alertBtnSubmit").hide();
+        $("#alertPayType1").attr("disabled","readonly");
+        $("#alertPayTypeStr").attr("readonly","readonly");
+        $("#alertApplyReason").attr("readonly","readonly");
+    }
+</script>

@@ -1,0 +1,388 @@
+<% include ../header.ejs %>
+
+<!--交易管理--收款交易查询-->
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>渠道费用管理</a>
+			<a href="#" class="current">渠道费用管理</a>
+		</div>
+		<h1>渠道费用管理</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+		<div class="row-fluid">
+			<div class="widget-box">
+				<div class="widget-content nopadding">
+					<form class="form-horizontal" id="signupForm" method="post" action="">
+						<table class="table table-striped">
+							<tbody>
+								<tr class="odd gradeX">
+									<td width="85" style="white-space: nowrap;">时间 :</td>
+									<td width="500" style="white-space: nowrap;">
+										<input type="text" class="input" style="float: left;" id="datepicker" readonly="readonly" name="repaymentStart">
+										<input type="text" class="input" style="float: left;" id="datepicker1" readonly="readonly" name="repaymentEnd">
+									</td>
+									<td width="100" style="white-space: nowrap;">
+										筛选APP：
+									</td>
+									<td>
+										<select name="productLine" id="productLine" v-model="productId">
+											<option value="">全部</option>
+											<option v-for="pro in ProList" v-bind:value="pro.id" v-text="pro.productName"></option>
+										</select>
+									</td>
+									<td width="100" style="white-space: nowrap;">
+										筛选渠道：
+									</td>
+									<td>
+										<select name="productLine" id="productLine" v-model="channelId">
+											<option value="">全部</option>
+											<option v-for="Qdao in QdaoList" v-bind:value="Qdao.id" v-text="Qdao.channelName"></option>
+										</select>
+									</td>
+									<td width="100" style="white-space: nowrap;"></td>
+									<td>
+										<button type="button" id="submit" class="btn btn-success" @click="listenDate(1)">查找</button>
+										<button type="button" id="reset" class="btn btn-success" @click="resets()">重置</button></td>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+						</tr>
+
+						</tbody>
+						</table>
+					</form>
+
+				</div>
+			</div>
+		</div>
+		<div class="form-actions _header">
+		<button type="button" data-toggle="modal" data-target="#myModal" class="btn btn-primary">新增</button>
+		</div>
+		<div class="row-fluid">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5></h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>日期</th>
+									<th>APP</th>
+									<th>渠道</th>
+									<th>花费(元)</th>
+									<th>操作人</th>
+									<th>操作时间</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+							    <tr v-for="msg in payList">
+									<td>{{msg.beginDate}}至{{msg.endDate}}</td>
+									<td v-text="msg.productName"></td>
+									<td v-text="msg.channelName"></td>
+									
+									<td v-text="msg.amount/100"></td>
+									<td v-text="msg.operationUserName"></td>
+									<td>{{msg.updateTime|time}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+							新增渠道推广费用
+						</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">推广金额 :</label>
+											<div class="controls">
+												<input type="text" class="input"  v-model="money" onkeyup="value=value.replace(/\.\d{2,}$/,value.substr(value.indexOf('.'),3))">
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">推广开始时间 :</label>
+											<div class="controls">
+												<input type="text" class="input"  id="datepicker2" readonly="readonly" name="repaymentStart">
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">推广结束时间 :</label>
+											<div class="controls">
+												<input type="text" class="input"  id="datepicker3" readonly="readonly" name="repaymentEnd">
+
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">推广APP :</label>
+											<div class="controls">
+												<select  v-model="productId_add">
+													<option value="">全部</option>
+													<option v-for="pro in ProList" v-bind:value="pro.id" v-text="pro.productName"></option>
+												</select>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">推广渠道 :</label>
+											<div class="controls">
+												<select v-model="channelId_add">
+													<option value="">全部</option>
+													<option v-for="Qdao in QdaoList" v-bind:value="Qdao.id" v-text="Qdao.channelName"></option>
+												</select>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+					    <button type="button" class="btn btn-default" id="btn-default" data-dismiss="modal" >关闭</button>
+						<button type="button" id="baocun" class="btn btn-primary" @click="addQdao">保存</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+		<div id="page">
+			<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+		</div>
+	</div>
+</div>
+
+<!--<script src="/javascripts/jquery.min.js"></script>
+<script src="/javascripts/jquery-ui.js"></script>-->
+<% include ../footer.ejs %>
+<script>
+
+	function dataTime(num) {
+		//console.log(num)
+		var yugi = function(num) {
+			var now1 = new Date;
+			var getFullYear = now1.getFullYear();
+			var getMonth = now1.getMonth() + 1;
+			var getDate = now1.getDate();
+			var DateTime1 = getFullYear + "-" + getMonth + "-" + getDate;
+			$("#datepicker1").val(DateTime1)
+			var now = new Date;
+			now.setDate(now.getDate() - num);
+			var getFullYear = now.getFullYear();
+			var getMonth = now.getMonth() + 1;
+			var getDate = now.getDate();
+			var DateTime = getFullYear + "-" + getMonth + "-" + getDate;
+			$("#datepicker").val(DateTime)
+			if(num == "1") {
+				$("#datepicker").val(DateTime);
+				$("#datepicker1").val(DateTime);
+			}
+			var timestamp = new Date();
+			//alert(starttimeHaoMiao);
+			var DateTime_starttimeHaoMiao = DateTime;
+			var DateTime_starttimeHaoMiao1 = DateTime1;
+			var starttimeHaoMiao = (new Date(DateTime_starttimeHaoMiao)).getTime();
+			var starttimeHaoMiao1 = (new Date(DateTime_starttimeHaoMiao1)).getTime();
+
+			$("#starttimeHaoMiao").val(starttimeHaoMiao)
+			$("#starttimeHaoMiao1").val(starttimeHaoMiao1)
+			return now;
+
+		}
+		yugi(num);
+	}
+
+	$(function() {
+		$("#datepicker").datepicker({
+			changeMonth: true,
+			changeYear: true,
+			yearRange: "1900:2050",
+		})
+		$("#datepicker1").datepicker({
+			changeMonth: true,
+			changeYear: true,
+			yearRange: "1900:2050",
+		})
+		$("#datepicker2").datepicker({
+			changeMonth: true,
+			changeYear: true,
+			yearRange: "1900:2050",
+		})
+		$("#datepicker3").datepicker({
+			changeMonth: true,
+			changeYear: true,
+			yearRange: "1900:2050",
+		})
+		/*$("#reset").click(function(){
+			$("#signupForm").find("input,select").val("")
+		})*/
+	});
+
+</script>
+<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+<script src="/javascripts/jquery-ui.js"></script>
+<script src="/javascripts/vue-resource.js"></script>
+<script src="/javascripts/public_page.js"></script>
+<script src="/javascripts/time_filter.js"></script>
+<script type="text/javascript">
+var total = "";
+	var pageBar = new Vue({
+        el: '#content',
+        data: {
+            all: 0, //总页数
+            cur: 1,//当前页码
+            ProList:"",
+            QdaoList:"",
+            channelcostList:"",
+            channelId:"",
+            productId:"",
+            payList:"",
+            money:"",
+            channelId_add:"",
+            productId_add:"",
+        },
+        components:{
+            'vue-nav':pagenav
+        },
+        watch: {
+            cur: function(oldValue , newValue){
+            }
+        },
+        mounted:function(){
+			this.listenDate(this.cur);
+			this.productList();
+			this.qudaoList();
+			
+		},
+		
+        methods:{
+        	//新增渠道列表
+        	addQdao:function(){
+				var _this = this;
+				var start = $("#datepicker2").val();
+				var end = $("#datepicker3").val();
+				var money= this.money*100;
+				var productId_add= this.productId_add;
+				var channelId_add = this.channelId_add;
+				if(money==""){
+					alert("金额不能为空");
+					return false;
+				}else if(start==""){
+					alert("请选择开始时间");
+					return false;
+				}else if(end==""){
+					alert("请选择结束时间");
+					return false;
+				}else if(productId_add==""){
+					alert("请选择推广APP");
+					return false;
+				}else if(channelId_add==""){
+					alert("请选择推广渠道");
+					return false;
+				}else{
+					$(".loading").show();
+					var _this = this;
+					this.$http.post("/channelcost/extensionChannelCost/saveExtCost",{"amount":money,"channelId":channelId_add,"productId":productId_add,"beginDate":start,"endDate":end}).then(function(res){
+						//console.log(res)
+						var code=res.body.code;
+						var msg = res.body.msg;
+						//alert(1111111111111)
+						if(code=="D1007"){
+						 	alert(msg);
+						 	return false;
+						 }
+						 if(code=="D1006"){
+						 	alert(msg);
+						 	return false;
+						 }
+						if(code=="0000"){
+							alert(msg)
+							$("#btn-default").click();
+							_this.listenDate(this.cur);
+							$("#datepicker2").val("");
+							$("#datepicker3").val("");
+							$(".loading").hide();
+							_this.money="";
+							_this.productId_add="";
+							_this.channelId_add="";
+						}else if(code=="0001"){
+                            alert(msg);
+						}
+					});
+				}
+
+		    },
+        	qudaoList:function(){
+            	var _this = this;
+                this.$http.post("/channelcost/extensionChannelCost/jsonExt",{}).then(function(res){
+                	//console.log(res);
+					_this.QdaoList=res.body.res.extensionChannelCost;
+				});
+
+            },
+        	productList:function(){
+            	var _this = this;
+                this.$http.post("/pay/product/jsonPro",{}).then(function(res){
+					_this.ProList=res.body.res.products;
+				});
+
+            },
+            //分页查询
+			listenDate:function(data){
+				$(".loading").show();
+				var _this = this;
+				var start = parseInt((new Date($("#datepicker").val())).getTime());
+				var end = parseInt((new Date($("#datepicker1").val())).getTime());
+				var channelId= this.channelId;
+				var productId = this.productId;
+				//console.log(productId)
+				var pageSize = 10;
+				this.$http.post("/channelcost/extensionChannelCost/jsonExtCost",{"pageNum":data,"pageSize":pageSize,"beginDate":start,"endDate":end,"channelId":channelId,"productId":productId}).then(function(res){
+					$(".loading").hide();
+					//console.log(res)
+					if(res.body.code=="D1007"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 if(res.body.code=="D1006"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 _this.payList = res.body.res.extensionChannelCost.res;
+					  //console.log(res)
+					  _this.pageTotal = res.body.res.extensionChannelCost.total;
+                     $(".table_toggle").show();
+					if (data<=1) {
+						total = Math.ceil(_this.pageTotal/10);
+					}
+					   _this.all = total;
+					   _this.cur = data;
+				});
+	        },
+            resets:function(){
+            	$("#datepicker").val("");
+            	$("#datepicker1").val("");
+            }
+        }
+    })
+</script>

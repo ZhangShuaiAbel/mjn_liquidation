@@ -1,0 +1,661 @@
+<% include ../header.ejs %>
+<style>
+	.file {
+    position: relative;
+    display: inline-block;
+    background: #D0EEFF;
+    border: 1px solid #99D3F5;
+    border-radius: 4px;
+    padding: 4px 12px;
+    overflow: hidden;
+    color: #1E88C7;
+    text-decoration: none;
+    text-indent: 0;
+    line-height: 20px;
+	}
+	.file input {
+	    position: absolute;
+	    font-size: 100px;
+	    right: 0;
+	    top: 0;
+	    opacity: 0;
+	}
+
+</style>
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>交易管理</a>
+			<a href="#" class="current">推单</a>
+		</div>
+		<h1>推单</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+		
+		<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+			<a  class="btn2" href="/deal/credit" target="liquidation">放款</a>
+			<a  class="btn2 cur1" href="/deal/pushSingle" target="liquidation">推单</a>
+			<a  class="btn2" href="/deal/gatheringDeal" target="liquidation">还款</a>
+			<a  class="btn2" href="/deal/refund"  target="liquidation">退款</a>
+<!--			<a  class="btn2" href="/deal/serviceCharge" target="liquidation">服务费</a>
+-->			<!--<a  class="btn btn-primary" href="/deal/capitalLoan" class="btn btn-primary" target="liquidation">资金放款</a>-->
+			<a  class="btn2" href="/deal/cash"  target="liquidation">兑付</a>
+			<a  class="btn2" href="/deal/repayearly"  target="liquidation">提前还款</a>
+		</div>
+		
+
+		<hr>
+		<div class="row-fluid">
+			<div class="widget-box">
+				<div class="widget-content nopadding">
+					<form class="form-horizontal" method="post" action="">
+						<table class="table table-striped">
+							<tbody>
+								<tr class="odd gradeX">
+									<td width="85" style="white-space: nowrap;">交易时间 :</td>
+									<td width="600" style="white-space: nowrap;">
+										<input type="text" class="input" id="datepicker" readonly="readonly" name="repaymentStart">
+										<input type="text" class="input" id="datepicker1" readonly="readonly" name="repaymentEnd">
+									</td>
+									<td width="85" style="white-space: nowrap;">时间类型 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" v-model="timeType">
+											<option value="1">创建时间</option>
+											<option value="2">审批时间</option>
+											<option value="3">打款时间</option>
+											<option value="4">用户放款时间</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td width="85" style="white-space: nowrap;">业务类型 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" v-model="productType">
+											<option value="1">现金贷</option>
+											<option value="2">商品贷</option>
+										</select>
+									</td>
+									<td width="85" style="white-space: nowrap;">交易订单号 :</td>
+									<td width="" style="white-space: nowrap;">
+										<input type="text" class="input" v-model="transactionOrderId" oninput="this.value=this.value.replace(/\D/g,'');if(isNaN(value))execCommand('undo');" >
+									</td>
+								</tr>
+								<tr class="odd gradeX">
+									
+									<td width="85" style="white-space: nowrap;">交易状态 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" v-model="status">
+											<option value="">所有</option>
+											<option value="2">失败</option>
+											<option value="3">审核中</option>
+											<option value="4">审核通过</option>
+											<option value="5">拒绝</option>
+											<option value="6">已放款</option>
+										</select>
+									</td>
+									<td width="85" style="white-space: nowrap;">商户订单号 :</td>
+									<td width="" style="white-space: nowrap;">
+										<input type="text" class="input" name="" v-model="channelOrderId">
+									</td>
+								</tr>
+								<tr class="odd gradeX">
+									<td width="85" style="white-space: nowrap;">账户主体 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" id="" required v-model="accountType">
+											<option value="">所有</option>
+											<option v-for="bb in licenseList" v-bind:value="bb.id" v-text="bb.enterpriseName"></option>
+										</select>
+									</td>
+									<td width="85" style="white-space: nowrap;">资方 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" v-model="channelType">
+											<option value="">所有</option>
+											<option value="1">玖富</option>
+											<option value="2">蜡笔</option>
+											<option value="3">团贷</option>
+											<option value="4">小鸡理财</option>
+											<option value="5">自己放款</option>
+											<option value="6">拿财</option>
+											<option value="7">中业兴融</option>
+											<option value="8">玖财通</option>
+										</select>
+									</td>
+									
+								</tr>
+								<tr>
+									<td width="85" style="white-space: nowrap;">基础订单号 :</td>
+									<td width="" style="white-space: nowrap;"><input type="text" class="input" name="" v-model="basicOrderId" oninput="this.value=this.value.replace(/\D/g,'');if(isNaN(value))execCommand('undo');" ></td>
+									<td width="85" style="white-space: nowrap;">用户账户 :</td>
+									<td width="" style="white-space: nowrap;"><input type="text" class="input" name="" v-model="others">
+									<span style="margin-left: 20px">
+											<button type="button" id="submit" class="btn btn-success" @click="listenDate(1)">查找</button>
+	                                    	<button type="button" id="submit" class="btn btn-success" @click="resets()" >重置</button>
+                                    	</span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+					</form>
+				</div>
+			</div>
+		</div>
+    	
+         
+  <!--  <input type="file" id="uploadFiles" name="file" @click="uploadButton"><br/>
+    <input type="hidden" id="flag" name="flag" value="ajax文件上传"/>
+    <input type="hidden" id="authToken" />
+    <input type="button" id="btnUpload" value="上传图片" />-->
+    
+    
+   <!--<input id="fileToUpload " type="file" size="20" name="fileToUpload " class="input"> 
+	<button class="button" id="buttonUpload" onclick="return ajaxFileUpload ();">上传</button> -->
+		<hr>
+		<div class="row-fluid">
+			<div class="" style="width: 20%;float: left;">
+				<div style="padding:0 10px;">
+					<div class="row-fluid">
+						<div class="span12">
+							<div class="span-box-one" style="background: rgb(255, 255, 255);">
+								<p><span style="font-size: 28px;word-wrap:break-word ;" id="tjCount">0</span><br><span style="margin: 0px 10px;">总订单数</span></p>
+							</div>
+						</div>
+						<!---->
+					</div>
+				</div>
+				
+			</div>
+			<div class="" style="width: 20%;float: left;">
+				<div style="padding:0 10px;">
+					<div class="row-fluid">
+						<div class="span12">
+							<div class="span-box-one" style="background: rgb(255, 255, 255);">
+								<p><span style="font-size: 28px;word-wrap:break-word ;" id="tjAmount">0</span><br><span style="margin: 0px 10px;">总交易额</span></p>
+							</div>
+						</div>
+						<!---->
+					</div>
+				</div>
+			</div>
+			<div class="" style="width: 20%;float: left;">
+				<div style="padding:0 10px;">
+					<div class="row-fluid">
+						<div class="span12">
+							<div class="span-box-one" style="background: rgb(255, 255, 255);">
+								<p><span style="font-size: 28px;word-wrap:break-word ;" id="tjLoanAmount">0</span><br><span style="margin: 0px 10px;">总放款金额</span></p>
+							</div>
+						</div>
+						<!---->
+					</div>
+				</div>
+			</div>
+			<div class="" style="width: 20%;float: left;">
+				<div style="padding:0 10px;">
+				<div class="row-fluid">
+					<div class="span12">
+						<div class="span-box-one" style="background: rgb(255, 255, 255);">
+							<p><span style="font-size: 28px;word-wrap:break-word ;" id="tjBailSum">0</span><br><span style="margin: 0px 10px;">总保证金</span></p>
+						</div>
+					</div>
+					<!---->
+				</div>
+				</div>
+			</div>
+			<div class="" style="width: 20%;float: left;">
+				<div style="padding:0 10px;">
+				<div class="row-fluid">
+					<div class="span12">
+						<div class="span-box-one" style="background: rgb(255, 255, 255);">
+							<p><span style="font-size: 28px;word-wrap:break-word ;" id="tjPoundageSum">0</span><br><span style="margin: 0px 10px;">总服务费</span></p>
+						</div>
+					</div>
+					<!---->
+				</div>
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row-fluid tab-two" style="display: none">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>订单明细
+							
+							<span class="badge badge-success" style="position: absolute; cursor: pointer; top: 8px; right: 62px; padding: 3px 10px;">
+								上传
+								<form  id="uploadForm" enctype="multipart/form-data" style="width: 30px;
+position: absolute;
+top: 0;
+left: 0;overflow: hidden;">
+						    		 <input type="file" name="filename" id="filename" class="file" style="width: 30px;opacity: 0;" @click="uploadButton">  
+							         <input type="hidden" name="authToken" id="authToken" />
+						    	</form>
+							</span>
+							
+							
+							
+							<span id="submit_down" @click="downLoad" class="badge badge-success" style="position: absolute; cursor: pointer; top: 8px; right: 10px; padding: 3px 10px;">下载</span></h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>创建时间</th>
+									<th>业务类型</th>
+									<th>交易订单号</th>
+									<th>商户订单号</th>
+									<th>我方账户</th>
+									<th>资方</th>
+									<th>用户|银行卡</th>
+									<!--<th>推单金额</th>-->
+									<th>保证金额</th>
+									<th>放款金额</th>
+									<th>服务费</th>
+									<th>状态</th>
+									<th>基础订单号</th>
+									<th width="100" style="white-space: nowrap;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+								<tr v-for="msg in collectionList">
+									<td v-text="msg.createTime"></td>
+									<td v-text="msg.businessType"></td>
+									<td v-text="msg.transactionId"></td>
+									<td v-text="msg.channelId"></td>
+									<td v-if="msg.account=='1'">想就拿</td>
+									<td v-else-if="msg.account=='2'">沐金农</td>
+									<td v-else-if="msg.account=='3'">喵财有道</td>
+									<td v-else></td>
+									<td v-text="msg.channelType"></td>
+									<td >{{msg.name}} {{msg.bankNo}}</td>
+									<!--<td>{{msg.amount/100 | forData}}</td>-->
+									<td>{{msg.amount/100*msg.bail_rate | forData}}</td>
+									<td >{{msg.loanAmount/100 | forData}}</td>
+									<td>{{msg.amount/100*msg.poundage_rate | forData}}</td>
+									<td v-text="msg.status"></td>
+									<td v-text="msg.dealId"></td>
+									<td>
+										<a href="/basics/particulars"  target="liquidation" class="btn_a detailA" @click="tui(msg.appid,msg.dealId)">详情</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="table_toggle1" style="display: none;">暂无数据</div>
+				</div>
+			</div>
+			<div id="page" style="display: none">
+				<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+			</div>
+		</div>
+	</div>
+	<% include ../footer.ejs %>
+
+	<script>
+		$(function() {
+			//dataTime(1);
+			$("#time_one").click();
+			$(".pay_list").click();
+			$(".enquiries").click();
+		})
+	</script>
+	<script>
+	
+		function dataTime(num) { ////console.log(num)
+			var yugi = function(num) {
+				var now1 = new Date;
+				var getFullYear = now1.getFullYear();
+				var getMonth = now1.getMonth() + 1;
+				var getDate = now1.getDate();
+				var DateTime1 = getFullYear + "-" + getMonth + "-" + getDate;
+				$("#datepicker1").val(DateTime1)
+				var now = new Date;
+				now.setDate(now.getDate() - num);
+				var getFullYear = now.getFullYear();
+				var getMonth = now.getMonth() + 1;
+				var getDate = now.getDate();
+				var DateTime = getFullYear + "-" + getMonth + "-" + getDate;
+				$("#datepicker").val(DateTime)
+				if(num == "1") {
+					$("#datepicker").val(DateTime);
+					$("#datepicker1").val(DateTime);
+				}
+				var timestamp = new Date();
+				//alert(starttimeHaoMiao);
+				var DateTime_starttimeHaoMiao = DateTime;
+				var DateTime_starttimeHaoMiao1 = DateTime1;
+				var starttimeHaoMiao = (new Date(DateTime_starttimeHaoMiao)).getTime();
+				var starttimeHaoMiao1 = (new Date(DateTime_starttimeHaoMiao1)).getTime();
+				$("#starttimeHaoMiao").val(starttimeHaoMiao)
+				$("#starttimeHaoMiao1").val(starttimeHaoMiao1)
+				return now;
+			}
+			yugi(num);
+		}
+
+		
+
+		$(function() {
+
+			$("#datepicker").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+			$("#datepicker1").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+		});
+	</script>
+<script src="/javascripts/jquery.min.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+
+	<script src="/javascripts/jquery-ui.js"></script>
+	<script src="/javascripts/vue-2.42.js"></script>
+	<script src="/javascripts/vue-resource.js"></script>
+	<script src="/javascripts/public_page.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+	<script src="/javascripts/bootstrap.min.js"></script>
+	<script src="/javascripts/jquery.flot.min.js"></script>
+	<script src="/javascripts/jquery.flot.pie.min.js"></script>
+	<script src="/javascripts/jquery.flot.resize.min.js"></script>
+	<script src="/javascripts/matrix.js"></script>
+	<script src="/javascripts/jquery.peity.min.js"></script>
+
+	<script type="text/javascript"> 
+		$(function(){
+			
+		$("#filename").change(function(){
+	
+				if($("#filename").val()==null){
+					
+				}else{
+					var reg = /^.*\.(?:xls|xlsx)$/i;//文件名可以带空格
+	                if (!reg.test($("#filename").val())) {//校验不通过
+	                    alert("请上传excel格式的文件!");
+	                    return;
+	                }else{
+	                	var formData = new FormData();
+						var authToken = $("#authToken").val();
+						formData.append("filename",$("#filename")[0].files[0]);
+						formData.append("authToken",authToken);
+						////console.log(formData)
+						$.ajax({ 
+						url : '/deal/transactionManager/upload', 
+						type : 'POST', 
+						data : formData, 
+						// 告诉jQuery不要去处理发送的数据
+						processData : false, 
+						// 告诉jQuery不要去设置Content-Type请求头
+						contentType : false,
+						success: function (result) {
+	                       alert("上传"+result.msg);
+	                    },error : function() {  
+						     alert("上传异常！");  
+						   } 
+
+						});
+	                }
+					
+				}
+				
+				})	
+			})
+		
+			
+	</script>
+
+	<script>
+		var total = "";
+		var datasets = "";
+		new Vue({
+			el: '#content',
+			data: {
+				all: 0, //总页数
+				cur: 1, //当前页码
+				timeType:"1",//时间类型
+				appid:"",//
+				status:"",//推单状态
+				basicOrderId:"",//基础订单号
+				transactionOrderId:"",//交易订单号
+				productType:"1",
+				channelOrderId:"",//商户订单号
+				channelType:"",//资方类型
+				others:"",//用户账户
+				accountType: "", //公司主体
+				licenseList: "",
+				totalNum:"",
+				totalAmount:"",
+				collectionList:"",
+				totalOrderId:"",
+				file1:'',
+			},
+			components: {
+				'vue-nav': pagenav
+			},
+			filters:{
+					forData:function(value){
+		        		return parseFloat(value.toFixed(2));
+		        	},
+			},
+			watch: {
+				timeType: function(oldValue, newValue) {
+					if(this.timeType==""){
+						$("#datepicker").val("");
+						$("#datepicker1").val("");
+					}
+				}
+			},
+			mounted: function() {
+				this.time();
+				this.qyList();
+				this.listenDate(this.cur);
+			},
+			methods: {
+				listenDate: function(data) {
+					var _this = this;
+					var timeStart = parseInt((new Date($("#datepicker").val())).getTime()-28800000);
+					var timeEnd =parseInt((new Date($("#datepicker1").val())).getTime()-28800000+86399000);
+					var timeType = parseInt(this.timeType);
+					var productType = parseInt(this.productType);
+					var accountType = parseInt(this.accountType);
+					var status = parseInt(this.status);
+					var basicOrderId = parseInt(this.basicOrderId);
+					var transactionOrderId = parseInt(this.transactionOrderId);
+					var channelOrderId = this.channelOrderId;
+					var channelType = parseInt(this.channelType);
+					var others = this.others;
+					var pageSize = 10;
+					if(this.timeType!=""){
+						if(isNaN(timeStart) || isNaN(timeEnd)){
+							alert("请选择交易时间段");
+							$(".tab-two").hide();
+							$("#page").hide();
+							$("#tjCount").html(0);
+                        	$("#tjAmount").html(0+"元");
+                        	$("#tjLoanAmount").html(0+"元");
+                        	$("#tjBailSum").html(0+"元");
+                        	$("#tjBailSum").html(0+"元");
+                        	
+                        	    tjBailSum
+							return false;
+						}
+					}
+					if(isNaN(timeStart)==false || isNaN(timeEnd)==false){
+						if(this.timeType==""){
+							alert("请选择时间类型");
+							$(".tab-two").hide();
+							$("#page").hide();
+							$("#tjCount").html(0);
+                        	$("#tjAmount").html(0+"元");
+                        	$("#tjLoanAmount").html(0+"元");
+                        	$("#tjBailSum").html(0+"元");
+                        	$("#tjBailSum").html(0+"元");
+							return false;
+						}
+					}
+					$(".loading").show();
+					$(".tab-two").show();
+					$("#page").show();
+					this.$http.post("/deal/transactionManager/pushOrder", {
+						"pageNum": data,
+						"pageSize": pageSize,
+						"timeStart": timeStart,
+						"timeEnd": timeEnd,
+						"timeType": timeType,
+						"productType": productType,
+						"accountType":accountType,
+						"status": status,
+						"basicOrderId": basicOrderId,
+						"transactionOrderId": transactionOrderId,
+						"channelOrderId": channelOrderId,
+						"channelType": channelType,
+						"others": others,
+
+					}).then(function(res) {
+						//console.log(res)
+						$(".loading").hide();
+						if(res.body.code == "D1007") {
+							alert(res.body.msg);
+							return false;
+						}
+						if(res.body.code == "D1006") {
+							alert(res.body.msg);
+							return false;
+						}
+						_this.collectionList = res.body.res.data;
+						_this.pageTotal = res.body.res.size;
+						_this.totalNum = res.body.res.total;
+						var totalAmount = res.body.res.totalAmount/100;
+						var tjLoanAmount = (res.body.res.loanAmountSum/100).toFixed(2);
+						var tjBailSum = (res.body.res.bailSum/100).toFixed(2);
+						var tjPoundageSum = (res.body.res.poundageSum/100).toFixed(2);
+						     
+						if(_this.collectionList==""){
+							$(".table_toggle1").show();
+						}else{
+							$(".table_toggle1").hide();
+						}
+						$(".table_toggle").show();
+						if(data <= 1) {
+							total = Math.ceil(_this.totalNum / 10);
+							
+							localStorage.setItem("total", _this.totalNum);
+							localStorage.setItem("Amount", totalAmount);
+							localStorage.setItem("tjLoanAmount", tjLoanAmount);
+							localStorage.setItem("tjBailSum", tjBailSum);
+							localStorage.setItem("tjPoundageSum", tjPoundageSum);
+							var totals=localStorage.getItem("total");
+							var Amount=localStorage.getItem("Amount");
+							var tjLoanAmount=localStorage.getItem("tjLoanAmount");
+							var tjBailSum=localStorage.getItem("tjBailSum");
+							var tjPoundageSum=localStorage.getItem("tjPoundageSum");
+							$("#tjCount").html(totals);
+                        	$("#tjAmount").html(Amount+"元");
+                        	$("#tjLoanAmount").html(tjLoanAmount+"元");
+                        	$("#tjBailSum").html(tjBailSum+"元");
+                        	$("#tjPoundageSum").html(tjPoundageSum+"元");
+							
+							
+							_this.totalOrderId = _this.totalNum;
+						}
+						
+						
+						_this.all = total;
+						_this.cur = data;
+					});
+
+				},
+				time:function(){
+				    var seperator1 = "-";
+	                var startDate = new Date();
+	                startDate.setDate(startDate.getDate()-7);
+	                var startYear = startDate.getFullYear();
+	                var startMonth = startDate.getMonth()+1;
+	                if(startMonth < 10) startMonth = "0"+startMonth;
+	                var startDay = startDate.getDate();
+	                if(startDay < 10) startDay = "0"+startDay;
+	                var endDate = new Date();
+	                var endYear = endDate.getFullYear();
+	                var endMonth = endDate.getMonth()+1;
+	                if(endMonth < 10) endMonth = "0"+endMonth;
+	                var endDay = endDate.getDate();
+	                if(endDay < 10) endDay = "0"+endDay;
+	                var currentdate = startYear + seperator1 + startMonth + seperator1 + startDay;
+	                var currentdate1 = endYear + seperator1 + endMonth + seperator1 + endDay;
+	                $("#datepicker").val(currentdate);
+	                $("#datepicker1").val(currentdate1);
+           		},
+				resets:function(){
+	        		$("#datepicker").val("");
+	        		$("#datepicker1").val("");
+					this.timeStart="";
+					this.timeEnd="";
+					this.timeType="";
+					this.productType="";
+					this.accountType="";
+					this.status="";
+					this.basicOrderId="";
+					this.transactionOrderId="";
+					this.channelOrderId="";
+					this.channelType="";
+					this.others="";
+	        	},
+				
+				//企业列表查询
+				qyList: function() {
+					var _this = this;
+					this.$http.post("/pay/product/jsonEnt").then(function(res) {
+						// //console.log(res)
+						this.licenseList = res.body.res.enterprise;
+					});
+				},
+				tui:function(appid,dealId){
+					if(appid == "1147483647"){
+                        $(".detailA").attr("href", "/basics/particulars1");
+                    }
+            	    sessionStorage.setItem('appid',appid);
+            	    sessionStorage.setItem('dealId',dealId);
+                },
+
+                downLoad:function(){
+                    if(this.all > 5000){
+                        alert("单次下载页数不能超过5000页");
+                        return;
+                    }
+                    
+	                    var timeStart = parseInt((new Date($("#datepicker").val())).getTime()-28800000);
+						var timeEnd =parseInt((new Date($("#datepicker1").val())).getTime()-28800000+86399000);
+						var timeType = this.timeType;
+						var productType = this.productType;
+						var accountType = this.accountType;
+						var status = this.status;
+						var basicOrderId = this.basicOrderId;
+						var transactionOrderId =this.transactionOrderId;
+						var channelOrderId = this.channelOrderId;
+						var channelType = this.channelType;
+						var others = this.others;
+	            		this.$http.get("/pay/transactionManager/pushOrderDownload").then(function(res){
+                      //window.location.href="http://192.168.10.232:8080/liquidation/transactionManager/cashedDetailDownload?param="+uriec+"&time="+time+"&authToken="+res.body;
+                      window.location.href="https://api.lqd.91naxia.com/liquidation/transactionManager/pushOrderDownload?timeStart="+timeStart+"&timeEnd="+timeEnd+"&timeType="+timeType+"&productType="+productType+"&accountType="+accountType+"&status="+status+"&basicOrderId="+basicOrderId+"&transactionOrderId="+transactionOrderId+"&channelOrderId="+channelOrderId+"&channelType="+channelType+"&others="+others+"&authToken="+res.body;
+	            	          
+	            	});
+	            },
+	            uploadButton:function(){
+						
+
+	            		this.$http.get("/pay/transactionManager/pushOrderDownload").then(function(res){
+						$("#authToken").val(res.body)         	          
+	            	    });
+	            }
+			}
+		})
+	</script>
+	
+	<!--Real-time-chart-js-->

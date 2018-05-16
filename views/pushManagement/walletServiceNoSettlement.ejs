@@ -1,0 +1,508 @@
+<% include ../header.ejs %>
+	<style>
+		.alertFont {
+			color: rgb(47, 150, 180);
+			cursor: pointer;
+		}
+
+		.ming {
+			color: #5bb75b;
+			cursor: pointer;
+		}
+	</style>
+	<div id="content">
+		<div id="content-header">
+			<div id="breadcrumb">
+				<a href="#" class="tip-bottom">
+					<i class="icon-home"></i>结算审核</a>
+				<a href="#" class="current">钱包服务费</a>
+				<a href="#" class="current">未结算</a>
+			</div>
+			<h1>未结算</h1>
+		</div>
+		<div class="container-fluid">
+			<div class="loading">
+				<img src="/images/jiazai.gif" alt="">
+			</div>
+			<hr>
+			<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+				<a class="btn2 cur1" href="/push/walletServiceNoSettlement" target="liquidation">未结算</a>
+				<a class="btn2" href="/push/walletServiceSettlement" target="liquidation">已结算</a>
+				<a class="btn2" href="/push/walletServiceAuditSettlement" target="liquidation">结算审核</a>
+			</div>
+
+			<hr>
+			<div class="row-fluid">
+				<div class="widget-box">
+					<div class="widget-content nopadding">
+						<form class="form-horizontal" method="post" action="">
+							<table class="table table-striped">
+								<tbody>
+									<tr class="odd gradeX">
+										<td width="85" style="white-space: nowrap;">创建时间 :</td>
+										<td width="600" style="white-space: nowrap;">
+											<input type="text" class="input" id="datepicker" readonly="readonly" name="repaymentStart">
+											<input type="text" class="input" id="datepicker1" readonly="readonly" name="repaymentEnd">
+										</td>
+										<td width="85" style="white-space: nowrap;">分账主体 :</td>
+										<td width="" style="white-space: nowrap;">
+											<select name="" v-model="memberId">
+												<option value="">所有</option>
+												<option value="1201609">想就拿平台</option>
+												<option value="1201608">包公有财平台</option>
+												<option value="1201606">安永担保</option>
+												<option value="1202638">沐金农</option>
+											</select>
+										</td>
+									</tr>
+									<tr>
+										<td width="85" style="white-space: nowrap;">结算方式 :</td>
+										<td width="" style="white-space: nowrap;">
+											<select name="" v-model="method">
+												<option value="">所有</option>
+												<option value="1">即时分账</option>
+												<option value="2">定时结算</option>
+											</select>
+										</td>
+										<td width="85" style="white-space: nowrap;"> APP:</td>
+										<td width="" style="white-space: nowrap;">
+											<select name="" v-model="app">
+												<option value="">所有</option>
+												<option v-for="msg in ProList" :value="msg.id">{{msg.productName}}</option>
+											</select>
+										</td>
+									</tr>
+									<tr class="odd gradeX">
+
+										<td width="85" style="white-space: nowrap;">子订单支付方式 :</td>
+										<td width="" style="white-space: nowrap;">
+											<select name="" v-model="son_pay_method">
+												<option value="">所有</option>
+												<option value="1">借款支付</option>
+												<option value="2">直接支付</option>
+											</select>
+										</td>
+										<td width="85" style="white-space: nowrap;"> 费用类型:</td>
+										<td width="" style="white-space: nowrap;">
+											<select name="" v-model="cost_type">
+												<option value="">所有</option>
+												<option value="1">想就拿资产方服务费</option>
+												<option value="2">包公有财平台服务费</option>
+												<option value="3">安永担保费</option>
+												<option value="4">沐金农资产方服务费</option>
+											</select>
+											<span style="margin-left: 20px">
+												<button type="button" id="submit" class="btn btn-success" @click="listenDate(1)">查找</button>
+												<button type="button" id="submit" class="btn btn-success" @click="resets()">重置</button>
+											</span>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</form>
+					</div>
+				</div>
+			</div>
+			<hr>
+			<div class="row-fluid">
+				<div class="span6">
+					<div class="row-fluid">
+						<div class="span12">
+							<div class="span-box-one" style="background: rgb(255, 255, 255);">
+								<p>
+									<span style="font-size: 28px;" v-text="current + '元'"></span>
+									<br>
+									<span style="margin: 0px 10px;">今日未结算</span>
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="span6">
+					<div class="row-fluid">
+						<div class="span12">
+							<div class="span-box-one" style="background: rgb(255, 255, 255);">
+								<p>
+									<span style="font-size: 28px;" v-text="his + '元'"></span>
+									<br>
+									<span style="margin: 0px 10px;">累计未结算</span>
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<hr>
+			<div class="row-fluid tab-two" style="display: none">
+				<div class="span12">
+					<div class="widget-box">
+						<div class="widget-title">
+							<span class="icon">
+								<i class="icon-th"></i>
+							</span>
+							<h5>列表
+									<span @click="downLoad" id="submit_down" class="badge badge-success"  style="position: absolute;cursor: pointer;top: 8px;right: 10px;padding: 3px 10px;">下载</span>                              								
+							</h5>
+						</div>
+						<div class="widget-content nopadding" id="common_list">
+							<table class="table table-bordered table-striped">
+								<thead>
+									<tr>
+										<th>应结算时间</th>
+										<th>分账主体</th>
+										<th>分账金额</th>
+										<th>结算方式</th>
+										<th>APP</th>
+										<th>子订单支付方式</th>
+										<th>费用类型</th>
+										<th>状态</th>
+										<th width="100" style="white-space: nowrap;">操作</th>
+										<th width="100" style="white-space: nowrap;">详情</th>
+									</tr>
+								</thead>
+								<tbody class="table_toggle">
+									<tr v-for="msg in dataList">
+										<td>{{msg.statisticsDate*1000 | time}}</td>
+										<td v-if="msg.memberId=='1201609'">想就拿平台</td>
+										<td v-else-if="msg.memberId=='1201608'">包公有财平台</td>
+										<td v-else-if="msg.memberId=='1201606'">安永担保</td>
+										<td v-else-if="msg.memberId=='1202638'">沐金农</td>
+										<td v-else></td>
+										<td v-text="msg.amount/100"></td>
+										<td v-if="msg.method=='1'">即时分账</td>
+										<td v-else-if="msg.method=='2'">定时结算</td>
+										<td v-else></td>
+										<td v-text="msg.appName"></td>
+										<td v-if="msg.sonPayMethod=='1'">借款支付</td>
+										<td v-else-if="msg.sonPayMethod=='2'">直接支付</td>
+										<td v-else></td>
+										<td v-if="msg.costType=='1'">想就拿资产方服务费</td>
+										<td v-else-if="msg.costType=='2'">包公有财平台服务费</td>
+										<td v-else-if="msg.costType=='3'">安永担保费</td>
+										<td v-else-if="msg.costType=='4'">沐金农资产方服务费</td>
+										<td v-else></td>
+										<td v-if="msg.status=='1'">结算申请</td>
+										<td v-else-if="msg.status=='2'">待审核</td>
+										<td v-else-if="msg.status=='3'">已结算</td>
+										<td v-else></td>
+										<td>
+											<span class="alertFont" v-if="msg.status=='1'" data-toggle="modal" data-target="#myModal" @click="alertFun(msg.amount,msg.memberId,msg.id)">结算申请</span>
+											<span class="alertFont" v-else-if="msg.status=='2'" data-toggle="modal" data-target="#myModal" @click="alertFun(msg.amount,msg.memberId,msg.id)">结算审核</span>
+											<span class="alertFont" v-else></span>
+										</td>
+										<td>
+											<a href="/push/walletServiceDetails" target="liquidation" class="ming" @click="tui(msg.id)">明细</a>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="table_toggle1" style="display: none;">暂无数据</div>
+					</div>
+				</div>
+				<div id="page" style="display: none">
+					<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+				</div>
+				<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display:none">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+								</button>
+								<h4 class="modal-title" id="myModalLabel">
+									结算申请
+								</h4>
+							</div>
+							<div class="modal-body">
+								<div class="container-fluid">
+									<div class="row-fluid">
+										<form id="addNewRule">
+											<div class="widget-content nopadding form-horizontal">
+												<div class="control-group">
+													<label class="control-label" style="width: 150px;">分账主体 :</label>
+													<div class="controls">
+														<input type="text" v-if="alert_memberId=='1201609'" value="想就拿平台" disabled>
+														<input type="text" v-else-if="alert_memberId=='1201608'" value="包公有财平台" disabled>
+														<input type="text" v-else-if="alert_memberId=='1201606'" value="安永担保" disabled>
+														<input type="text" v-else-if="alert_memberId=='1202638'" value="沐金农" disabled>
+														<input type="text" v-else value="" disabled>
+													</div>
+												</div>
+												<div class="control-group">
+													<label class="control-label" style="width: 150px;">分账金额 :</label>
+													<div class="controls">
+														<input type="text" v-model="alert_new_amount">
+													</div>
+												</div>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" id="guanbi" class="btn btn-default" data-dismiss="modal">
+									返回
+								</button>
+								<button type="button" class="btn btn-primary" @click="applyFun()">
+									结算申请
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<% include ../footer.ejs %>
+
+		<script>
+			$(function () {
+				//dataTime(1);
+				$("#time_one").click();
+				$(".pay_list").click();
+				$(".enquiries").click();
+			})
+		</script>
+		<script>
+			function dataTime(num) { ////console.log(num)
+				var yugi = function (num) {
+					var now1 = new Date;
+					var getFullYear = now1.getFullYear();
+					var getMonth = now1.getMonth() + 1;
+					var getDate = now1.getDate();
+					var DateTime1 = getFullYear + "-" + getMonth + "-" + getDate;
+					$("#datepicker1").val(DateTime1)
+					var now = new Date;
+					now.setDate(now.getDate() - num);
+					var getFullYear = now.getFullYear();
+					var getMonth = now.getMonth() + 1;
+					var getDate = now.getDate();
+					var DateTime = getFullYear + "-" + getMonth + "-" + getDate;
+					$("#datepicker").val(DateTime)
+					if (num == "1") {
+						$("#datepicker").val(DateTime);
+						$("#datepicker1").val(DateTime);
+					}
+					var timestamp = new Date();
+					//alert(starttimeHaoMiao);
+					var DateTime_starttimeHaoMiao = DateTime;
+					var DateTime_starttimeHaoMiao1 = DateTime1;
+					var starttimeHaoMiao = (new Date(DateTime_starttimeHaoMiao)).getTime();
+					var starttimeHaoMiao1 = (new Date(DateTime_starttimeHaoMiao1)).getTime();
+					$("#starttimeHaoMiao").val(starttimeHaoMiao)
+					$("#starttimeHaoMiao1").val(starttimeHaoMiao1)
+					return now;
+				}
+				yugi(num);
+			}
+
+			$(function () {
+
+				$("#datepicker").datepicker({
+					changeMonth: true,
+					changeYear: true,
+					yearRange: "1900:2050",
+				})
+				$("#datepicker1").datepicker({
+					changeMonth: true,
+					changeYear: true,
+					yearRange: "1900:2050",
+				})
+			});
+		</script>
+		<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+		<script src="/javascripts/time_filter.js"></script>
+
+		<script src="/javascripts/jquery-ui.js"></script>
+		<script src="/javascripts/vue-2.42.js"></script>
+		<script src="/javascripts/vue-resource.js"></script>
+		<script src="/javascripts/public_page.js"></script>
+		<script src="/javascripts/time_filter.js"></script>
+		<script src="/javascripts/jquery.flot.min.js"></script>
+		<script src="/javascripts/jquery.flot.pie.min.js"></script>
+		<script src="/javascripts/jquery.flot.resize.min.js"></script>
+		<script src="/javascripts/matrix.js"></script>
+		<script src="/javascripts/jquery.peity.min.js"></script>
+		<script>
+			
+			var total = "";
+			var datasets = "";
+			new Vue({
+				el: '#content',
+				data: {
+					all: 0, //总页数
+					cur: 1, //当前页码
+					memberId: "",
+					method: "",
+					app: "",
+					son_pay_method: "",
+					cost_type: "",
+					status: "",
+					dataList: "",
+					current: "",
+					his: "",
+					ProList: "",
+					alert_amount : "",
+					alert_memberId : "",
+					alert_new_amount : "",
+					alert_id : "",
+				},
+				components: {
+					'vue-nav': pagenav
+				},
+				watch: {
+
+				},
+				mounted: function () {
+					this.time();
+					this.productList();
+					this.listenDate(this.cur);
+				},
+				methods: {
+					listenDate: function (data) {
+						$(".loading").show();
+						$(".tab-two").show();
+						$("#page").show();
+						var _this = this;
+						var beginDate = $("#datepicker").val();
+						var endDate = $("#datepicker1").val();
+						var pageSize = 10;
+						this.$http.post("/push/costSettlement/json", {
+							"pageNum": data,
+							"pageSize": 10,
+							"startStr": beginDate,
+							"endStr": endDate,
+							"memberId": _this.memberId,
+							"method": _this.method,
+							"app": _this.app,
+							"sonPayMethod": _this.son_pay_method,
+							"costType": _this.cost_type,
+							"status": 1,
+						}).then(function (res) {
+							console.log(res);
+							$(".loading").hide();
+							if (res.body.code == "D1007") {
+								alert(res.body.msg);
+								return false;
+							}
+							if (res.body.code == "D1006") {
+								alert(res.body.msg);
+								return false;
+							}
+							_this.dataList = res.body.res.res;
+							//console.log(_this.collectionList)
+							_this.pageTotal = res.body.res.total;
+							if (_this.dataList == "") {
+								$(".table_toggle1").show();
+							} else {
+								$(".table_toggle1").hide();
+							}
+							$(".table_toggle").show();
+							if (data <= 1) {
+								total = Math.ceil(_this.pageTotal / 10);
+							}
+							_this.all = total;
+							_this.cur = data;
+						});
+						this.$http.post("/push/costSettlement/sumAmount", {
+							"startStr": beginDate,
+							"endStr": endDate,
+							"memberId": _this.memberId,
+							"method": _this.method,
+							"app": _this.app,
+							"sonPayMethod": _this.son_pay_method,
+							"costType": _this.cost_type,
+							"status": 1,
+						}).then(function (res) {
+							_this.his = res.body.res.his;
+							_this.current = res.body.res.current;
+						});
+					},
+					time: function () {
+						var seperator1 = "-";
+						var startDate = new Date();
+						startDate.setDate(startDate.getDate() - 7);
+						var startYear = startDate.getFullYear();
+						var startMonth = startDate.getMonth() + 1;
+						if (startMonth < 10) startMonth = "0" + startMonth;
+						var startDay = startDate.getDate();
+						if (startDay < 10) startDay = "0" + startDay;
+						var endDate = new Date();
+						var endYear = endDate.getFullYear();
+						var endMonth = endDate.getMonth() + 1;
+						if (endMonth < 10) endMonth = "0" + endMonth;
+						var endDay = endDate.getDate();
+						if (endDay < 10) endDay = "0" + endDay;
+						var currentdate = startYear + seperator1 + startMonth + seperator1 + startDay;
+						var currentdate1 = endYear + seperator1 + endMonth + seperator1 + endDay;
+						$("#datepicker").val(currentdate);
+						$("#datepicker1").val(currentdate1);
+					},
+
+					productList: function () {
+						var _this = this;
+						this.$http.post("/pay/product/jsonProNew", {}).then(function (res) {
+							_this.ProList = res.body.res.products;
+							console.log(_this.ProList)
+						});
+					},
+
+					tui: function (id) {
+						sessionStorage.setItem('detailId', id);
+						sessionStorage.setItem('detailStatus', "1");
+					},
+					alertFun(amount,memberId,id){
+						console.log(amount,memberId,id);
+						this.alert_amount = amount;
+						this.alert_memberId = memberId;
+						this.alert_id = id;
+					},
+					applyFun: function () {
+						console.log(this.alert_new_amount,this.alert_amount)
+						if(this.alert_new_amount == ""){
+							alert("分账金额不能空！");
+							return;
+						}else if(this.alert_new_amount*100!=this.alert_amount){
+							alert("分账金额有误！");
+							return;
+						}
+						this.$http.post("/push/costSettlement/apply", {
+							"id": this.alert_id
+						}).then(function (res) {
+							if(res.body.code=="0000"){
+								alert(res.body.msg);
+								$('#guanbi').click();
+								this.listenDate(this.cur);
+							}else if(res.body.code!="0000"){
+								alert(res.body.msg)
+							}
+						});
+					},
+					downLoad(){
+						var beginDate = $("#datepicker").val();
+						var endDate = $("#datepicker1").val();
+                        this.$http.get("/push/costSettlement/downLoadJson").then(function(res){
+                            console.log(res.body.config.config);							
+							var domainName = "";
+							if(res.body.config.config=="192.168.30.30"){
+								domainName = "http://192.168.30.30:18087/";
+							}else{
+								domainName = "https://api.lqd.91naxia.com/";								
+							}
+							window.location.href=domainName+"liquidation/costSettlement/downLoadJson?startStr="+beginDate+"&endStr="+endDate+"&memberId="+this.memberId+"&method="+this.method+"&app="+this.app+"&sonPayMethod="+this.son_pay_method+"&costType="+this.cost_type+"&status=1"+"&authToken="+res.body.cookie;							
+						});
+					},
+					resets: function () {
+						$("#datepicker").val("");
+						$("#datepicker1").val("");
+						this.memberId = "";
+						this.method = "";
+						this.app = "";
+						this.son_pay_method = "";
+						this.cost_type = "";
+					},	
+				}
+			})
+		</script>
+
+		<!--Real-time-chart-js-->

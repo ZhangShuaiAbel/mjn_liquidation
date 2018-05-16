@@ -1,0 +1,438 @@
+<% include ../header.ejs %>
+
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>交易管理</a>
+			<a href="#" class="current">现金贷-用户订单信息</a>
+		</div>
+		<h1>现金贷-用户订单信息</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+
+		
+		<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+			<a href="/basics/basics" class="btn2 cur1">现金贷-用户订单信息</a>
+			<a href="/basics/goodsOrder" class="btn2">商品贷-用户订单信息</a>
+			<a href="/basics/commodity" class="btn2">商品贷-商户订单信息</a>
+		</div>
+		<div class="row-fluid">
+			<div class="widget-box">
+				<div class="widget-content nopadding">
+					<form class="form-horizontal" method="post" action="">
+						<table class="table table-striped">
+							<tbody>
+								<tr class="odd gradeX">
+									<td width="85" style="white-space: nowrap;">时间 :</td>
+									<td width="600" style="white-space: nowrap;">
+										<input type="text" class="input" id="datepicker" readonly="readonly" name="repaymentStart">
+										<input type="text" class="input" id="datepicker1" readonly="readonly" name="repaymentEnd">
+									</td>
+									<td width="85" style="white-space: nowrap;">订单状态 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" v-model="status">
+											<option value="">所有</option>
+											<option value="0">未提交</option>
+											<option value="1">申请</option>
+											<option value="2">审核通过</option>
+											<option value="3">审核拒绝</option>
+											<option value="4">放弃签合同</option>
+											<option value="5">还款中</option>
+											<option value="6">渠道拒绝</option>
+											<option value="7">待人工审核</option>
+											<option value="8">待打款</option>
+											<option value="10">已还清</option>
+											<option value="11">用户借款确认</option>
+											<option value="12">撤单（未打款）</option>
+											<!--<option v-for="msg in zfList" :value="msg.id" v-text="msg.name"></option>-->
+										</select>
+									</td>
+									
+								</tr>
+								<tr>
+									<td width="85" style="white-space: nowrap;">订单号 :</td>
+									<td width="" style="white-space: nowrap;">
+										<input type="text" class="input" name="" v-model="cashId" oninput="this.value=this.value.replace(/\D/g,'');if(isNaN(value))execCommand('undo');">
+									</td>
+									<td width="85" style="white-space: nowrap;">用户名 :</td>
+									<td width="" style="white-space: nowrap;">
+										<input type="text" class="input" v-model="userName">
+									</td>
+								</tr>
+								<tr class="odd gradeX">
+									
+									<td width="85" style="white-space: nowrap;">用户手机号 :</td>
+									<td width="" style="white-space: nowrap;">
+										<input type="text" class="input" v-model="mobile">
+									</td>
+									<td width="85" style="white-space: nowrap;">用户身份证号 :</td>
+									<td width="" style="white-space: nowrap;">
+										<input type="text" class="input" name="" v-model="idCard">
+									</td>
+								</tr>
+								<tr class="odd gradeX">
+									<td width="85" style="white-space: nowrap;">我方主体 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" id="" required v-model="company">
+											<option value="">所有</option>
+											<option v-for="bb in licenseList" v-bind:value="bb.id" v-text="bb.enterpriseName"></option>
+										</select>
+									</td>
+									<td width="85" style="white-space: nowrap;">资方账号 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" v-model="fundChannel">
+											<option value="">所有</option>
+											<option value="1">玖富</option>
+											<option value="2">蜡笔</option>
+											<option value="3">团贷</option>
+											<option value="4">小鸡</option>
+											<option value="5">自己放款</option>
+											<option value="6">拿财</option>
+										</select>
+										<span style="margin-left: 20px">
+											<button type="button" id="submit" class="btn btn-success" @click="listenDate(1)">查找</button>
+	                                    	<button type="button" id="submit" class="btn btn-success" @click="resets()" >重置</button>
+                                    	</span>
+									</td>
+									
+								</tr>
+
+							</tbody>
+						</table>
+
+					</form>
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row-fluid">
+			<div class="span6">
+				
+					<div class="span12">
+						<div class="span-box-one" style="background: rgb(255, 255, 255);">
+							<p><span style="font-size: 28px;" id="tjCount">0</span><br><span style="margin: 0px 10px;">总订单数</span></p>
+						</div>
+					</div>
+					<!---->
+				
+			</div>
+			<div class="span6">
+					<div class="span12">
+						<div class="span-box-one" style="background: rgb(255, 255, 255);">
+							<p><span style="font-size: 28px;" id="tjAmount">0</span><br><span style="margin: 0px 10px;">总交易额</span></p>
+						</div>
+					</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row-fluid tab-two" style="display: none">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>订单明细</h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>订单编号</th>
+									<th>用户名</th>
+									<th>用户手机号</th>
+									<th>身份证号</th>
+									<th>合同金额（元）</th>
+									<th>我方</th>
+									<th>资方</th>
+									<th>状态</th>
+									<th>创建时间</th>
+									<th width="100" style="white-space: nowrap;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+								<tr v-for="msg in collectionList">
+									<td v-text="msg.id"></td>
+									<td v-text="msg.userName"></td>
+									<td v-text="msg.phone"></td>
+									<td v-text="msg.idCard"></td>
+									<td v-text="msg.approveAmount"></td>
+									<td v-text="msg.company"></td>
+									<td v-text="msg.fundChannelName"></td>
+									
+									<!--<td v-if="msg.fundChannel=='1'">玖富</td>
+									<td v-else-if="msg.fundChannel=='2'">蜡笔</td>
+									<td v-else-if="msg.fundChannel=='3'">团贷</td>
+									<td v-else-if="msg.fundChannel=='4'">小鸡</td>
+									<td v-else-if="msg.fundChannel=='5'">自己放款</td>
+									<td v-else-if="msg.fundChannel=='6'">拿财</td>-->
+									<td v-if="msg.status=='0'">未提交</td>
+									<td v-else-if="msg.status=='1'">申请</td>
+									<td v-else-if="msg.status=='2'">审核通过</td>
+									<td v-else-if="msg.status=='3'">审核拒绝</td>
+									<td v-else-if="msg.status=='4'">放弃签合同</td>
+									<td v-else-if="msg.status=='5'">还款中</td>
+									<td v-else-if="msg.status=='6'">渠道拒绝</td>
+									<td v-else-if="msg.status=='7'">待人工审核</td>
+									<td v-else-if="msg.status=='8'">待打款</td>
+									<td v-else-if="msg.status=='10'">已还清</td>
+									<td v-else-if="msg.status=='11'">用户借款确认</td>
+									<td v-else-if="msg.status=='12'">撤单</td>
+									<td v-else></td>
+									<td>{{msg.createTime | time}}</td>
+									<td>
+										<a href="/basics/particulars" target="liquidation" class="btn_a" @click="tui(msg.appId,msg.id)">详情</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="table_toggle1" style="display: none;">暂无数据</div>
+				</div>
+			</div>
+			<div id="page" style="display: none">
+				<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+			</div>
+		</div>
+	</div>
+
+	<% include ../footer.ejs %>
+
+	<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+
+	<script src="/javascripts/jquery-ui.js"></script>
+	<script src="/javascripts/vue-2.42.js"></script>
+	<script src="/javascripts/vue-resource.js"></script>
+	<script src="/javascripts/public_page.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+	<script src="/javascripts/bootstrap.min.js"></script>
+	<script src="/javascripts/jquery.flot.min.js"></script>
+	<script src="/javascripts/jquery.flot.pie.min.js"></script>
+	<script src="/javascripts/jquery.flot.resize.min.js"></script>
+	<script src="/javascripts/matrix.js"></script>
+	<script src="/javascripts/jquery.peity.min.js"></script>
+	<!--Real-time-chart-js-->
+
+	<script>
+		$(function() {
+			//dataTime(1);
+			$("#time_one").click();
+			$(".pay_list").click();
+			$(".enquiries").click();
+		})
+	</script>
+	<script>
+		function dataTime(num) { //console.log(num)
+			var yugi = function(num) {
+				var now1 = new Date;
+				var getFullYear = now1.getFullYear();
+				var getMonth = now1.getMonth() + 1;
+				var getDate = now1.getDate();
+				var DateTime1 = getFullYear + "-" + getMonth + "-" + getDate;
+				$("#datepicker1").val(DateTime1)
+				var now = new Date;
+				now.setDate(now.getDate() - num);
+				var getFullYear = now.getFullYear();
+				var getMonth = now.getMonth() + 1;
+				var getDate = now.getDate();
+				var DateTime = getFullYear + "-" + getMonth + "-" + getDate;
+				$("#datepicker").val(DateTime)
+				if(num == "1") {
+					$("#datepicker").val(DateTime);
+					$("#datepicker1").val(DateTime);
+				}
+				var timestamp = new Date();
+				//alert(starttimeHaoMiao);
+				var DateTime_starttimeHaoMiao = DateTime;
+				var DateTime_starttimeHaoMiao1 = DateTime1;
+				var starttimeHaoMiao = (new Date(DateTime_starttimeHaoMiao)).getTime();
+				var starttimeHaoMiao1 = (new Date(DateTime_starttimeHaoMiao1)).getTime();
+				$("#starttimeHaoMiao").val(starttimeHaoMiao)
+				$("#starttimeHaoMiao1").val(starttimeHaoMiao1)
+				return now;
+			}
+			yugi(num);
+		}
+
+		$(function() {
+
+			$("#datepicker").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+			$("#datepicker1").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+		});
+	</script>
+	<!--Real-time-chart-js-end-->
+	<!--Turning-series-chart-js-->
+	<script src="https://img.hcharts.cn/highcharts/highcharts.js"></script>
+	<script src="https://img.hcharts.cn/highcharts/modules/data.js"></script>
+	<script src="https://img.hcharts.cn/highcharts/modules/drilldown.js"></script>
+	<script src="https://img.hcharts.cn/highcharts-plugins/highcharts-zh_CN.js"></script>
+	<script>
+		// var data_aa=
+	</script>
+	<script>
+		var total = "";
+		var datasets = "";
+		new Vue({
+			el: '#content',
+			data: {
+				all: 0, //总页数
+				cur: 1, //当前页码
+				status: "0", //订单状态
+				cashId: "", //订单号
+				userName: "", //用户名
+				mobile: "", //手机号
+				idCard: "", //身份证号
+				company: "", //公司主体
+				fundChannel: "", //资金方
+				licenseList: "",
+				collectionList: "",
+				totalNum:"",
+				totalAmount:"",
+			},
+			components: {
+				'vue-nav': pagenav
+			},
+			watch: {
+				cur: function(oldValue, newValue) {
+					// this.data();
+				}
+			},
+			mounted: function() {
+				this.time();
+				this.qyList();
+				this.listenDate(this.cur);
+				
+			},
+			methods: {
+				listenDate: function(data) {
+					var _this = this;
+					var beginDate = $("#datepicker").val();
+					var endDate = $("#datepicker1").val();
+					var status = this.status;
+					var cashId =  parseInt(this.cashId);
+					var pattern = /\D/ig;
+					/*if(pattern.test(cashId)==true){
+						cashId = 0;
+					}else{
+						cashId = cashId;
+					}*/
+					//console.log(cashId);
+					var userName = this.userName;
+					var mobile = this.mobile;
+					var idCard = this.idCard;
+					var company = this.company;
+					var fundChannel = parseInt(this.fundChannel);
+					var pageSize = 10;
+					$(".loading").show();
+					$(".tab-two").show();
+					$("#page").show();
+					this.$http.post("/basics/cash/getCashList", {
+						"pageNum": data,
+						"pageSize": pageSize,
+						"status": status,
+						"beginDate": beginDate,
+						"endDate": endDate,
+						"cashId": cashId,
+						"userName": userName,
+						"mobile": mobile,
+						"idCard": idCard,
+						"company": company,
+						"fundChannel": fundChannel
+					}).then(function(res) {
+						//console.log(res);
+						$(".loading").hide();
+						if(res.body.code == "D1007") {
+							alert(res.body.msg);
+							return false;
+						}
+						if(res.body.code == "D1006") {
+							alert(res.body.msg);
+							return false;
+						}
+						_this.collectionList = res.body.res.cashList.res;
+						_this.pageTotal = res.body.res.cashList.total;
+						_this.totalNum = res.body.res.totalNum;
+						_this.totalAmount = res.body.res.totalAmount;
+						if(_this.collectionList==""){
+							$(".table_toggle1").show();
+						}else{
+							$(".table_toggle1").hide();
+						}
+						$(".table_toggle").show();
+						if(data <= 1) {
+							total = Math.ceil(_this.pageTotal / 10);
+							localStorage.setItem("total", _this.totalNum);
+							localStorage.setItem("Amount", _this.totalAmount);
+							var totals=localStorage.getItem("total");
+							var Amount=localStorage.getItem("Amount");
+							$("#tjCount").html(totals);
+                        	$("#tjAmount").html(Amount+"元");
+						}
+						_this.all = total;
+						_this.cur = data;
+					});
+
+				},
+				
+				time:function(){
+            		var seperator1 = "-";
+
+	                var startDate = new Date();
+	                startDate.setDate(startDate.getDate()-7);
+	                var startYear = startDate.getFullYear();
+	                var startMonth = startDate.getMonth()+1;
+	                if(startMonth < 10) startMonth = "0"+startMonth;
+	                var startDay = startDate.getDate();
+	                if(startDay < 10) startDay = "0"+startDay;
+	                var endDate = new Date();
+	                var endYear = endDate.getFullYear();
+	                var endMonth = endDate.getMonth()+1;
+	                if(endMonth < 10) endMonth = "0"+endMonth;
+	                var endDay = endDate.getDate();
+	                if(endDay < 10) endDay = "0"+endDay;
+	                var currentdate = startYear + seperator1 + startMonth + seperator1 + startDay;
+	                var currentdate1 = endYear + seperator1 + endMonth + seperator1 + endDay;
+	                $("#datepicker").val(currentdate);
+	                $("#datepicker1").val(currentdate1);
+           		},
+				
+				resets:function(){
+	        		$("#datepicker").val("");
+	        		$("#datepicker1").val("");
+					this.status="";
+					this.beginDate="";
+					this.endDate="";
+					this.cashId="";
+					this.userName="";
+					this.mobile="";
+					this.idCard="";
+					this.company="";
+					this.fundChannel="";
+	        	},
+				
+				//企业列表查询
+				qyList: function() {
+					var _this = this;
+					this.$http.post("/pay/product/jsonEnt").then(function(res) {
+						// console.log(res)
+						this.licenseList = res.body.res.enterprise;
+					});
+				},
+				tui:function(appid,dealId){
+            	    sessionStorage.setItem('appid',appid);
+            	    sessionStorage.setItem('dealId',dealId);
+                },
+			}
+		})
+	</script>
+	<!--Turning-series-chart-js-->
+	<script src="/javascripts/matrix.dashboard.js"></script>

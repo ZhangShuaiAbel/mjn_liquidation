@@ -1,0 +1,438 @@
+<% include ../header.ejs %>
+
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>对账管理</a>
+			<a href="#" class="current">记账</a>
+		</div>
+		<h1>记账</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+		<div class="row-fluid">
+			<div class="widget-box">
+				<div class="widget-content nopadding">
+					<form method="post" action="" class="form-horizontal">
+						<table class="table table-striped">
+							<tbody>
+
+								<tr>
+									<td style="white-space: nowrap;" class="span4">
+										<lable>时间 :</lable>
+										<input type="text" class="input" id="datepicker" readonly="readonly" name="repaymentStart">
+										<input type="text" class="input" id="datepicker1" readonly="readonly" name="repaymentEnd">
+									</td>
+								</tr>
+								<tr>
+									<td class="span4"><lable >主体:</lable>
+										<button type="button" class="btn btn-primary btn getAccounts" @click="getAccounts(1)">想就拿</button>
+										<button type="button" class="btn getAccounts" @click="getAccounts(2)">沐金农</button>
+										<button type="button" class="btn getAccounts" @click="getAccounts(3)">喵财有道</button>
+									</td>
+								</tr>
+								<tr>
+									<td class="span4">
+										<lable>帐户名 :</lable>
+										<select v-model="accountId">
+											<option value="">所有</option>
+											<option v-for="msg in accounts" v-bind:value="msg.accountId" v-text="msg.accountName"></option>
+										</select>
+										<button type="button" id="submit" class="btn btn-success" @click="listenDate(1)" style="margin-right: 20px;">查找</button>
+
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row-fluid tab-two">
+			<div class="">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>账单明细
+							<span  id="submit" data-toggle="modal" data-target="#myModal" class="badge badge-info" style="position: absolute;
+top: 8px;right: 80px;padding: 3px 10px;">记一笔</span>  
+                            <span @click="downLoad" id="submit_down" class="badge badge-success"  style="position: absolute;cursor: pointer;top: 8px;right: 10px;padding: 3px 10px;">下载</span></h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>记账日期</th>
+									<th>交易类型</th>
+									<th>往来账号</th>
+									<th>往来账户</th>
+									<th>收入</th>
+									<th>支出</th>
+									<th>余额</th>
+									<th>状态</th>
+									<th>记账人</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+								<tr v-for="msg in collectionList">
+									<td>{{msg.time | time}}</td>
+									<td v-if="msg.type=='1'">资方兑付</td>
+									<td v-else-if="msg.type=='2'">资方放款</td>
+									<td v-else-if="msg.type=='3'">提现</td>
+									<td v-else-if="msg.type=='4'">充值</td>
+									<td v-else></td>
+
+									<td v-text="msg.reciprocalAccountNo"></td>
+									<td v-text="msg.reciprocalAccountName"></td>
+									<td v-text="msg.receive"></td>
+									<td v-text="msg.payType"></td>
+									<td v-text="msg.balance"></td>
+									<!--									<td v-text="msg.status"></td>
+-->
+									<td v-if="msg.status=='0'">未对账</td>
+									<td v-else-if="msg.status=='1'">已对账</td>
+									<td v-else-if="msg.status=='2'">审核中</td>
+									<td v-else-if="msg.status=='3'">异常</td>
+									<td v-else></td>
+									<td v-text="msg.operator"></td>
+
+								</tr>
+							</tbody>
+							
+						</table>
+					</div>
+					<div class="table_toggle1" style="display: none;">暂无数据</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+								记账
+							</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">记账时间 :</label>
+											<div class="controls">
+												<input type="text" class="input" id="datepicker2" readonly="readonly" name="repaymentStart">
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">我方账户 :</label>
+											<div class="controls">
+												<select name="" id="" v-model="ourAccountId">
+													<option value="">请选择</option>
+													<option v-for="msg in accounts1" v-bind:value="msg.accountId" >{{msg.accountName}}{{msg.accountNo}}</option>
+												</select>
+											</div>
+										</div>
+
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">往来账号 :</label>
+											<div class="controls">
+												<select name="" id="" v-model="reciprocalAccountId">
+													<option value="">请选择</option>
+													<option v-for="msg in accounts1" v-bind:value="msg.accountId" >{{msg.accountName}}{{msg.accountNo}}</option>
+												</select>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">交易类型 :</label>
+											<div class="controls">
+												<select name="" id="" v-model="payType">
+													<option value="">请选择</option>
+													<option value="1">资方兑付</option>
+													<option value="2">资方放款</option>
+													<option value="3">提现</option>
+													<option value="4">充值</option>
+												</select>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">收入金额 :</label>
+											<div class="controls">
+												<input type="text" v-model="receiveAmount" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">支出金额 :</label>
+											<div class="controls">
+												<input type="text" v-model="payAmount" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">余额 :</label>
+											<div class="controls">
+												<input type="text" v-model="balance" />
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+							</button>
+						<button type="button" class="btn btn-primary" @click="baocun()">
+								保存
+							</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+
+		<div id="page" style="display: none">
+			<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+		</div>
+	</div>
+
+	<% include ../footer.ejs %>
+	<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+
+	<script>
+		$(function() {
+
+			$("#datepicker").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+			$("#datepicker1").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+			$("#datepicker2").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+		});
+	</script>
+	<script src="/javascripts/jquery-ui.js"></script>
+	<script src="/javascripts/vue-2.42.js"></script>
+	<script src="/javascripts/vue-resource.js"></script>
+	<script src="/javascripts/public_page.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+	<script>
+		$(function(){
+			$(".getAccounts").click(function(){
+				$(this).addClass("btn-primary").siblings().removeClass("btn-primary");
+			})
+		})
+	</script>
+	<script>
+		var total = "";
+		var datasets = "";
+		new Vue({
+			el: '#content',
+			data: {
+				all: 0, //总页数
+				cur: 1, //当前页码
+				ourAccountId: "", //我方账户id
+				reciprocalAccountId: "", // 往来账户id
+				payType: "", //交易类型
+				receiveAmount: "", //收入金额
+				payAmount: "", //支出金额
+				balance: "", //余额
+				accountId: "1",
+				collectionList: "",
+				accounts:"",
+				accounts1:"",
+				enterpriseType:"",
+
+			},
+			components: {
+				'vue-nav': pagenav
+			},
+			watch: {
+				cur: function(oldValue, newValue) {
+					// this.data();
+				}
+			},
+			mounted: function() {
+				this.time();
+				this.listenDate(this.cur);
+				this.getAccounts(1);
+				this.getAccounts1();
+			},
+			methods: {
+				listenDate: function(data) {
+					var _this = this;
+					var startTime = parseInt((new Date($("#datepicker").val())).getTime() - 28800000);
+					var endTime = parseInt((new Date($("#datepicker1").val())).getTime() - 28800000 + 86399000);
+					var accountId = parseInt(this.accountId);
+					var pageSize = 10;
+					$(".loading").show();
+					$(".tab-two").show();
+					$("#page").show();
+					this.$http.post("/accountCapital/reconciliation/getAccountings", {
+						"pageNum": data,
+						"pageSize": pageSize,
+						"startTime": startTime,
+						"endTime": endTime,
+						"accountId": accountId,
+					}).then(function(res) {
+						//console.log(res);
+						$(".loading").hide();
+						if(res.body.code == "D1007") {
+							alert(res.body.msg);
+							return false;
+						}
+						if(res.body.code == "D1006") {
+							alert(res.body.msg);
+							return false;
+						}
+						_this.collectionList = res.body.res.data;
+						_this.pageTotal = res.body.res.total;
+						if(_this.collectionList==""){
+							$(".table_toggle1").show();
+						}else{
+							$(".table_toggle1").hide();
+						}
+						$(".table_toggle").show();
+						if(data <= 1) {
+							total = Math.ceil(_this.pageTotal / 10);
+						}
+						_this.all = total;
+						_this.cur = data;
+					});
+
+				},
+
+				time: function() {
+					var seperator1 = "-";
+
+					var startDate = new Date();
+					startDate.setDate(startDate.getDate() - 7);
+					var startYear = startDate.getFullYear();
+					var startMonth = startDate.getMonth() + 1;
+					if(startMonth < 10) startMonth = "0" + startMonth;
+					var startDay = startDate.getDate();
+					if(startDay < 10) startDay = "0" + startDay;
+					var endDate = new Date();
+					var endYear = endDate.getFullYear();
+					var endMonth = endDate.getMonth() + 1;
+					if(endMonth < 10) endMonth = "0" + endMonth;
+					var endDay = endDate.getDate();
+					if(endDay < 10) endDay = "0" + endDay;
+					var currentdate = startYear + seperator1 + startMonth + seperator1 + startDay;
+					var currentdate1 = endYear + seperator1 + endMonth + seperator1 + endDay;
+					$("#datepicker").val(currentdate);
+					$("#datepicker1").val(currentdate1);
+				},
+				baocun: function() {
+
+					var _this = this;
+					var time = parseInt((new Date($("#datepicker2").val())).getTime() - 28800000);
+					var ourAccountId = parseInt(this.ourAccountId); //我方账户id
+					var reciprocalAccountId = parseInt(this.reciprocalAccountId); // 往来账户id
+					var payType = parseInt(this.payType); // 交易类型
+					var receiveAmount = this.receiveAmount; // 收入金额
+					var payAmount = this.payAmount; // 支出金额
+					var balance = this.balance; // 余额
+					if(isNaN(ourAccountId)) {
+						alert("请选择我方账户");
+						return false;
+					} else if(isNaN(reciprocalAccountId)) {
+						alert("请选择往来账户");
+						return false;
+					} else if(isNaN(payType)) {
+						alert("请选择交易类型");
+						return false;
+					} else if(receiveAmount == "") {
+						alert("请输入收入金额");
+						return false;
+					} else if(payAmount == "") {
+						alert("请输入支出金额");
+						return false;
+					} else if(balance == "") {
+						alert("请输入余额");
+						return false;
+					}
+					this.$http.post("/accountCapital/reconciliation/accounting", {
+						"time": time,
+						"ourAccountId": ourAccountId,
+						"reciprocalAccountId": reciprocalAccountId,
+						"payType": payType,
+						"receiveAmount": receiveAmount,
+						"payAmount": payAmount,
+						"balance": balance,
+
+					}).then(function(res) {
+						var code = res.body.code;
+						var msg = res.body.msg;
+						if(code == "0000") {
+							alert(msg)
+							$(".btn-default").click();
+							//_this.listenDate();
+						} else if(code == "0001") {
+							alert(msg)
+						}
+					});
+				},
+
+				resets: function() {
+					$("#datepicker").val("");
+					$("#datepicker1").val("");
+					this.status = "";
+					this.beginDate = "";
+					this.endDate = "";
+					this.cashId = "";
+					this.userName = "";
+					this.mobile = "";
+					this.idCard = "";
+					this.company = "";
+					this.fundChannel = "";
+				},
+				getAccounts:function(data){
+	            	var enterpriseType= parseInt(data);
+	            	this.$http.post("/accountCapital/reconciliation/getAccounts",{
+	                    "enterpriseType": enterpriseType,
+	                }).then(function(res){
+	                	//console.log(res)
+	                	 this.accounts=res.body.res;
+					});
+                },
+                getAccounts1:function(data){
+	            	var enterpriseType= parseInt(data);
+	            	this.$http.post("/accountCapital/reconciliation/getAccounts",{
+	                }).then(function(res){
+	                	 this.accounts1=res.body.res;
+					});
+                },
+				downLoad:function(){
+                    if(this.all > 5000){
+                        alert("单次下载页数不能超过5000页");
+                    }
+					var _this = this;
+					var startTime = parseInt((new Date($("#datepicker").val())).getTime() - 28800000);
+					var endTime = parseInt((new Date($("#datepicker1").val())).getTime() - 28800000 + 86399000);
+					var accountId = this.accountId;
+	            	this.$http.get("/accountCapital/reconciliation/getAccountingsDownload").then(function(res){
+	            		//window.location.href="http://192.168.10.232:8080/liquidation/reconciliation/getAccountingsDownload?startTime="+startTime+"&endTime="+endTime+"&accountId="+accountId+"&authToken="+res.body;
+	            		window.location.href="https://api.lqd.91naxia.com/liquidation/reconciliation/getAccountingsDownload?startTime="+startTime+"&endTime="+endTime+"&accountId="+accountId+"&authToken="+res.body;
+
+
+	            	});
+	            }
+			}
+		})
+	</script>

@@ -1,0 +1,478 @@
+<% include ../header.ejs %>
+<style type="text/css">
+	.row-fluid .span6 {
+		margin-left: 0;
+	}
+	
+	.row-fluid [class*="span"] span {
+		width: 24%;
+		display: inline-block;
+		text-align: center;
+		height: 30px;
+		line-height: 30px;
+		font-size: 14px;
+		float: left;
+	}
+	
+	.row-fluid .row-fluid-title {
+		height: 40px;
+		line-height: 40px;
+		margin: 0;
+		border-bottom: 1px solid #cdcdcd;
+	}
+	
+	.row-fluid .row-fluid-title b {
+		font-size: 14px;
+		padding-left: 20px;
+	}
+	
+	.control-group {
+		padding: 5px 0;
+	}
+	.span-box-one{border: none;}
+	.widget-content1{background: #fafafa;margin: 20px ;border-bottom: none;}
+	.form-horizontal .control-group{border-bottom:1px solid #fafafa;border-top:1px solid #fafafa;}
+	.form-horizontal .control-group span{text-align: left;height: 40px;line-height: 40px;}
+	.form-horizontal .control-group span:first-child{padding-left: 20px;}
+</style>
+<div id="content" >
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>资金管理</a>
+			<a href="#" class="current">账户资金</a>
+		</div>
+		<h1>账户资金</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+
+		<hr>
+		<div style="background: #fff;padding: 10px;">
+			<div class="row-fluid" style="margin-top:0;">
+				<div class="span3" style="border-right: 1px solid #E2E2E2;">
+					<div class="span-box-one" style="height: 160px;">
+						<p style="margin-top: 50px;">总资金<br><span style="font-size:36px;float: none;width: 100%;margin-top: 10px;" v-text="amountAll/100">0</span></p>
+					</div>
+				</div>
+				<div class="span3">
+					<div class="span-box-one" style="height: 160px;">
+						<p style="margin-top: 50px;">沐金农-资金总额<br><span style="font-size: 36px;float: none;width: 100%;margin-top: 10px;" v-text="amount2/100">0</span></p>
+					</div>
+				</div>
+				<div class="span3">
+					<div class="span-box-one" style="height: 160px;">
+						<p style="margin-top: 50px;">想就拿-现金总额<br><span style="font-size: 36px;float: none;width: 100%;margin-top: 10px;" v-text="amount1/100">0</span></p>
+					</div>
+				</div>
+				<div class="span3">
+					<div class="span-box-one" style="height: 160px;">
+						<p style="margin-top: 50px;">喵财有道-现金总额<br><span style="font-size: 36px;float: none;width: 100%;margin-top: 10px;" v-text="amount3/100">0</span></p>
+					</div>
+				</div>
+				<!---->
+			</div>
+		</div>
+		
+		<br>
+
+		<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+			<a @click="getAccounts(1)" class="btn2 cur1">想就拿<a>
+			<a @click="getAccounts(2)" class="btn2">沐金农<a>
+			<a @click="getAccounts(3)" class="btn2">喵财有道</a>
+		</div>
+		<div class="row-fluid tab-two">
+			<div style="background: #fff;">
+				
+				<div class="widget-content widget-content1 nopadding form-horizontal" style="min-height: 200px;">
+					<p class="row-fluid-title">
+						<b>银行账户</b><span style="padding: 5px 10px;float: right;color: #4c84ff;cursor: pointer;" data-toggle="modal" data-target="#myModal">添加银行账号</span>
+						<span style="padding: 5px 10px;float: right;color: #4c84ff;cursor: pointer;" data-toggle="modal" data-target="#myModal1">添加账户信息</span>
+					</p>
+					<div class="control-group span11" v-for="msg in accountType1">
+						<span v-text="msg.accountName" ></span>
+						<span v-text="msg.accountNo" ></span>
+						<span v-if="msg.balabce>='0'" style="text-align: center;">{{msg.balabce/100}}元</span>
+						<span v-else style="text-align: center;">暂无数据</span>
+						<span style="text-align: right;"><a href="/flow/statismonth" target="liquidation" style="color:#4c84ff;"  @click="zhangdan(msg.accountId)">账单</a></span>
+					</div>
+				</div>
+				
+				<div class="widget-content widget-content1 nopadding form-horizontal" style="min-height: 200px;">
+					<p class="row-fluid-title">
+						<b>资方渠道账户</b>
+						<!--<span class="badge badge-success" style="padding: 5px 10px;float: right;margin: 10px 10px 0 0;" data-toggle="modal" data-target="#myModal">添加银行账号</span>-->
+					</p>
+					<div class="control-group span11" v-for="msg in accountType2">
+						<span v-text="msg.accountName"></span>
+						<span v-text="msg.accountNo"></span>
+<!--						<span v-text="msg.balabce/100+'元'" style="text-align: center;"></span>
+-->						<span v-if="msg.balabce>='0'" style="text-align: center;">{{msg.balabce/100}}元</span>
+						<span v-else style="text-align: center;">暂无数据</span>
+						<span style="text-align: right;"><a href="/flow/statismonth" target="liquidation" style="color:#4c84ff"  @click="zhangdan(msg.accountId)">账单</a></span>
+					</div>
+				</div>
+				
+				<div class="widget-content widget-content1 nopadding form-horizontal" style="min-height:200px;">
+					<p class="row-fluid-title">
+						<b>第三方支付渠道账户</b>
+						<!--<span class="badge badge-success" style="padding: 5px 10px;float: right;margin: 10px 10px 0 0;" data-toggle="modal" data-target="#myModal">添加银行账号</span>-->
+					</p>
+					<div class="control-group span11" v-for="msg in accountType3">
+						<span v-text="msg.accountName"></span>
+						<span v-text="msg.accountNo"></span>
+						<!--<span v-text="msg.balabce/100+'元'" style="text-align: center;"></span>-->
+						<span v-if="msg.balabce>='0'" style="text-align: center;">{{msg.balabce/100}}元</span>
+						<span v-else style="text-align: center;">暂无数据</span>
+						<span style="text-align: right;"><a href="/flow/statismonth" target="liquidation" style="color:#4c84ff"  @click="zhangdan(msg.accountId)">账单</a></span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+								添加银行卡
+							</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">账户名称:</label>
+											<div class="controls">
+												<input type="text" v-model="ourAccountName" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">公司主体 :</label>
+											<div class="controls">
+												<select name="productLine" id="productLine" v-model="qy_name">
+													<option value="">请选择</option>
+													<option v-for="bb in licenseList" v-bind:value="bb.id" v-text="bb.enterpriseName"></option>
+												</select>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">开户行 :</label>
+											<div class="controls">
+												<input type="text" v-model="yinhang_name" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">银行账号 :</label>
+											<div class="controls">
+												<input type="text" v-model="bankNo" />
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+							</button>
+						<button type="button" class="btn btn-primary" @click="baocun()">
+								保存
+							</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+								添加账户信息
+							</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">企业主体 :</label>
+											<div class="controls">
+												<select name="productLine" id="productLine" v-model="enterpriseType">
+													<option value="">请选择</option>
+													<option v-for="bb in licenseList" v-bind:value="bb.id" v-text="bb.enterpriseName"></option>
+												</select>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">账户类型 :</label>
+											<div class="controls">
+												<select name="productLine" id="productLine" v-model="accountType">
+													<option value="">请选择</option>
+													<option value="1" >银行</option>
+													<option value="2" >资方</option>
+													<option value="3" >代扣</option>
+												</select>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">账户名称 :</label>
+											<div class="controls">
+												<input type="text" v-model="yinhang_name1" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">银行账号 :</label>
+											<div class="controls">
+												<input type="text" v-model="bankNo1" />
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+							</button>
+						<button type="button" class="btn btn-primary" @click="baocun1()">
+								保存
+							</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!--<div id="page" style="display: none">
+			<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+		</div>-->
+	</div>
+
+	<% include ../footer.ejs %>
+	<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+
+	<script>
+		$(function() {
+			$(".xiangqing_list a").click(function(){
+				$(this).addClass("cur1").siblings().removeClass("cur1")
+			})
+
+			$("#datepicker").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+			$("#datepicker1").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+		});
+	</script>
+	<script src="/javascripts/jquery-ui.js"></script>
+	<script src="/javascripts/vue-2.42.js"></script>
+	<script src="/javascripts/vue-resource.js"></script>
+	<script src="/javascripts/public_page.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+
+	<script>
+		var total = "";
+		var datasets = "";
+		new Vue({
+			el: '#content',
+			data: {
+				all: 0, //总页数
+				cur: 1, //当前页码
+				amountAll: "",
+				amount1: "",
+				amount2: "",
+				amount3: "",
+				accountType1:"",
+				accountType2:"",
+				accountType3:"",
+				data: "",
+				licenseList: "",
+				qy_name: "",
+				yinhang_name: "",
+				bankNo: "",
+				yinhang_name1: "",
+				bankNo1: "",
+				ourAccountName:"",
+				enterpriseType:"",
+				accountType:"",
+				
+
+			},
+			components: {
+				'vue-nav': pagenav
+			},
+			watch: {
+				cur: function(oldValue, newValue) {
+					// this.data();
+				}
+			},
+			mounted: function() {
+				this.getAccounts(1);
+				this.qyList();
+				//this.listenDate(this.cur);
+
+			},
+			methods: {
+				
+				//签约企业
+				qyList: function() {
+					var _this = this;
+					this.$http.post("/pay/product/jsonEnt").then(function(res) {
+						this.licenseList = res.body.res.enterprise;
+					});
+				},
+				zhangdan: function(accountId) {
+					sessionStorage.setItem('accountId', accountId);
+				},
+				baocun: function() {
+					var _this = this;
+
+					var qy_name = parseInt(this.qy_name); //公司主体
+					var yinhang_name = this.yinhang_name; // 开户行
+					var bankNo = this.bankNo; // 银行账号
+					var ourAccountName = this.ourAccountName; // 银行账号
+					
+
+					if(isNaN(qy_name)) {
+						alert("请选择添加银行账号");
+						return false;
+					}
+					if(yinhang_name == "") {
+						alert("请输入开户行");
+						return false;
+					} else if(bankNo == "") {
+						alert("请输入银行账号");
+						return false;
+					}
+					else if(ourAccountName == "") {
+						alert("请输入账户名");
+						return false;
+					}
+					this.$http.post("/accountCapital/reconciliation/addAccount", {
+						"enterpriseType": qy_name,
+						"bankName": yinhang_name,
+						"bankNo": bankNo,
+						"ourAccountName": ourAccountName,
+
+					}).then(function(res) {
+						var code = res.body.code;
+						var msg = res.body.msg;
+						if(code == "0000") {
+							alert(msg)
+							$(".btn-default").click();
+							getAccounts(1)
+
+							//_this.listenDate();
+						} else if(code == "0001") {
+							alert(msg)
+						}
+					});
+				},
+				baocun1: function() {
+					var _this = this;
+ 					
+					var accountType = parseInt(this.accountType); //账户类型
+					var enterpriseType = parseInt(this.enterpriseType); // 企业主体
+					var bankNo1 = this.bankNo1; // 银行账号
+					var yinhang_name1 = this.yinhang_name1; // 银行账号
+					if(isNaN(enterpriseType)) {
+						alert("请选择添加企业主体");
+						return false;
+					}
+					if(isNaN(accountType)) {
+						alert("请选择添加账户类型");
+						return false;
+					}
+					
+					if(bankNo1 == "") {
+						alert("请输入银行账号");
+						return false;
+					}
+					else if(yinhang_name1 == "") {
+						alert("请输入账户名");
+						return false;
+					}
+					this.$http.post("/accountCapital/capitalAccount/saveAccount", {
+						"enterpriseType": enterpriseType,
+						"accountType": accountType,
+						"accountNo": bankNo1,
+						"name": yinhang_name1,
+
+					}).then(function(res) {
+						//console.log(res)
+						var code = res.body.code;
+						var msg = res.body.msg;
+						if(code == "0000") {
+							alert(msg)
+							$(".btn-default").click();
+							getAccounts(1)
+
+							//_this.listenDate();
+						} else if(code == "0001") {
+							alert(msg)
+						}
+					});
+				},
+
+				getAccounts: function(data) {
+					var params = "";
+					if(data == "1") {
+						params = {
+							enterpriseId: 1
+						}
+					}
+					if(data == "2") {
+						params = {
+							enterpriseId: 2
+						}
+					}
+					if(data == "3") {
+						params = {
+							enterpriseId: 3
+						}
+					}
+					//console.log(params)
+					var _this = this;
+					this.$http.post("/accountCapital/reconciliation/allAccounts", params).then(function(res) {
+						//console.log(res)
+						var code = res.body.code;
+						var msg = res.body.msg;
+						$(".loading").hide();
+						if(code == "0000") {
+							_this.amountAll = (res.body.res.amountAll).toFixed(2);
+							_this.amount1 = (res.body.res.amount1).toFixed(2);
+							_this.amount2 = (res.body.res.amount2).toFixed(2);
+							_this.amount3 = (res.body.res.amount3).toFixed(2);
+							_this.accountType1 = res.body.res.accountType1;
+							_this.accountType2 = res.body.res.accountType2;
+							_this.accountType3 = res.body.res.accountType3;
+							
+							
+							
+
+						} else if(code == "0001") {
+							alert(msg)
+						}
+
+					});
+				},
+
+			}
+		})
+	</script>

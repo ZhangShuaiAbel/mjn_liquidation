@@ -1,0 +1,406 @@
+<% include ../header.ejs %>
+
+<!--交易管理--收款交易查询-->
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>交易管理</a>
+			<a href="#" class="current">异常收款订单</a>
+		</div>
+					<h1>异常收款订单</h1>
+
+	</div>
+
+	<div class="container-fluid">
+	    <div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+	    <hr>
+		<div class="row-fluid">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5></h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>创建时间</th>
+									<th>交易流水号</th>
+									<th>商户订单号</th>
+									<th>商品名称</th>
+									<th>交易方式</th>
+									<th>交易金额</th>
+									<th>状态</th>
+									<th>收款主体</th>
+									<th>买方</th>
+									<th>买方账号</th>
+									<th>最近更新时间</th>
+									<th width="100" style="white-space: nowrap;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+							<tr v-for="msg in collectionList">
+									<td>{{msg.createTime | time}}</td>
+									<td v-text="msg.transactionFlowNo"></td>
+									<td v-text="msg.orderId"></td>
+									<td v-text="msg.commodityName"></td>
+									<td v-text="msg.channelName"></td>
+									<td v-text="msg.amount/100"></td>
+									<td v-if="msg.status=='0'">待支付</td>
+									<td v-else-if="msg.status=='1'">支付成功</td>
+									<td v-else-if="msg.status=='2'">失败</td>
+									<td v-else>其他</td>
+									<td v-text="msg.enterpriseName"></td>
+									<td v-text="msg.buyers"></td>
+									<td v-text="msg.buyersAccount"></td>
+									<td>{{msg.updateTime | time}}</td>
+									<td width="100" style="white-space: nowrap;">
+										<button data-toggle="modal" data-target="#myModal" class="btn-info btn-mini float_btn_cen" @click="refund(msg.id,msg.status,msg.refundStatus)">退款</button>
+									</td>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+								申请退款
+							</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<input type="hidden" id="druleId" name="druleId">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">创建时间 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="createTime_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">商户订单号 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="buyersIdCard_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">商品名称 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="commodityName_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">支付通道 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="channelName_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">退款金额 :</label>
+											<div class="controls">
+												<input type="text" v-model="amount_1" onkeyup="value=value.replace(/\.\d{2,}$/,value.substr(value.indexOf('.'),3))"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">退款户名 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="buyers_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">退款账号 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="buyersAccount_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">退款原因 :</label>
+											<div class="controls">
+												<textarea name="" rows="" cols="" v-model="refundReason"></textarea>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">附件材料 :</label>
+											<div class="controls">
+												<div id="showAttrs">
+													<div v-for="msg in mbTransactionAttList" class="qiniu" style="position: relative;">
+													<span><img :src="msg.path" :id="msg.id" :transactionId="msg.transactionId"></span>
+													<b onclick="dels(this)" style="position: absolute;right: 0;top: 0;"><img src="../../images/close.png" @click="delImg(msg.id)"></b>
+													<div class="img_path" :data_path="msg.path"></div>
+													</div>
+                                                </div>
+                                                <input type="hidden" id="attrs" name="attrs">
+												<button type="button" id="ADDsubmit" class="btn btn-success" >添加附件</button>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" id="btn-default" data-dismiss="modal">关闭
+							</button>
+						<button type="button" class="btn btn-primary" @click="applyRefund(id_1)">
+								申请退款
+							</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="page">
+			<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+		</div>
+<div class="modal" id="shangchuan_list" style="display: none;">
+
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" onclick="closes()">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel"  >
+                    上传文件
+                </h4>
+                <input type="hidden" id="pictureType">
+            </div>
+            <div class="modal-body">
+                <div class="widget-box">
+                    <div class="widget-content nopadding">
+                        <div class="" style="width: 100%">
+
+                            <div class="tab-content">
+                                <div role="tabpanel" class="tab-pane fade in active" id="demo" aria-labelledby="demo-tab">
+
+                                    <div class="" style="margin-top: 20px;">
+                                        <input type="hidden" id="domain" value="http://7xocov.com1.z0.glb.clouddn.com/">
+                                        <input type="hidden" id="uptoken_url" value="/pay/product/getUploadToken">
+
+                                        <div class="col-md-12">
+                                            <div id="container">
+                                                <a class="btn btn-primary " id="pickfiles" href="#" style="margin-left: 20px">
+                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                    <span>选择文件</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 ">
+                                            <table class="table table-striped table-hover text-left"   style="margin-top:20px;display:none">
+                                                <thead>
+                                                <tr>
+                                                    <th class="col-md-4">文件名</th>
+                                                    <th class="col-md-2">大小</th>
+                                                    <th class="col-md-6">详情</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody id="fsUploadProgress">
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" onclick="closes()">关闭</button>
+                <input type="button" class="btn btn-primary addimg fileBtn" value="上传" id="" onclick="closes()" />
+            </div>
+        </div>
+
+    </div>
+	</div>
+</div>
+
+<% include ../footer.ejs %>
+
+<script src="/javascripts/jquery.min.js"></script>
+<script src="/javascripts/jquery-ui.js"></script>
+<script src="/javascripts/vue-resource.js"></script>
+<script src="/javascripts/public_page.js"></script>
+<script src="/javascripts/time_filter.js"></script>
+
+<script type="text/javascript" src="/javascripts/bower_components/plupload/js/moxie.js"></script>
+<script type="text/javascript" src="/javascripts/bower_components/plupload/js/plupload.dev.js"></script>
+<script type="text/javascript" src="/javascripts/bower_components/plupload/js/i18n/zh_CN.js"></script>
+<script type="text/javascript" src="/javascripts/scripts/ui.js"></script>
+<script type="text/javascript" src="/javascripts/src/qiniu.js"></script>
+<script type="text/javascript" src="/javascripts/scripts/highlight.js"></script>
+<script type="text/javascript" src="/javascripts/scripts/mainDeal.js"></script>
+<script type="text/javascript">hljs.initHighlightingOnLoad();</script>
+<script>
+
+
+	$(function(){
+		$("#ADDsubmit").click(function(){
+			$("#shangchuan_list").show();
+		})
+	})
+	function closes(){
+		$("#shangchuan_list").hide();
+	}
+	function dels(e) {
+		    var attrsVal=$("#attrs").val();
+		    var arr=attrsVal.split(',');
+		    arr.splice($(e).parent(".qiniu").index(),1);
+		    var arrs= arr.join(",");
+		    $("#attrs").val(arrs);
+		    $(e).parents(".qiniu").remove();
+		    return arr;
+		}
+</script>
+<script type="text/javascript">
+var total = "";
+	var pageBar = new Vue({
+        el: '#content',
+        data: {
+            all: 0, //总页数
+            cur: 1,//当前页码
+            msg:'',
+            collectionList:"",
+            amount_1:"",
+            createTime_1:"",
+            buyers_1:"",
+            buyersAccount_1:"",
+            buyersIdCard_1:"",
+            buyersPhone_1:"",
+            channelName_1:"",
+            commodityName_1:"",
+            id_1:"",
+            refundReason:"",
+            mbTransactionAttList:"",
+        },
+        components:{
+            'vue-nav':pagenav
+        },
+        watch: {
+            cur: function(oldValue , newValue){
+                // console.log('监听cur前与后的值：');
+                // console.log(arguments);
+            }
+        },
+        mounted:function(){
+			this.listenDate(this.cur);
+		},
+        methods:{
+            listenDate:function(data){
+            	$(".loading").show();
+				var _this = this;
+				var id = sessionStorage.getItem('id');
+				//console.log(id);
+				var pageSize = 10;
+				this.$http.post("/deal/mbTransaction/jsonAoExtTra",{"pageNum":data,"pageSize":pageSize,"extId":id}).then(function(res){
+					$(".loading").hide();
+					if(res.body.code=="D1007"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 if(res.body.code=="D1006"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 _this.collectionList = res.body.res.mbTransaction.res;
+					 _this.pageTotal = res.body.res.mbTransaction.total;
+					 $(".table_toggle").show();
+                    if (data<=1) {
+						total = Math.ceil(_this.pageTotal/10);
+					}
+					   _this.all = total;
+					   _this.cur = data;
+				});
+	        },
+	        refund:function(id,status,refundStatus){
+            	//console.log(id);
+            	if(status=="1"){
+            		if(refundStatus!="1" &&  refundStatus!="2" &&  refundStatus!="4"){
+            			$("#tui_btn").attr({
+            				'data-toggle': 'modal',
+            				'data-target': '#myModal'
+            			});
+            			this.$http.post("/deal/mbTransaction/oneTra",{"id":id}).then(function(res){
+	                	   //console.log(res)
+		                	var amount_1=res.body.res.mbTransaction.amount;
+		                	this.amount_1=amount_1/100;
+		                	var createTime_1=res.body.res.mbTransaction.createTime;
+		                	this.createTime_1=new Date(createTime_1).toLocaleString();
+		                	this.buyers_1=res.body.res.mbTransaction.buyers;
+		                	this.buyersAccount_1=res.body.res.mbTransaction.buyersAccount;
+		                	this.buyersIdCard_1=res.body.res.mbTransaction.buyersIdCard;
+		                	this.buyersPhone_1=res.body.res.mbTransaction.buyersPhone;
+		                	this.channelName_1=res.body.res.mbTransaction.channelName;
+		                	this.commodityName_1=res.body.res.mbTransaction.commodityName;
+		                	this.id_1=res.body.res.mbTransaction.id;
+		                	this.mbTransactionAttList=res.body.res.mbTransaction.mbTransactionAttList;
+		                	this.refundReason=res.body.res.mbTransaction.refundReason;
+		                	var list = this.mbTransactionAttList;
+		                	/*for(i=0;i<list.length;i++){
+		                		//console.log(list[i]);
+		                	}*/
+		                	var array = "";
+				            $.each(list, function(i){
+					            var  img_list= list[i].path;
+					            array+=img_list+","
+				            });
+				            $("#attrs").val(array)
+						});
+            		}else{
+            			alert("订单已退回");
+            		}
+            	}else if(status!="1"){
+            		alert("订单已退回");
+            	}
+            },
+            applyRefund:function(id){
+            	var attrsImg=$("#attrs").val();
+            	var refundAmount1=this.amount_1*100;
+            	var refundReason=this.refundReason;
+            	var refundAmount=Math.round(refundAmount1);
+            	// console.log(refundAmount);
+            	var ary = [];
+            	strs=attrsImg.split(",");
+            	if(strs.length>4){
+            		alert("图片不能超过三张");
+            		return false;
+            	}
+            	this.$http.post("/deal/mbTransaction/updateToWait",{"id":id,"refundAmount":refundAmount,"refundReason":refundReason,"path":attrsImg}).then(function(res){
+                	 //console.log(res)
+                	 var code=res.body.code;
+                	 var msg=res.body.msg;
+                	 if(code=="0000"){
+                	 	alert(msg);
+                	 	$("#btn-default").click();
+                	 }else if(code=="0001"){
+                	 	alert(msg);
+                	 }
+				});
+            },
+            delImg:function(id){
+            	//console.log(id);
+            	this.$http.post("/deal/mbTransaction/deleteAtt",{"id":id}).then(function(res){
+
+				});
+            }
+        }
+    })
+</script>

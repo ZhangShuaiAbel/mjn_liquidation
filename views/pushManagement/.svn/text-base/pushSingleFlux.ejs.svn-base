@@ -1,0 +1,216 @@
+<% include ../header.ejs %>
+
+<!--退单管理--推单流量管理-->
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>渠道管理</a>
+			<a href="#" class="current">推单流量管理</a>
+		</div>
+		<h1>推单流量管理</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+		<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+
+			<a href="/push/capitalChannel" target="liquidation" class="btn2">资金渠道管理</a>
+
+			<a href="/push/pushSingleFlux" target="liquidation" class="btn2 cur1">推单流量管理</a>
+
+			<a href="/push/configuration" target="liquidation" class="btn2">资金渠道费率配置</a>
+
+		</div>
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+								管理推单配置
+							</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<input type="hidden" id="druleId" name="druleId">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">产品名称 :</label>
+											<div class="controls">
+												<select name="" v-model="oneId" disabled="disabled">
+													<option value="">请选择</option>
+													<option v-for="msg in proList" v-bind:value="msg.id" v-text="msg.productName"></option>
+												</select>
+											</div>
+										</div>
+										<div class="control-group for-list" v-for="(msg,index) in oneList">
+											<label class="control-label" style="width: 150px">{{msg.name}}</label>
+											<div class="controls">
+												<input class="pei" style="width: 60px" type="text" v-model="msg.proportion" :data-id="msg.proportion" :data-class="msg.id" :data-sort="msg.sort" onkeyup="return number(this)" />
+												<button type="button" class="btn btn-primary">%</button>
+												<span style="margin-left: 10px">排序</span>
+												<input style="width: 60px" type="text" v-model="msg.sort" />
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+							</button>
+						<button type="button" id="btn-1" class="btn btn-primary" @click="upConfiguration">
+								保存
+							</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+		<!-- 		<hr> -->
+		<div class="row-fluid">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5></h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>产品名称</th>
+									<th>资金渠道<span>/</span>比例</th>
+									<th width="100" style="white-space: nowrap;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+								<tr v-for="msg in trafficList">
+									<td v-text="msg.productName"></td>
+									<td v-text="msg.capitalChannelNameProportion"></td>
+									<td width="100" style="white-space: nowrap;">
+										<a style="color:#2f96b4" data-toggle="modal" href="javascript:;" data-target="#myModal" @click="upOne(msg.id)">管理</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+<% include ../footer.ejs %>
+<!-- <script src="/javascripts/public_page.js"></script> -->
+<script src="/javascripts/vue-resource.js"></script>
+<script type="text/javascript">
+	function number(e) {
+		var shu = $(e).val();
+		if(shu > 100) {
+			$(e).val("");
+			alert("数字不能大于100");
+
+		}
+	}
+	var idValue = [];
+	var classValue = [];
+	var products = new Vue({
+		el: '#content',
+		data: {
+			trafficList: "",
+			proList: "",
+			oneList: "",
+			oneId: "",
+		},
+		mounted: function() {
+			this.capitalList();
+			this.productList();
+		},
+		methods: {
+			//查询列表
+			capitalList: function() {
+				$(".loading").show();
+				var _this = this;
+				this.$http.post("/push/capitalProduct/jsonCap").then(function(res) {
+					$(".loading").hide();
+					if(res.body.code == "D1007") {
+						alert(res.body.msg);
+						return false;
+					}
+					if(res.body.code == "D1006") {
+						alert(res.body.msg);
+						return false;
+					}
+					_this.trafficList = res.body.res.capitalProduct;
+					$(".table_toggle").show();
+				});
+			},
+			//适用产平查询
+			productList: function() {
+				var _this = this;
+				this.$http.post("/pay/product/jsonPro", {}).then(function(res) {
+					_this.proList = res.body.res.products;
+					// //console.log(res)
+				});
+			},
+			//推单查询
+			upOne: function(id) {
+				// //console.log(id);
+				var _this = this;
+				this.$http.post("/push/capitalProduct/oneCap", {
+					"id": id
+				}).then(function(res) {
+					console.log(res);
+					_this.oneId = res.body.res.capitalProduct.productId;
+					_this.oneList = res.body.res.capitalProduct.cpList;
+				});
+			},
+			upConfiguration: function() {
+				var _this = this;
+				var len = $(".for-list .controls .pei").size();
+				var arr = [];
+				for(var index = 0; index < len; index++) { //创建一个数字数组
+					arr[index] = index;
+				}
+				var array = [];
+				$.each(arr, function(i) { //循环得到不同的id的值
+					var idValue = $(".for-list .controls .pei").eq(i).attr("data-id");
+					var classValue = $(".for-list .controls .pei").eq(i).attr("data-class");
+					var sort = $(".for-list .controls .pei").eq(i).attr("data-sort");
+					var temp = {
+						id: classValue,
+						proportion: idValue,
+						sort: sort
+					};
+					array.push(temp);
+					capitalProductList = JSON.stringify(array);
+				});
+
+				this.$http.post("/push/capitalProduct/updateCap", {
+					capitalProductList: capitalProductList
+				}).then(function(res) {
+					var code = res.body.code;
+					var msg = res.body.msg;
+					if(code == "0000") {
+						alert(msg);
+						$("#myModal").modal("hide");
+						_this.capitalList();
+					} else if(code == "0001") {
+						alert(msg);
+					}
+				});
+			}
+		}
+	})
+</script>

@@ -1,0 +1,208 @@
+<% include ../header.ejs %>
+
+<!--退单管理--推单流量管理-->
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>渠道管理</a>
+			<a href="#" class="current">扣款渠道管理</a>
+		</div>
+		<h1>扣款渠道管理</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+		<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+			
+			<a href="/push/deductions" target="liquidation" class="btn2">扣款渠道管理</a>
+
+			<a href="/push/allocation" target="liquidation" class="btn2 cur1">比例配置</a>
+			
+			<a href="/push/codeback" target="liquidation" class="btn2">返回码配置</a>		
+			
+			<a href="/push/errorcode" target="liquidation" class="btn2">返回错误码</a>
+		</div>
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+								管理比例配置
+							</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<input type="hidden" id="druleId" name="druleId">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">产品名称 :</label>
+											<div class="controls">
+												<input type="text" disabled="disabled" v-model="name"/>
+											</div>
+										</div>
+										<div class="control-group for-list" v-for="msg in oneList">
+											<label class="control-label" style="width: 150px">{{msg.channelName}}</label>
+											<div class="controls">
+												<input class="pei" style="width: 60px" type="text" v-model="msg.scale" :data-id="msg.id" :data-class="msg.scale" :data-sort="msg.orderNo" onkeyup="return number(this)"/>
+												<button type="button" class="btn btn-primary">%</button>
+												<span style="margin-left: 10px">排序</span>
+												<input style="width: 60px" type="text" v-model="msg.orderNo"/>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+							</button>
+						<button type="button" id="btn-1" class="btn btn-primary" @click="upConfiguration">
+								保存
+							</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+<!-- 		<hr> -->
+		<div class="row-fluid">
+			
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5></h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>扣款渠道名称</th>
+									<th>产品<span>/</span>比例</th>
+									<th width="100" style="white-space: nowrap;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+							    <tr v-for="msg in trafficList">
+								    <td v-text="msg.name"></td>
+									<td><span v-for="list in msg.configs" style="margin-right: 10px;">{{list.channel}} : {{list.scale}};</span></td>									
+									<td width="100" style="white-space: nowrap;">
+										<span style="color:#2f96b4;cursor: pointer;" data-toggle="modal" data-target="#myModal" @click="upOne(msg.appid,msg.name)">管理</span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+					</div>
+                    <div class="table_toggle1" style="display: none;">暂无数据</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<% include ../footer.ejs %>
+<!-- <script src="/javascripts/public_page.js"></script> -->
+<script src="/javascripts/vue-resource.js"></script>
+<script type="text/javascript">
+
+function number(e){
+	var shu = $(e).val();
+	if(shu>100){
+		$(e).val("");
+		alert("数字不能大于100");
+
+	}
+}
+    var idValue=[];
+	var classValue=[];
+    var products = new Vue({
+        el: '#content',
+        data: {
+        	trafficList:"",
+        	proList:"",
+        	oneList:"",
+        	name:"",
+        },
+        mounted:function(){
+			this.capitalList();
+			this.productList();
+		},
+        methods:{
+        	//查询列表
+            capitalList:function(){
+            	$(".loading").show();
+            	var _this = this;
+                this.$http.post("/push/payChannel/getWithholdConfigList").then(function(res){
+//              	console.log(res);
+                	$(".loading").hide();
+                	if(res.body.code=="D1007"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 if(res.body.code=="D1006"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 _this.trafficList=res.body.res;
+					if(_this.trafficList==""){
+						$(".table_toggle1").show();
+					}else{
+						$(".table_toggle1").hide();
+					}
+					 $(".table_toggle").show();
+				});
+            },
+            //管理查询
+            upOne:function(id,name){
+            	var _this = this;
+            	_this.name=name;
+                this.$http.post("/push/payChannel/getWithholdConfig",{"appid":id}).then(function(res){
+                  	 console.log(res);
+				    _this.oneList=res.body.res;
+				});
+            },
+            upConfiguration:function(){
+	            var _this = this;
+	            var len = $(".for-list .controls .pei").size();
+		        var arr = [];
+		        for(var index = 0; index < len; index++){//创建一个数字数组
+	                arr[index] = index;
+	            }
+	            var array = [];
+		        $.each(arr, function(i){//循环得到不同的id的值
+		            var idValue = $(".for-list .controls .pei").eq(i).attr("data-id");
+		            var classValue = $(".for-list .controls .pei").eq(i).attr("data-class");
+		            var sort = $(".for-list .controls .pei").eq(i).attr("data-sort");
+		        	var temp = {id : idValue,order : sort,scale : classValue};
+		        	array.push(temp);
+		        	capitalProductList=JSON.stringify(array);
+	            });
+	            console.log(capitalProductList);
+				this.$http.post("/push/payChannel/saveWithholdConfig",{data:capitalProductList}).then(function(res){
+					console.log(res);
+                	var code=res.body.code;
+                	var msg=res.body.msg;
+				    if(code=="0000"){
+			        	alert(msg);
+			        	$("#myModal").modal("hide");
+			        	_this.capitalList();
+			        }else{
+			        	alert(msg);
+			        }
+					
+				});
+            }
+        }
+    })
+</script>

@@ -1,0 +1,171 @@
+<% include ../header.ejs %>
+
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>资金管理</a>
+			<a href="#" class="current">资金划转申请</a>
+		</div>
+		<h1>资金划转申请</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+
+		<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+			<a class="btn2 cur1" id="sqjl" href="/accountCapital/cashFlowAnalysis" target="liquidation">申请记录</a>
+			<a class="btn2" href="/accountCapital/cashFlowAnalysis1" target="liquidation">对公转账申请</a>
+			<a class="btn2" href="/accountCapital/cashFlowAnalysis2" target="liquidation">对私转账申请</a>
+		</div>
+		<hr>
+		<div class="row-fluid tab-two" style="">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>申请记录</h5>
+					</div>
+					<div id="common_list" class="widget-content nopadding">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>工单号</th>
+									<th>申请日期</th>
+									<th>申请类型</th>
+									<th>申请人</th>
+									<th>付款账户</th>
+									<th>付款账号</th>
+									<th>收款账户</th>
+									<th>收款账号</th>
+									<th>交易金额</th>
+									<th>审批人</th>
+									<th width="100" style="white-space: nowrap;">审批结果</th>
+									<th width="100" style="white-space: nowrap;">放款状态</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+								<tr v-for="msg in res">
+									<td v-text="msg.rebateNo"></td>
+									<td>{{msg.createTime | time}}</td>
+									<td v-if="msg.applyType=='1'">对公</td>
+									<td v-else-if="msg.applyType=='0'">对私</td>
+									<td v-else=""></td>
+									<td v-text="msg.applyUser"></td>
+									<!--<td v-if="msg.applyType=='1'"></td>
+									<td v-else-if="msg.applyType=='2'"></td>-->
+									<td v-text="msg.payAccount"></td>
+									<td v-text="msg.payAccountNo"></td>
+									<td v-text="msg.receiveAccount"></td>
+									<td v-text="msg.receiveBankNo"></td>
+									<td v-text="msg.amount/100"></td>
+									<td v-text="msg.auditUser"></td>
+									<td v-if="msg.auditResult=='0'">待审核</td>
+									<td v-else-if="msg.auditResult=='1'">审核通过</td>
+									<td v-else-if="msg.auditResult=='2'">拒绝</td>
+									<td v-else=""></td>
+									<td v-if="msg.payStatus=='0'">待打款</td>
+									<td v-if="msg.payStatus=='1'">放款成功</td>
+									<td v-if="msg.payStatus=='2'">放款失败</td>
+									<td v-if="msg.payStatus=='3'">提交第三方</td>
+									<td v-else=""></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="table_toggle1" style="display: none;">暂无数据</div>
+				</div>
+			</div>
+
+		</div>
+		<div id="page" style="display: none">
+			<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+		</div>
+	</div>
+
+	<% include ../footer.ejs %>
+
+	<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+
+	<script src="/javascripts/jquery-ui.js"></script>
+	<script src="/javascripts/vue-2.42.js"></script>
+	<script src="/javascripts/vue-resource.js"></script>
+	<script src="/javascripts/public_page.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+	<script>
+		$(function() {
+			$(".close").click(function() {
+				$(".close1").click();
+			})
+		})
+	</script>
+	<script type="text/javascript">
+		var total = "";
+		var pageBar = new Vue({
+			el: '#content',
+			data: {
+				all: 0, //总页数
+				cur: 1, //当前页码
+				res: "",
+				payAccount: "",
+				receiveAccount: "",
+				receiveBankNo: "",
+				receiveBank: "",
+				receiveBankCode: "",
+				amount: 0,
+				transferNote: "",
+				receiveAccountPhone: "",
+				receiveAccountIdcard: "",
+				payAccountNo: "201611141001247507"
+			},
+			components: {
+				'vue-nav': pagenav
+			},
+			watch: {
+				cur: function(oldValue, newValue) {}
+			},
+			mounted: function() {
+				this.listenDate(this.cur);
+			},
+			methods: {
+				listenDate: function(data) {
+					var _this = this;
+					var pageSize = 10;
+					var applyOrAudit = 0;
+					$(".loading").show();
+					$(".tab-two").show();
+					$("#page").show();
+					this.$http.post("/accountCapital/capitalTransfer/getCapitalTransferList", {
+						"pageNum": data,
+						"pageSize": pageSize,
+						"applyOrAudit": applyOrAudit,
+					}).then(function(res) {
+						console.log(res);
+						$(".loading").hide();
+						if(res.body.code == "D1007") {
+							alert(res.body.msg);
+							return false;
+						}
+						if(res.body.code == "D1006") {
+							alert(res.body.msg);
+							return false;
+						}
+						_this.res = res.body.res.res;
+						_this.pageTotal = res.body.res.total;
+						if(_this.collectionList == "") {
+							$(".table_toggle1").show();
+						} else {
+							$(".table_toggle1").hide();
+						}
+						$(".table_toggle").show();
+						if(data <= 1) {
+							total = Math.ceil(_this.pageTotal / 10);
+						}
+						_this.all = total;
+						_this.cur = data;
+					});
+				},
+
+			}
+		})
+	</script>

@@ -1,0 +1,89 @@
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/mujinnong/!svn/ver/25078/trunk/naxia/liquidation/liquidation-h5/views/pushManagement
+END
+walletServiceDetails.ejs
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/svn/mujinnong/!svn/ver/25078/trunk/naxia/liquidation/liquidation-h5/views/pushManagement/walletServiceDetails.ejs
+END
+pushSingleFlux.ejs
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/mujinnong/!svn/ver/23543/trunk/naxia/liquidation/liquidation-h5/views/pushManagement/pushSingleFlux.ejs
+END
+deductions.ejs
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/mujinnong/!svn/ver/24775/trunk/naxia/liquidation/liquidation-h5/views/pushManagement/deductions.ejs
+END
+membersMoney.ejs
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/mujinnong/!svn/ver/25017/trunk/naxia/liquidation/liquidation-h5/views/pushManagement/membersMoney.ejs
+END
+errorcode.ejs
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/mujinnong/!svn/ver/24944/trunk/naxia/liquidation/liquidation-h5/views/pushManagement/errorcode.ejs
+END
+allocation.ejs
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/mujinnong/!svn/ver/24775/trunk/naxia/liquidation/liquidation-h5/views/pushManagement/allocation.ejs
+END
+walletServiceAuditSettlement.ejs
+K 25
+svn:wc:ra_dav:version-url
+V 122
+/svn/mujinnong/!svn/ver/25078/trunk/naxia/liquidation/liquidation-h5/views/pushManagement/walletServiceAuditSettlement.ejs
+END
+capitalChannel.ejs
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/mujinnong/!svn/ver/23543/trunk/naxia/liquidation/liquidation-h5/views/pushManagement/capitalChannel.ejs
+END
+recoveryMoney.ejs
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/mujinnong/!svn/ver/23846/trunk/naxia/liquidation/liquidation-h5/views/pushManagement/recoveryMoney.ejs
+END
+configuration.ejs
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/mujinnong/!svn/ver/24944/trunk/naxia/liquidation/liquidation-h5/views/pushManagement/configuration.ejs
+END
+withdraw.ejs
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/mujinnong/!svn/ver/24288/trunk/naxia/liquidation/liquidation-h5/views/pushManagement/withdraw.ejs
+END
+codeback.ejs
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/mujinnong/!svn/ver/24775/trunk/naxia/liquidation/liquidation-h5/views/pushManagement/codeback.ejs
+END
+walletServiceNoSettlement.ejs
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/svn/mujinnong/!svn/ver/25078/trunk/naxia/liquidation/liquidation-h5/views/pushManagement/walletServiceNoSettlement.ejs
+END
+walletServiceSettlement.ejs
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/svn/mujinnong/!svn/ver/25078/trunk/naxia/liquidation/liquidation-h5/views/pushManagement/walletServiceSettlement.ejs
+END

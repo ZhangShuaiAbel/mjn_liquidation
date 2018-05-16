@@ -1,0 +1,871 @@
+<% include ../header.ejs %>
+<style>
+	.table th{
+		line-height: 37px
+	}
+	.table1-border{border:1px solid #CDCDCD;overflow: hidden;}
+	.table1-width{padding: 0 20px;}
+	.row-fluid .span12{margin-left: 0;border-bottom: 1px solid #CDCDCD;}
+	
+	.table th, .table td{text-align: center;}
+</style>
+<div id="content" style="background: #fff;">
+	<div id="content-header" >
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>基础订单信息</a>
+			<a href="#" class="current">订单详情</a>
+		</div>
+	</div>
+	<div class="container-fluid" style="background: #fff;">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<div class="xiangqing_list">
+			<h3>订单详情</h3>
+			
+		</div>
+		<div class="row-fluid  table1-border" >
+			<div class="table1-width">
+				<div class="span12">
+					<h5>用户信息</h5>
+					<div class="table1">
+						<div class="table1_list span4">
+							<span>用户编号:</span><p v-text="userInfoUid"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>用户名:</span><p v-text="userInfoName"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>手机号:</span><p v-text="userInfoPhone"></p>
+						</div>
+					</div>
+					<div class="table1">
+						<div class="table1_list span4">
+							<span>身份证号:</span><p v-text="userInfoIdcard"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>常住地址:</span><p v-text="userInfoHomeAddress"></p>
+						</div>
+					</div>
+					<div class="table1" v-for="msg in banks">
+						<div class="table1_list span4">
+							<span>银行卡开户行:</span><p v-text="msg.bankName"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>银行卡号:</span><p  v-text="msg.bankNo"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>银行卡状态:</span><p v-text="msg.bankStatus"></p>
+						</div>
+					</div>
+				</div>
+				<div class="span12">
+					<h5>订单信息</h5>
+					<div class="table1">
+						<div class="table1_list span4">
+							<span>借款人姓名:</span><p v-text="orderInfo_userName"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>我方账户:</span><p v-text="orderInfo_companey"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>合同金额:</span><!--<p v-text="orderInfo_approveAmount"></p>-->
+							<p v-if="orderInfo_approveAmount">{{orderInfo_approveAmount}}</p>
+							<p v-else>0</p>
+						</div>
+					</div>
+					<div class="table1">
+						<div class="table1_list span4">
+							<span>借款期限:</span><!--<p v-text="orderInfo_approvePeriod"></p>-->
+							<p v-if="orderInfo_approvePeriod">{{orderInfo_approvePeriod}}</p>
+							<p v-else>0</p>
+						</div>
+						<div class="table1_list span4">
+							<span>申请金额:</span><!--<p  v-text="orderInfo_amount"></p>-->
+							<p v-if="orderInfo_amount">{{orderInfo_amount}}</p>
+							<p v-else>0</p>
+						</div>
+						<div class="table1_list span4">
+							<span>放款金额:</span><!--<p  v-text="orderInfo_billAmount"></p>-->
+							<p v-if="orderInfo_billAmount">{{orderInfo_billAmount}}</p>
+							<p v-else>0</p>
+						</div>
+					</div>
+					<div class="table1">
+						<div class="table1_list span4">
+							<span>信审费用:</span><!--<p v-text="orderInfo_auditFee"></p>-->
+							<p v-if="orderInfo_auditFee">{{orderInfo_auditFee}}</p>
+							<p v-else>0</p>
+						</div>
+						<div class="table1_list span4">
+							<span>管理费:</span><p></p>
+						</div>
+						<div class="table1_list span4">
+							<span>利率:</span><p  v-text="orderInfo_rate"></p>
+						</div>
+					</div>
+					<div class="table1">
+						<div class="table1_list span4">
+							<span>罚息:</span><p></p>
+						</div>
+						
+					</div>
+					<!--<div class="table1">
+						<div class="table1_list span4">
+							<span>申请金额:</span><p  v-text="orderInfo_amount"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>合同金额:</span><p  v-text="orderInfo_approveAmount"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>放款金额:</span><p  v-text="orderInfo_billAmount"></p>
+						</div>
+					</div>
+					<div class="table1">
+						<div class="table1_list span4">
+							<span>资方:</span><p v-text="orderInfo_fundChannelName"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>保证金比例:</span><p></p>
+						</div>
+						<div class="table1_list span4">
+							<span>服务费:</span><p></p>
+						</div>
+					</div>
+					<div class="table1">
+						<div class="table1_list span4">
+							<span>审批金额:</span><p v-text="orderInfo_approveAmount"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>还款期限:</span><p v-text="orderInfo_approvePeriod"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>费率:</span><p></p>
+						</div>
+					</div>-->
+					
+					<!--<div class="table1">
+						<div class="table1_list span4">
+							<span>订单创建时间:</span><p v-text="orderInfo_orderCreateTime"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>订单编号:</span><p v-text="orderInfo_orderId"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>订单状态:</span>
+							<p v-if="orderInfo_status=='0'">未提交</p>
+							<p v-else-if="orderInfo_status=='1'">申请</p>
+							<p v-else-if="orderInfo_status=='2'">审核通过</p>
+							<p v-else-if="orderInfo_status=='3'">审核拒绝</p>
+							<p v-else-if="orderInfo_status=='4'">放弃签合同</p>
+							<p v-else-if="orderInfo_status=='5'">还款中</p>
+							<p v-else-if="orderInfo_status=='6'">渠道拒绝</p>
+							<p v-else-if="orderInfo_status=='7'">待人工审核</p>
+							<p v-else-if="orderInfo_status=='8'">待打款</p>
+							<p v-else-if="orderInfo_status=='10'">已还清</p>
+							<p v-else-if="orderInfo_status=='11'">用户借款确认</p>
+							<p v-else-if="orderInfo_status=='12'">撤单（未打款）</p>
+							<p v-else></p>
+						</div>
+					</div>-->
+					<!--<div class="table1">
+						<div class="table1_list span4">
+							<span>审批金额:</span><p v-text="orderInfo_approveAmount"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>还款期限:</span><p v-text="orderInfo_approvePeriod"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>费率:</span><p></p>
+						</div>
+					</div>
+					<div class="table1" v-for="list in orderInfo_pushInfo">
+						<div class="table1_list span4">
+							<span>推单创建时间:</span><p v-text="list.createTime"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>推单编号:</span><p v-text="list.channelId"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>推单状态:</span><p v-text="list.status"></p>
+						</div>
+					</div>
+					<div class="table1">
+						<div class="table1_list span4">
+							<span>账单创建时间:</span><p v-text="orderInfo_billCreateTime"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>账单编号:</span><p v-text="orderInfo_billId"></p>
+						</div>
+						
+					</div>-->
+					<!--<div class="table1">
+						<div class="table1_list span4">
+							<span>资方放款时间:</span><p></p>
+						</div>
+						<div class="table1_list span4">
+							<span>资方账单编号:</span><p></p>
+						</div>
+					</div>-->
+					<!--<div class="table1">
+						<div class="table1_list span4">
+							<span>用户还款计划创建时间:</span><p v-text="orderInfo_userPayPlanCreateTime"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>用户还款计划编号:</span><p v-text="orderInfo_userPayPlanId"></p>
+						</div>
+					</div>
+					<div class="table1">
+						<div class="table1_list span4">
+							<span>资方还款计划创建时间:</span><p v-text="orderInfo_channelPayPlanCreateTime"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>资方还款计划编号:</span><p v-text="orderInfo_channlePayPlanId"></p>
+						</div>
+					</div>-->
+				</div>
+				
+				<div class="span12">
+					<div class="xiangqing_list" style="border-bottom: 1px solid #CDCDCD;">
+						<h4>订单追踪</h4>
+						<h4>推单信息</h4>
+						<h4>账单信息</h4>
+						<h4>用户还款计划</h4>
+						<!--<h4>资方还款计划</h4>-->
+					</div>
+					<div class="xiangqing_main" style="margin-bottom: -2px;">
+						<div class="row-fluid " style="margin-top: 0;">
+							<div class="span12">
+								<div class="">
+									<div class="widget-content nopadding" id="common_list" style="min-height: 370px;">
+										<table class="table  table2">
+											<thead>
+												<tr>
+													<td style="width:200px">创建时间：<span v-text="orderInfo_orderCreateTime"></span></td><td>创建订单：<span v-text="orderInfo_orderId"></span></td>
+												</tr>
+												<tr v-for="list in orderInfo_pushInfo">
+													<td style="width:200px">创建时间：<span v-text="list.createTime"></span></td><td>创建推单：<span v-text="list.channelId"></span></td>
+												</tr>
+												<tr>
+												    <td style="width:200px">创建时间：<span v-text="orderInfo_billCreateTime"></span></td><td>创建账单：<span v-text="orderInfo_billId"></span></td>
+												</tr>
+												<tr>
+													<td style="width:200px">创建时间：<span v-text="orderInfo_userPayPlanCreateTime"></span></td><td>创建用户还款计划：<span v-text="orderInfo_userPayPlanId"></span></td>
+												</tr>
+												<tr>
+													<td style="width:200px">创建时间：<span v-text="orderInfo_channelPayPlanCreateTime"></span></td><td>创建资方还款计划：<span v-text="orderInfo_channlePayPlanId"></span></td>
+												</tr>
+
+											</thead>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row-fluid " style="display: none;margin-top: 0;">
+							<div class="span12">
+								<div class="">
+									<div class="widget-content nopadding" id="common_list" style="min-height: 370px;">
+										<table class="table">
+											<thead>
+												<tr>
+													<th>推单订单号</th>
+													<th>资方订单号</th>
+													<th>推单金额</th>
+													<th>资方</th>
+													<th>我方</th>
+													<th> 仲裁费费率</th>
+													<th> 手续费率</th>
+													<th>利率</th>
+													<th> 保证金费率</th>
+													<th>更新时间</th>
+													<th>状态</th>
+													<th>备注（拒绝原因）</th>
+												</tr>
+												<tr v-for="msg in push">
+													<td v-text="msg.transactionId"></td>
+													<td v-text="msg.channelId">1</td>
+													<td>{{msg.amount/100 | forData}}</td>
+													<td v-text="msg.channelType">1</td>
+													<td v-text="msg.account">1</td>
+													<td v-text="msg.arbitrationRate"></td>
+													<td v-text="msg.poundageRate"></td>
+													<td v-text="msg.rate"></td>
+													<td v-text="msg.bailRate"></td>
+													<td v-text="msg.createTime">1</td>
+													<td v-text="msg.status">1</td>
+													<td></td>
+												</tr>
+											</thead>
+										</table>
+										<div class="table_toggle1" id="table_toggle2" style="display: none;">暂无数据</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row-fluid " style="display: none;margin-top: 0;">
+							<div class="span12">
+								<div class="">
+									<div class="widget-content nopadding" id="common_list" style="min-height: 370px;">
+										<table class="table">
+											<thead>
+												<tr>
+													<th>账单订单号</th>
+													<th>第三方支付渠道订单号</th>
+													<th>放款金额</th>
+													<th>收款人</th>
+													<th>收款银行</th>
+													<th>收款银行卡号</th>
+													<th>支付渠道</th>
+													<th>状态</th>
+													<th>放款时间</th>
+													<th>放款成功时间</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td v-text="billInfo_rebateNo">1</td>
+													<td v-text="billInfo_merTrandNo">1</td>
+													<td v-text="billInfo_rebateMoney">1</td>
+													<td v-text="billInfo_userName">1</td>
+													<td v-text="billInfo_bankName">1</td>
+													<td v-text="billInfo_bankNo">1</td>
+													<td v-text="billInfo_payChannelName">1</td>
+													<td v-text="billInfo_payStatusName">1</td>
+													<!-- <td v-if="billInfo_appropriationTime==null"></td>
+													<td v-else>{{billInfo_appropriationTime | time}}</td>
+													<td v-if="billInfo_paySuccessTime==null"></td>
+													<td v-else>{{billInfo_paySuccessTime | time}}</td> -->
+													<!-- <td v-if="billInfo_appropriationTime==null"></td> -->
+													<td>{{billInfo_appropriationTime}}</td>
+													<!-- <td v-if="billInfo_paySuccessTime==null"></td> -->
+													<td>{{billInfo_paySuccessTime}}</td>
+												</tr>
+											</tbody>
+										</table>
+										<div class="table_toggle1" id="table_toggle3" style="display: none;">暂无数据</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row-fluid " style="display: none;margin-top: 0;">
+							<div class="span12">
+								<div class="">
+									<div class="widget-content nopadding" id="common_list" style="min-height: 370px;">
+										<table class="table">
+											<thead>
+												<tr>
+													<th>应还期数</th>
+													<th>应还时间</th>
+													<th>应还金额</th>
+													<th>实还时间</th>
+													<th>实还金额</th>
+													<th>扣款订单号</th>
+													<th>支付渠道订单号</th>
+													<th>支付人</th>
+													<th>支付银行卡</th>
+													<th>支付渠道</th>
+													<th>状态</th>
+													<th>备注</th>
+												</tr>
+												<tr v-for="msg in userRepayPlan">
+													<td v-text="msg.period"></td>
+													<td v-text="msg.repaydate"></td>
+													<td v-text="msg.amount/100">1</td>
+													<td v-text="msg.realRepaydate">1</td>
+													<td v-text="msg.realRepayAmount/100">1</td>
+													<td v-text="msg.orderId">1</td>
+													<td v-text="msg.channelId">1</td>
+													<td v-text="msg.name">1</td>
+													<td v-text="msg.bankNo">1</td>
+													<td v-if="msg.channel=='1'">闪信</td>
+													<td v-else-if="msg.channel=='2'">连连</td>
+													<td v-else-if="msg.channel=='3'">易行通</td>
+													<td v-else-if="msg.channel=='4'">连连认证</td>
+													<td v-else-if="msg.channel=='5'">支付宝</td>
+													<td v-else-if="msg.channel=='6'">mustpay</td>
+													<td v-else-if="msg.channel=='7'">BeeCloud代收付系统</td>
+													<td v-else-if="msg.channel=='8'">haier代收付系统</td>
+													<td v-else-if="msg.channel=='9'">宝付代收付系统</td>
+													<td v-else-if="msg.channel=='10'">易极付微信公众号支付</td>
+													<td v-else-if="msg.channel=='11'">EBJ支付宝支付</td>
+													<td v-else></td>
+													<td v-text="msg.status"></td>
+													<td></td>
+												</tr>
+											</thead>
+										</table>
+										<div class="table_toggle1" id="table_toggle4" style="display: none;">暂无数据</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row-fluid " style="display: none;margin-top: 0;">
+							<div class="span12">
+									<div class="widget-content nopadding" id="common_list" style="min-height: 370px;">
+										<table class="table">
+											<thead>
+												<tr>
+													<th>应还期数</th>
+													<th>应还时间</th>
+													<th>应还金额</th>
+													
+													<th>状态</th>
+													<th>备注</th>
+												</tr>
+												<tr v-for="msg in channelRepayPlan">
+													<td v-text="msg.period">1</td>
+													<td v-text="msg.repaydate">1</td>
+													<td v-text="msg.amount/100">1</td>
+												
+													<td v-text="msg.status">1</td>
+													<td></td>
+												</tr>
+											</thead>
+										</table>
+										<div class="table_toggle1" id="table_toggle5" style="display: none;">暂无数据</div>
+									</div>
+								</div>
+						</div>
+					</div>
+				</div>
+					
+				</div>
+				
+				
+			</div>
+			
+		</div>
+
+		
+
+
+
+	</div>
+
+	<% include ../footer.ejs %>
+
+	<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+
+	<script src="/javascripts/jquery-ui.js"></script>
+	<script src="/javascripts/vue-2.42.js"></script>
+	<script src="/javascripts/vue-resource.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+	<script src="/javascripts/bootstrap.min.js"></script>
+	<!--Real-time-chart-js-->
+
+	<script>
+		$(function() {
+			$(".xiangqing_list h4").click(function(){
+				var index = $(this).index();
+				$(".xiangqing_main").find(".row-fluid").eq(index).show().siblings().hide();
+				$(this).addClass("cur").siblings().removeClass("cur")
+			})
+		})
+	</script>
+	<script>
+		function dataTime(num) { //console.log(num)
+			var yugi = function(num) {
+				var now1 = new Date;
+				var getFullYear = now1.getFullYear();
+				var getMonth = now1.getMonth() + 1;
+				var getDate = now1.getDate();
+				var DateTime1 = getFullYear + "-" + getMonth + "-" + getDate;
+				$("#datepicker1").val(DateTime1)
+				var now = new Date;
+				now.setDate(now.getDate() - num);
+				var getFullYear = now.getFullYear();
+				var getMonth = now.getMonth() + 1;
+				var getDate = now.getDate();
+				var DateTime = getFullYear + "-" + getMonth + "-" + getDate;
+				$("#datepicker").val(DateTime)
+				if(num == "1") {
+					$("#datepicker").val(DateTime);
+					$("#datepicker1").val(DateTime);
+				}
+				var timestamp = new Date();
+				//alert(starttimeHaoMiao);
+				var DateTime_starttimeHaoMiao = DateTime;
+				var DateTime_starttimeHaoMiao1 = DateTime1;
+				var starttimeHaoMiao = (new Date(DateTime_starttimeHaoMiao)).getTime();
+				var starttimeHaoMiao1 = (new Date(DateTime_starttimeHaoMiao1)).getTime();
+				$("#starttimeHaoMiao").val(starttimeHaoMiao)
+				$("#starttimeHaoMiao1").val(starttimeHaoMiao1)
+				return now;
+			}
+			yugi(num);
+		}
+
+		$(function() {
+
+			$("#datepicker").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+			$("#datepicker1").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+		});
+	</script>
+	<!--Real-time-chart-js-end-->
+	<!--Turning-series-chart-js-->
+
+	<script>
+		// var data_aa=
+	</script>
+	<script>
+		var total = "";
+		var datasets = "";
+		new Vue({
+			el: '#content',
+			data: {
+				userInfo:"",
+				orderInfo:"",
+				pushInfo:"",
+				billInfo:"",
+				push:"",
+				channelRepayPlan:"",
+				userRepayPlan:"",
+				userInfoName:"",
+				userInfoUid:"",
+				userInfoPhone:"",
+				userInfoIdcard:"",
+				userInfoHomeAddress:"",
+				orderInfo_orderId:"",
+				orderInfo_orderCreateTime:"",
+				orderInfo_billCreateTime:"",
+				orderInfo_billId:"",
+				orderInfo_channelPayPlanCreateTime:"",
+				orderInfo_channlePayPlanId:"",
+				orderInfo_userPayPlanCreateTime:"",
+				orderInfo_userPayPlanId:"",
+				orderInfo_status:"",
+				orderInfo_userName:"",
+				orderInfo_type:"",
+				orderInfo_companey:"",
+				orderInfo_fundChannel:"",
+				orderInfo_approveAmount:"",
+				orderInfo_fundChannelName:"",
+				orderInfo_appName:"",
+				orderInfo_rate:"",
+				orderInfo_approvePeriod:"",
+				orderInfo_periodUnit:"",
+				orderInfo_periodUnitName:"",
+				orderInfo_auditAmount:"",
+				orderInfo_billAmount:"",
+				orderInfo_amount:"",
+				orderInfo_cantractId:"",
+				orderInfo_auditFee:"",
+				// push_createTime:"",
+				// push_businessType:"",
+				// push_transactionId:"",
+				// push_channelId:"",
+				// push_account:"",
+				// push_channelType:"",
+				// push_name:"",
+				// push_bankNo:"",
+				// push_amount:"",
+				// push_status:"",
+				// channelRepayPlan_period:"",
+				// channelRepayPlan_repaydate:"",
+				// channelRepayPlan_amount:"",
+				// channelRepayPlan_dealId:"",
+				// channelRepayPlan_status:"",
+				// userRepayPlan_period:"",
+				// userRepayPlan_repaydate:"",
+				// userRepayPlan_amount:"",
+				// userRepayPlan_status:"",
+				// userRepayPlan_channel:"",
+				// userRepayPlan_orderId:"",
+				// userRepayPlan_channelId:"",
+				// userRepayPlan_name:"",
+				// userRepayPlan_bankNo:"",
+				billInfo_appropriationTime:"",
+				billInfo_bankName:"",
+				billInfo_bankNo:"",
+				billInfo_company:"",
+				billInfo_dataType:"",
+				billInfo_dataTypeName:"",
+				billInfo_merTrandNo:"",
+				billInfo_payChannelName:"",
+				billInfo_payStatus:"",
+				billInfo_payStatusName:"",
+				billInfo_paySuccessTime:"",
+				billInfo_payType:"",
+				billInfo_phone:"",
+				billInfo_rebateMoney:"",
+				billInfo_rebateNo:"",
+				billInfo_type:"",
+				billInfo_userId:"",
+				billInfo_userName:"",
+				push:"",
+				banks:"",
+				orderInfo_pushInfo:"",
+				orderInfo_company:"", //我方
+				orderInfo_billAmount:"", //放款金额
+			},
+			filters:{
+					forData:function(value){
+		        		return parseFloat(value.toFixed(2));
+		        	},
+			},
+			/*components: {
+				'vue-nav': pagenav
+			},
+			watch: {
+				cur: function(oldValue, newValue) {
+					// this.data();
+				}
+			},*/
+			mounted: function() {
+				this.listenDate(this.cur);
+			},
+			methods: {
+				listenDate: function(data) {
+					var _this = this;
+					var appid = sessionStorage.getItem('appid');
+					var dealId = sessionStorage.getItem('dealId');
+					//console.log(appid)
+                    var isOrderId = sessionStorage.getItem('isOrderId');
+                    var orderId = sessionStorage.getItem('orderId');
+                    var id = sessionStorage.getItem('id');
+
+                    var params = "";
+                    var uri = "";
+//                  var appid_list_two = appid.substr(appid.length-2);
+                    //console.log(isOrderId);
+//                  if(appid_list_two=="47"){
+//                  	uri = "/basics/transactionManager/orderDetail";
+//                      params = {
+//                           "appid": appid,
+//                           "dealId": dealId,
+//                      }
+//                  }else{
+                    	if(isOrderId == "1"){
+	                        uri = "/basics/mbTransaction/toDetail";
+	                        params = {
+	                             "orderId": orderId,
+	                        }
+	                    }else if(isOrderId == "2"){
+	                        uri = "/basics/mbTransaction/toPublicDetail";
+	                        params = {
+	                             "id": id,
+	                        }
+	                    }else{
+	                        uri = "/basics/transactionManager/orderDetail";
+	                        params = {
+	                             "appid": appid,
+	                             "dealId": dealId,
+	                        }
+	                    }
+//                  }
+                    
+                    //console.log(params);
+                    //console.log(uri);
+					$(".loading").show();
+					//console.log();
+					$("#page").show(uri);
+					this.$http.post(uri, params).then(function(res) {
+						
+						sessionStorage.removeItem("appid");
+						sessionStorage.removeItem("dealId");
+						sessionStorage.removeItem("orderId");
+						sessionStorage.removeItem("isOrderId");
+						
+						$(".loading").hide();
+						var res = JSON.parse(res.body.res);
+						//console.log(res);
+						//用户信息
+						var userInfo=res.userInfo;
+						_this.userInfoName = userInfo.name;
+						_this.userInfoUid = userInfo.uid;
+						_this.userInfoPhone = userInfo.phone;
+						_this.userInfoIdcard = userInfo.idcard;
+						_this.userInfoHomeAddress = userInfo.homeAddress;
+						// _this.userInfoName = userInfo.name;
+						_this.banks = userInfo.banks;
+						// _this.userInfoName = userInfo.name;
+						//订单信息
+						var orderInfo=res.orderInfo;
+						//console.log(orderInfo);
+						_this.orderInfo_pushInfo=res.orderInfo.pushInfo;
+						_this.orderInfo_orderId=orderInfo.orderId;   //订单编码
+                        _this.orderInfo_orderCreateTime=orderInfo.orderCreateTime;   //订单创建时间
+                        _this.orderInfo_billCreateTime=orderInfo.billCreateTime;   //账单创建时间
+                        _this.orderInfo_billId=orderInfo.billId;    //账单id
+                        _this.orderInfo_channelPayPlanCreateTime=orderInfo.channelPayPlanCreateTime;   //资方还款计划创建时间
+                        _this.orderInfo_channlePayPlanId=orderInfo.channlePayPlanId;   //资方还款计划编号
+                        _this.orderInfo_userPayPlanCreateTime=orderInfo.userPayPlanCreateTime;   //用户还款计划创建时间
+                        _this.orderInfo_userPayPlanId=orderInfo.userPayPlanId;  //用户还款计划编号
+                        _this.orderInfo_status=orderInfo.status;    //订单状态
+                        _this.orderInfo_userName=orderInfo.userName;   //用户
+                        _this.orderInfo_type=orderInfo.type;  //现金贷类型（用于判断公司主体）
+                        _this.orderInfo_companey=orderInfo.company;   //公司主体
+                        //console.log(_this.orderInfo_companey)
+                        _this.orderInfo_fundChannel=orderInfo.fundChannel;   //资方
+                        _this.orderInfo_fundChannelName=orderInfo.fundChannelName;   //资方名称
+                        _this.orderInfo_approveAmount=orderInfo.approveAmount;   //审批/合同金额
+                        _this.orderInfo_appName=orderInfo.appName;
+                        var orderInfo_rate=orderInfo.rate;
+                        _this.orderInfo_rate=(orderInfo_rate*100).toFixed(2)+"%";   //利率
+                        _this.orderInfo_approvePeriod=orderInfo.approvePeriod;   //借款期限
+                        _this.orderInfo_periodUnit=orderInfo.periodUnit;   //分期单位：0、月；1、周
+                        _this.orderInfo_periodUnitName=orderInfo.periodUnitName;   //公司主体
+                        _this.orderInfo_auditAmount=orderInfo.auditAmount;   //审核费
+                        _this.orderInfo_billAmount=orderInfo.billAmount;   //放款金额
+                        _this.orderInfo_amount=orderInfo.amount;   //申请金额
+                        _this.orderInfo_cantractId=orderInfo.cantractId;   //合同编号
+                        _this.orderInfo_auditFee=orderInfo.auditFee;   //管理费
+                        _this.orderInfo_company=orderInfo.company;    //我方
+
+						//推单信息
+						_this.push=res.push;
+						if(_this.push==""){
+							$("#table_toggle2").show();
+						}else{
+							$("#table_toggle2").hide();
+						}
+						_this.channelRepayPlan=res.channelRepayPlan;
+						if(_this.channelRepayPlan==""){
+							$("#table_toggle5").show();
+						}else{
+							$("#table_toggle5").hide();
+						}
+
+						//用户还款计划
+						_this.userRepayPlan = res.userRepayPlan;
+						if(_this.userRepayPlan==""){
+							$("#table_toggle4").show();
+						}else{
+							$("#table_toggle4").hide();
+						}
+
+
+						var billInfo=res.billInfo;
+						if(billInfo==""){
+							$("#table_toggle3").show();
+						}else{
+							$("#table_toggle3").hide();
+						}
+						//console.log(billInfo);
+						var apprTime=billInfo.appropriationTime;
+						//console.log(typeof(apprTime));
+						 _this.billInfo_appropriationTime=billInfo.appropriationTime.time;
+						if(apprTime==null){
+							_this.billInfo_appropriationTime="";
+						}else{
+							 var apprTime=billInfo.appropriationTime.time;
+							 var date = new Date(apprTime);
+							 Y = date.getFullYear(),
+							 m = date.getMonth() + 1,
+							 d = date.getDate(),
+							 H = date.getHours(),
+							 i = date.getMinutes(),
+							 s = date.getSeconds();
+							 if (m < 10) {
+							  m = '0' + m;
+							 }
+							 if (d < 10) {
+							  d = '0' + d;
+							 }
+							 if (H < 10) {
+							  H = '0' + H;
+							 }
+							 if (i < 10) {
+							  i = '0' + i;
+							 }
+							 if (s < 10) {
+							  s = '0' + s;
+							 }
+							var t = Y+'-'+m+'-'+d+' '+H+':'+i+':'+s;
+							_this.billInfo_appropriationTime=t;
+						}
+						_this.billInfo_bankName=billInfo.bankName;
+						_this.billInfo_bankNo=billInfo.bankNo;
+						_this.billInfo_company=billInfo.company;
+						_this.billInfo_dataType=billInfo.dataType;
+						_this.billInfo_dataTypeName=billInfo.dataTypeName;
+						_this.billInfo_merTrandNo=billInfo.merTrandNo;
+						_this.billInfo_payChannelName=billInfo.payChannelName;
+						_this.billInfo_payStatus=billInfo.payStatus;
+						_this.billInfo_payStatusName=billInfo.payStatusName;
+						_this.billInfo_payType=billInfo.payType;
+						_this.billInfo_phone=billInfo.phone;
+						_this.billInfo_rebateMoney=billInfo.rebateMoney;
+						_this.billInfo_rebateNo=billInfo.rebateNo;
+						_this.billInfo_payType=billInfo.payType;
+						_this.billInfo_userId=billInfo.userId;
+						_this.billInfo_userName=billInfo.userName;
+						var payTime=billInfo.paySuccessTime;
+						if(payTime==null){
+							_this.billInfo_paySuccessTime="";
+						}else{
+							 _this.billInfo_appropriationTime=time_chuo(apprTime);
+							var payTime=billInfo.paySuccessTime.time;
+							 var date = new Date(apprTime);
+							 Y = date.getFullYear(),
+							 m = date.getMonth() + 1,
+							 d = date.getDate(),
+							 H = date.getHours(),
+							 i = date.getMinutes(),
+							 s = date.getSeconds();
+							 if (m < 10) {
+							  m = '0' + m;
+							 }
+							 if (d < 10) {
+							  d = '0' + d;
+							 }
+							 if (H < 10) {
+							  H = '0' + H;
+							 }
+							 if (i < 10) {
+							  i = '0' + i;
+							 }
+							 if (s < 10) {
+							  s = '0' + s;
+							 }
+							var t = Y+'-'+m+'-'+d+' '+H+':'+i+':'+s;
+							_this.billInfo_paySuccessTime=t;
+						}
+						
+
+					});
+
+				},
+
+			}
+		})
+	</script>
+	<!--Turning-series-chart-js-->
+	<script src="/javascripts/matrix.dashboard.js"></script>
+	<script>
+		 function time_chuo(value) {
+			 var date = new Date(value);
+			 Y = date.getFullYear(),
+			 m = date.getMonth() + 1,
+			 d = date.getDate(),
+			 H = date.getHours(),
+			 i = date.getMinutes(),
+			 s = date.getSeconds();
+			 if (m < 10) {
+			  m = '0' + m;
+			 }
+			 if (d < 10) {
+			  d = '0' + d;
+			 }
+			 if (H < 10) {
+			  H = '0' + H;
+			 }
+			 if (i < 10) {
+			  i = '0' + i;
+			 }
+			 if (s < 10) {
+			  s = '0' + s;
+			 }
+			  var t = Y+'-'+m+'-'+d+' '+H+':'+i+':'+s;
+			 return t;
+		 }
+	</script>

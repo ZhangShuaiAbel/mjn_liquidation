@@ -1,0 +1,376 @@
+<% include ../header.ejs %>
+
+<!--交易管理--收款交易查询-->
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>交易管理</a>
+			<a href="#" class="current">退款订单列表</a>
+		</div>
+		<h1>退款订单列表</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+		<div class="row-fluid">
+			<div class="widget-box">
+				<div class="widget-content nopadding">
+					<form class="form-horizontal" id="signupForm" method="post" action="">
+						<table class="table table-striped">
+							<tbody>
+								<tr class="odd gradeX">
+									<td width="100" style="white-space: nowrap;">支付通道</td>
+									<td width="100" style="white-space: nowrap;">
+										<select name="" v-model="channelId">
+											<option value="">请选择</option>
+											<option v-for="msg in zfList" :value="msg.id" v-text="msg.name"></option>
+										</select>
+									</td>
+									<td width="100" style="white-space: nowrap;">
+										状态
+									</td>
+									<td>
+										<select name="" v-model="refundStatus">
+											<option value="">请选择</option>
+											<option value="1">待审核</option>
+											<option value="2">退款中</option>
+											<option value="3">已退回</option>
+											<option value="4">已退款</option>
+										</select>
+									</td>
+									<td width="100" style="white-space: nowrap;">商户订单号</td>
+									<td width="100" style="white-space: nowrap;">
+										<input type="text" value="" class="" name="loanUserName" v-model="orderId">
+									</td>
+									<td width="100" style="white-space: nowrap;">交易流水号</td>
+									<td width="100" style="white-space: nowrap;"><input type="text" value="" class="" name="loanUserName" v-model="transactionFlowNo"></td>
+								</tr>
+								<tr class="odd gradeX">
+									<td width="100" style="white-space: nowrap;">用户手机号</td>
+									<td width="100" style="white-space: nowrap;">
+										<input type="text" value="" class="" name="loanUserName"  v-model="buyersPhone">
+									</td>
+									<td width="100" style="white-space: nowrap;">
+										用户姓名
+									</td>
+									<td>
+									<input type="text" value="" class="" name="loanUserName" v-model="buyers">
+									</td>
+									<td width="100" style="white-space: nowrap;">身份证号</td>
+									<td width="100" style="white-space: nowrap;">
+									<input type="text" value="" class="" name="loanUserName" v-model="buyersIdCard">
+									</td>
+									<td width="100" style="white-space: nowrap;">
+										<button type="button" id="submit" class="btn btn-success" @click="listenDate(1)">查找</button>
+									</td>
+									<td width="100" style="white-space: nowrap;">
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+						</tr>
+
+						</tbody>
+						</table>
+					</form>
+
+				</div>
+			</div>
+		</div>
+		<div class="row-fluid">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5></h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>创建时间</th>
+									<th>交易流水号</th>
+									<th>商户订单号</th>
+									<th>商品名称</th>
+									<th>交易方式</th>
+									<th>交易金额</th>
+									<th>状态</th>
+									<th>收款主体</th>
+									<th>买方</th>
+									<th>买方账号</th>
+									<th>最近更新时间</th>
+									<th width="100" style="white-space: nowrap;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+							<tr v-for="msg in collectionList">
+									<td>{{msg.createTime | time}}</td>
+									<td v-text="msg.transactionFlowNo"></td>
+									<td v-text="msg.orderId"></td>
+									<td v-text="msg.commodityName"></td>
+									<td v-text="msg.channelName"></td>
+									<td v-text="msg.amount/100"></td>
+									<td v-if="msg.refundStatus=='1'">待审核</td>
+									<td v-else-if="msg.refundStatus=='2'">退款中</td>
+									<td v-else-if="msg.refundStatus=='3'">已退回</td>
+									<td v-else-if="msg.refundStatus=='4'">已退款</td>
+									<td v-else-if="msg.refundStatus=='5'">退款失败</td>
+									<td v-else-if="msg.refundStatus=='0'">初始状态</td>
+									<td v-else></td>
+									<td v-text="msg.enterpriseName"></td>
+									<td v-text="msg.buyers"></td>
+									<td v-text="msg.buyersAccount"></td>
+									<td>{{msg.updateTime | time}}</td>
+									<!-- <td width="100" style="white-space: nowrap;">
+										<button data-toggle="modal" data-target="#myModal" class="btn-info btn-mini float_btn_cen" @click="refund(msg.id)">处理</button>
+									</td> -->
+									<td v-if="msg.refundStatus=='1'">
+										<button data-toggle="modal" data-target="#myModal" class="btn-info btn-mini float_btn_cen" @click="refund(msg.id)">处理</button>
+									</td>
+									<td v-if="msg.refundStatus!='1'">
+
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+								申请退款
+						</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<input type="hidden" id="druleId" name="druleId">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">创建时间 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="createTime_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">商户订单号 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="orderId_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">商品名称 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="commodityName_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">支付通道 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="channelName_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">退款金额 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="amount_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">退款户名 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="buyers_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">退款账号 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="buyersAccount_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">退款原因 :</label>
+											<div class="controls">
+												<textarea name="" rows="" cols="" disabled v-model="refundReason_1"></textarea>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">附件材料 :</label>
+											<div class="controls">
+												<img v-for="msg in mbTransactionAttList" :src="msg.path" alt="msg.transactionId">
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+					   <button type="button" class="btn btn-default" id="btn-default" data-dismiss="modal" >关闭</button>
+					    <button type="button" class="btn btn-primary" @click="back(id_1)">退回</button>
+						<button type="button" class="btn btn-primary" @click="confirmRefund(id_1)">确认退款</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+		<div id="page">
+			<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+		</div>
+	</div>
+</div>
+
+<!--<script src="/javascripts/jquery.min.js"></script>
+<script src="/javascripts/jquery-ui.js"></script>-->
+<% include ../footer.ejs %>
+
+<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+<script src="/javascripts/jquery-ui.js"></script>
+<script src="/javascripts/vue-resource.js"></script>
+<script src="/javascripts/public_page.js"></script>
+<script src="/javascripts/time_filter.js"></script>
+<script type="text/javascript">
+var total = "";
+	var pageBar = new Vue({
+        el: '#content',
+        data: {
+            all: 0, //总页数
+            cur: 1,//当前页码
+            msg:'',
+            channelId:"",
+            refundStatus:"",
+            orderId:"",
+            transactionFlowNo:"",
+            buyersPhone:"",
+            buyers:"",
+            buyersIdCard:"",
+            zfList:"",
+            pageTotal:"",
+            collectionList:"",
+            refundList:"",
+            amount_1:"",
+            buyers_1:"",
+            buyersAccount_1:"",
+            buyersIdCard_1:"",
+            buyersPhone_1:"",
+            channelName_1:"",
+            commodityName_1:"",
+            createTime_1:"",
+            id_1:"",
+            orderId_1:"",
+            refundReason_1:"",
+            mbTransactionAttList:""
+        },
+        components:{
+            'vue-nav':pagenav
+        },
+        watch: {
+            cur: function(oldValue , newValue){
+            }
+        },
+        mounted:function(){
+			this.listenDate(this.cur);
+			this.payList();
+		},
+        methods:{
+            listenDate:function(data){
+            	$(".loading").show();
+				var _this = this;
+				var refundStatus = this.refundStatus;
+				var channelId = this.channelId;
+				var orderId = this.orderId;
+				var transactionFlowNo = this.transactionFlowNo;
+				var buyersPhone = this.buyersPhone;
+				var buyers = this.buyers;
+				var buyersIdCard = this.buyersIdCard;
+				var pageSize = 10;
+				this.$http.post("/deal/mbTransaction/jsonRefTra",{"pageNum":data,"pageSize":pageSize,"channelId":channelId,"refundStatus":refundStatus,"orderId":orderId,"transactionFlowNo":transactionFlowNo,"buyersPhone":buyersPhone,"buyers":buyers,"buyersIdCard":buyersIdCard}).then(function(res){
+					$(".loading").hide();
+					 if(res.body.code=="D1007"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 if(res.body.code=="D1006"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 _this.collectionList = res.body.res.mbTransaction.res;
+					 _this.pageTotal = res.body.res.mbTransaction.total;
+					 $(".table_toggle").show();
+                    if (data<=1) {
+						total = Math.ceil(_this.pageTotal/10);
+					}
+					   _this.all = total;
+					   _this.cur = data;
+				});
+	        },
+	        payList:function(){
+            	this.$http.post("/deal/mbTransaction/jsonPayCfg").then(function(res){
+                	 this.zfList=res.body.res.payChannelConfig;
+				});
+            },
+            refund:function(id){
+            	this.$http.post("/deal/mbTransaction/oneTra",{"id":id}).then(function(res){
+                	var money=res.body.res.mbTransaction.amount;
+		            this.amount_1=money/100;
+                	var createTime_1=res.body.res.mbTransaction.createTime;
+                	this.createTime_1=new Date(createTime_1).toLocaleString();
+                	this.buyers_1=res.body.res.mbTransaction.buyers;
+                	this.buyersAccount_1=res.body.res.mbTransaction.buyersAccount;
+                	this.buyersIdCard_1=res.body.res.mbTransaction.buyersIdCard;
+                	this.buyersPhone_1=res.body.res.mbTransaction.buyersPhone;
+                	this.channelName_1=res.body.res.mbTransaction.channelName;
+                	this.commodityName_1=res.body.res.mbTransaction.commodityName;
+                	this.id_1=res.body.res.mbTransaction.id;
+                	this.orderId_1=res.body.res.mbTransaction.orderId;
+                	this.refundReason_1=res.body.res.mbTransaction.refundReason;
+                	this.mbTransactionAttList=res.body.res.mbTransaction.mbTransactionAttList;
+				});
+            },
+            //退回
+            back:function(id){
+            	var _this = this;
+            	this.$http.post("/deal/mbTransaction/updateToReturn",{"id":id}).then(function(res){
+                	 var code = res.body.code;
+                	 var msg = res.body.msg;
+                	 if(code=="0000"){
+                	 	alert(msg);
+                	 	$("#btn-default").click();
+                	 	_this.listenDate(this.cur);
+                	 }else if(code=="0001"){
+                	 	alert(msg);
+                	 }
+				});
+            },
+            //确认退款
+            confirmRefund:function(id){
+            	var _this = this;
+            	this.$http.post("/deal/mbTransaction/updateToSuccess",{"id":id}).then(function(res){
+                	 var code = res.body.code;
+                	 var msg = res.body.msg;
+                	 if(code=="0000"){
+                	 	alert(msg);
+                	 	$("#btn-default").click();
+                	 	_this.listenDate(this.cur);
+                	}else if(code=="0001"){
+                	 	alert(msg);
+                	}
+				});
+            },
+        }
+    })
+</script>

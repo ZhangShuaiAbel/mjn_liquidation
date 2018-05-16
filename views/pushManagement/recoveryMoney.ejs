@@ -1,0 +1,481 @@
+<% include ../header.ejs %>
+
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>结算审核</a>
+			<a href="#" class="current">包公回收打款</a>
+		</div>
+		<h1>包公回收打款</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+
+		<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+			<a class="btn2 cur1" href="/push/recoveryMoney" target="liquidation">包公回收打款</a>
+			<!-- <a class="btn2" href="/push/aaa" target="liquidation">钱包回收打款</a>
+			<a class="btn2" href="/deal/refund" target="liquidation">代扣支付退款</a> -->
+		</div>
+
+		<hr>
+		<div class="row-fluid">
+			<div class="widget-box">
+				<div class="widget-content nopadding">
+					<form class="form-horizontal" method="post" action="">
+						<table class="table table-striped">
+							<tbody>
+								<tr class="odd gradeX">
+									<td width="85" style="white-space: nowrap;">交易时间 :</td>
+									<td width="600" style="white-space: nowrap;">
+										<input type="text" class="input" id="datepicker" readonly="readonly" name="repaymentStart">
+										<input type="text" class="input" id="datepicker1" readonly="readonly" name="repaymentEnd">
+									</td>
+									<td width="85" style="white-space: nowrap;">支付状态 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" v-model="payStatus">
+											<option value="">请选择</option>
+											<option value="0">待处理</option>
+											<option value="1">待支付</option>
+											<option value="2">支付中</option>
+											<option value="3">支付成功</option>
+											<option value="4">支付失败</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td width="85" style="white-space: nowrap;">手机号 :</td>
+									<td width="" style="white-space: nowrap;"><input type="text" class="input" name="" v-model="phone" oninput="this.value=this.value.replace(/\D/g,'');if(isNaN(value))execCommand('undo');"></td>
+									<td width="85" style="white-space: nowrap;"></td>
+									<td width="" style="white-space: nowrap;">
+										<span style="margin-left: 20px">
+											<button type="button" id="submit" class="btn btn-success" @click="listenDate(1)">查找</button>
+	                                    	<button type="button" id="submit" class="btn btn-success" @click="resets()" >重置</button>
+                                    	</span>
+									</td>
+								</tr>
+
+							</tbody>
+						</table>
+					</form>
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row-fluid tab-two" style="display: none">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>订单明细</h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>ID</th>
+									<th>关联ID</th>
+									<th>回收商品名称 </th>
+									<th>审核时间</th>
+									<th>扣款渠道</th>
+									<th>支付完成时间</th>
+									<th>支付开始时间</th>
+									<th>支付状态</th>
+									<th>收款人手机号</th>
+									<th>收款用户名</th>
+									<th>收款银行卡号</th>
+									<th>放款失败原因</th>
+									<th>确认放款人</th>
+									<th>账单创建时间 </th>
+									<th>账单号</th>
+									<th>账单金额</th>
+									<th width="100" style="white-space: nowrap;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+								<tr v-for="msg in rmList">
+									<td v-text="msg.id"></td>
+									<td v-text="msg.virtualId"></td>
+									<td v-text="msg.cashCardName"></td>
+									<td v-if="msg.auditTime*1000==0"></td>
+									<td v-else>{{msg.auditTime*1000 | time}}</td>
+									<td v-text="msg.channel"></td>
+									<td v-if="msg.payFinishTime==0"></td>
+									<td v-else>{{msg.payFinishTime*1000 | time}}</td>
+
+									<td v-if="msg.payStartTime==0"></td>
+									<td v-else>{{msg.payStartTime*1000 | time}}</td>
+
+									<!--<td v-text="msg.payStatus"></td>-->
+									<td v-if="msg.payStatus==0">待处理</td>
+									<td v-else-if="msg.payStatus==1">待支付</td>
+									<td v-else-if="msg.payStatus==2">支付中</td>
+									<td v-else-if="msg.payStatus==3">支付成功</td>
+									<td v-else-if="msg.payStatus==4">支付失败</td>
+									<td v-else></div>
+									<td v-text="msg.phone"></td>
+									<td v-text="msg.receivableAccountName"></td>
+									<td v-text="msg.receivableAccountNo"></td>
+									<td v-text="msg.payFailReason"></td>
+									<td v-text="msg.auditUser"></td>
+									<td>{{msg.createTime | time}}</td>
+									<td v-text="msg.billNo"></td>
+									<td v-text="msg.billAmount/100"></td>
+									<td>
+										<button data-toggle="modal" data-target="#myModal" @click="details(msg.id)" class="btn-info">详情</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="table_toggle1" style="display: none;">暂无数据</div>
+				</div>
+			</div>
+			<div id="page" style="display: none">
+				<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+			</div>
+			<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="left: 55% !important;display:none">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							<h4 class="modal-title" id="myModalLabel">详情</h4>
+						</div>
+						<div class="modal-body">
+							<div class="container-fluid">
+								<div class="row-fluid">
+									<form id="addNewRule">
+										<div class="widget-content nopadding form-horizontal">
+											<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">ID :</label>
+												<div class="controls" v-text="d_id"></div>
+											</div>
+											<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">关联ID  :</label>
+												<div class="controls" v-text="d_virtualId"></div>
+											</div>
+											<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">用户ID	 :</label>
+												<div class="controls" v-text="d_userId"></div>
+											</div>
+											<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">回收商品名称:</label>
+												<div class="controls" v-text="d_cashCardName"></div>
+											</div>
+											<!--<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">扣款渠道:</label>
+												<div class="controls" v-text="d_channel"></div>
+											</div>-->
+											<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">支付完成时间 :</label>
+												<div v-if="d_payFinishTime==0" class="controls"></div>
+												<div v-else class="controls">{{d_payFinishTime*1000 | time}}</div>
+											</div>
+											<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">支付开始时间 :</label>
+												<div v-if="d_payStartTime==0" class="controls"></div>
+												<div v-else class="controls">{{d_payStartTime*1000 | time}}</div>
+											</div>
+											<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">支付状态 :</label>
+												<div v-if="d_payStatus==0" class="controls">待处理</div>
+												<div v-else-if="d_payStatus==1" class="controls">待支付</div>
+												<div v-else-if="d_payStatus==2" class="controls">支付中</div>
+												<div v-else-if="d_payStatus==3" class="controls">支付成功</div>
+												<div v-else-if="d_payStatus==4" class="controls">支付失败</div>
+												<div v-else class="controls"></div>
+											</div>
+											<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">收款人手机号 :</label>
+												<div class="controls" v-text="d_phone"></div>
+											</div>
+											<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">收款用户名 :</label>
+												<div class="controls" v-text="d_receivableAccountName"></div>
+											</div>
+											<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">收款银行卡号 :</label>
+												<div class="controls" v-text="d_receivableAccountNo"></div>
+											</div>
+											<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">账单创建时间 :</label>
+												<div class="controls">{{d_createTime | time}}</div>
+											</div>
+											<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">账单号 :</label>
+												<div class="controls" v-text="d_billNo"></div>
+											</div>
+											<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">账单金额 :</label>
+												<div class="controls" v-text="d_billAmount"></div>
+											</div>
+											<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">审核人 :</label>
+												<div class="controls" v-text="d_auditUser"></div>
+											</div>
+											<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">审核拒绝原因 :</label>
+												<div class="controls" v-text="d_auditFailReason"></div>
+											</div>
+											<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">审核状态 :</label>
+												<div class="controls" v-text="d_auditStatus"></div>
+											</div>
+											<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">审核时间 :</label>
+												<div class="controls">{{d_auditTime*1000 | time}}</div>
+											</div>
+											<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">支付失败原因 :</label>
+												<div class="controls" v-text="d_payFailReason"></div>
+											</div>
+											<div class="control-group">
+												<label class="control-label" style="width: 150px;padding-top: 10px;">服务费 :</label>
+												<div class="controls" v-text="d_serviceAmount/100"></div>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button id="guanbibtn" type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+							<span v-if="d_payStatus==0"><button type="button" class="btn btn-primary" @click="que(d_id)">确认打款</button></span>
+							<span v-else></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+</div>
+	<% include ../footer.ejs %>
+
+	<script>
+		function dataTime(num) { ////console.log(num)
+			var yugi = function(num) {
+				var now1 = new Date;
+				var getFullYear = now1.getFullYear();
+				var getMonth = now1.getMonth() + 1;
+				var getDate = now1.getDate();
+				var DateTime1 = getFullYear + "-" + getMonth + "-" + getDate;
+				$("#datepicker1").val(DateTime1)
+				var now = new Date;
+				now.setDate(now.getDate() - num);
+				var getFullYear = now.getFullYear();
+				var getMonth = now.getMonth() + 1;
+				var getDate = now.getDate();
+				var DateTime = getFullYear + "-" + getMonth + "-" + getDate;
+				$("#datepicker").val(DateTime)
+				if(num == "1") {
+					$("#datepicker").val(DateTime);
+					$("#datepicker1").val(DateTime);
+				}
+				var timestamp = new Date();
+				//alert(starttimeHaoMiao);
+				var DateTime_starttimeHaoMiao = DateTime;
+				var DateTime_starttimeHaoMiao1 = DateTime1;
+				var starttimeHaoMiao = (new Date(DateTime_starttimeHaoMiao)).getTime();
+				var starttimeHaoMiao1 = (new Date(DateTime_starttimeHaoMiao1)).getTime();
+				$("#starttimeHaoMiao").val(starttimeHaoMiao)
+				$("#starttimeHaoMiao1").val(starttimeHaoMiao1)
+				return now;
+			}
+			yugi(num);
+		}
+
+		$(function() {
+
+			$("#datepicker").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+			$("#datepicker1").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+		});
+	</script>
+	<script src="/javascripts/vue-2.42.js"></script>
+	<script src="/javascripts/vue-resource.js"></script>
+	<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+	<script src="/javascripts/jquery-ui.js"></script>
+
+	<script src="/javascripts/public_page.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+	<script>
+		var total = "";
+		var datasets = "";
+		new Vue({
+			el: '#content',
+			data: {
+				all: 0, //总页数
+				cur: 1, //当前页码
+				payStatus: "",
+				phone: "",
+				rmList: "",
+				d_auditFailReason : "",
+				d_auditStatus : "",
+				d_auditTime : "",
+				d_auditUser : "",
+				d_billAmount : "",
+				d_billNo : "",
+				d_cashCardName : "",
+				d_channel : "",
+				d_createTime : "",
+				d_id : "",
+				d_payFailReason : "",
+				d_payFinishTime : "",
+				d_payStartTime : "",
+				d_payStatus : "",
+				d_phone : "",
+				d_receivableAccountName : "",
+				d_receivableAccountNo : "",						
+				d_serviceAmount : "",
+				d_type : "",
+				d_updateTime : "",
+				d_userId : "",
+				d_virtualId : "",
+
+			},
+			components: {
+				'vue-nav': pagenav
+			},
+			watch: {
+
+			},
+			mounted: function() {
+				this.time();
+				this.listenDate(this.cur);
+			},
+			methods: {
+				listenDate: function(data) {
+					$(".loading").show();
+					$(".tab-two").show();
+					$("#page").show();
+					var _this = this;
+					var start = $("#datepicker").val();
+					var end = $("#datepicker1").val();
+					var phone = this.phone;
+					var payStatus = this.payStatus;
+					var pageSize = 10;
+					console.log(start, end, phone, payStatus);
+					this.$http.post("/push/lifeBill/json", {
+						"pageNum": data,
+						"pageSize": pageSize,
+						"start": start,
+						"end": end,
+						"payStatus": payStatus,
+						"phone": phone,
+					}).then(function(res) {
+						$(".loading").hide();
+						if(res.body.code == "D1007") {
+							alert(res.body.msg);
+							return false;
+						}
+						if(res.body.code == "D1006") {
+							alert(res.body.msg);
+							return false;
+						}
+						_this.rmList = res.body.res.res;
+						console.log(_this.rmList)
+						_this.pageTotal = res.body.res.total;
+						_this.totalNum = res.body.res.totalNum;
+						if(_this.rmList == "") {
+							$(".table_toggle1").show();
+						} else {
+							$(".table_toggle1").hide();
+						}
+						$(".table_toggle").show();
+						if(data <= 1) {
+							total = Math.ceil(_this.pageTotal / 10);
+						}
+						_this.all = total;
+						_this.cur = data;
+					});
+
+				},
+				time: function() {
+					var seperator1 = "-";
+
+					var startDate = new Date();
+					startDate.setDate(startDate.getDate() - 7);
+					var startYear = startDate.getFullYear();
+					var startMonth = startDate.getMonth() + 1;
+					if(startMonth < 10) startMonth = "0" + startMonth;
+					var startDay = startDate.getDate();
+					if(startDay < 10) startDay = "0" + startDay;
+					var endDate = new Date();
+					var endYear = endDate.getFullYear();
+					var endMonth = endDate.getMonth() + 1;
+					if(endMonth < 10) endMonth = "0" + endMonth;
+					var endDay = endDate.getDate();
+					if(endDay < 10) endDay = "0" + endDay;
+					var currentdate = startYear + seperator1 + startMonth + seperator1 + startDay;
+					var currentdate1 = endYear + seperator1 + endMonth + seperator1 + endDay;
+					$("#datepicker").val(currentdate);
+					$("#datepicker1").val(currentdate1);
+				},
+				resets: function() {
+					$("#datepicker").val("");
+					$("#datepicker1").val("");
+					this.phone = "";
+					this.payStatus = "";
+				},
+				details: function(id) {
+					console.log(id);
+					this.$http.post("/push/lifeBill/detail", {
+						"id": id,
+					}).then(function(res) {
+						console.log(res);
+						this.d_auditFailReason = res.body.res.auditFailReason;
+						this.d_auditStatus = res.body.res.auditStatus;
+						this.d_auditTime = res.body.res.auditTime;
+						this.d_auditUser = res.body.res.auditUser;
+						this.d_billAmount = res.body.res.billAmount/100;
+						this.d_billNo = res.body.res.billNo;
+						this.d_cashCardName = res.body.res.cashCardName;
+						this.d_channel = res.body.res.channel;
+						this.d_createTime = res.body.res.createTime;
+						this.d_id = res.body.res.id;
+						this.d_payFailReason = res.body.res.payFailReason;
+						this.d_payFinishTime = res.body.res.payFinishTime;
+						this.d_payStartTime = res.body.res.payStartTime;
+						this.d_payStatus = res.body.res.payStatus;
+						this.d_phone = res.body.res.phone;
+						this.d_receivableAccountName = res.body.res.receivableAccountName;
+						this.d_receivableAccountNo = res.body.res.receivableAccountNo;						
+						this.d_serviceAmount = res.body.res.serviceAmount;
+						this.d_type = res.body.res.type;
+						this.d_updateTime = res.body.res.updateTime;
+						this.d_userId = res.body.res.userId;
+						this.d_virtualId = res.body.res.virtualId;
+					});
+				},
+				que:function(id){
+					if(confirm("确定提交吗?")){
+						this.$http.post("/push/lifeBill/audit", {
+							"id": id,
+						}).then(function(res) {
+							console.log(res);
+							var code = res.body.code;
+							var msg = res.body.msg;
+							if(code=="0000"){
+								alert(msg);
+								$('#guanbibtn').click();
+							}else{
+								alert(msg);
+							}
+						});
+					}else{
+						
+					}
+					
+				}
+			}
+		})
+	</script>
+
+	<!--Real-time-chart-js-->

@@ -1,0 +1,60 @@
+
+{
+
+  "data": {
+
+    "total": 52,
+
+    "page": 1,
+
+    "size": 10,
+
+    "totalPage": 6,
+
+    "items": [
+
+      {
+
+        "id": 52,
+
+        "day": 22,
+
+        "registerNum": 0,
+
+        "orderSubmitNum": 663,
+
+        "orderSubmitMoney": 4598056,
+
+        "orderPassNum": 179,
+
+        "orderPassMoney": 1210099,
+
+        "orderPassRate": 27,
+
+        "orderPayNum": 179,
+
+        "orderPayMoney": 847623,
+
+        "orderPayRate": 27,
+
+        "orderPayPercapita": 4735.32,
+
+        "firstRepayMoney": 1357446,
+
+        "firstRepayPercapita": 206927.74,
+
+        "termNum": 21.7,
+
+        "createDate": 1482336000000
+
+      }
+
+    ]
+
+  },
+
+  "code": 0,
+
+  "message": "成功"
+
+}

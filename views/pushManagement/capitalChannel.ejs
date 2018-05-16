@@ -1,0 +1,460 @@
+<% include ../header.ejs %>
+
+<!--退单管理--资金渠道管理-->
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>渠道管理</a>
+			<a href="#" class="current">资金渠道管理</a>
+		</div>
+					<h1>资金渠道管理</h1>
+
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+		<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+			
+			<a href="/push/capitalChannel" target="liquidation" class="btn2 cur1">资金渠道管理</a>
+
+			<a href="/push/pushSingleFlux" target="liquidation" class="btn2">推单流量管理</a>
+
+			<a href="/push/configuration" target="liquidation" class="btn2">资金渠道费率配置</a>
+						
+		</div>
+
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+								添加资金渠道
+							</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<input type="hidden" id="druleId" name="druleId">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">渠道名称 :</label>
+											<div class="controls">
+												<input type="text" v-model="qd_name"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">限额状态 :</label>
+											<div class="controls">
+												<select name="" id="" v-model="limit">
+													<option value="">选择</option>
+													<option value="1">限额</option>
+													<option value="2">不限额</option>
+												</select>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">单日额度 :</label>
+											<div class="controls">
+												<input type="text" v-model="e_day" class="e_day1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">适用产品 :</label>
+											<div class="controls">
+												<label v-for="aa in ProList" style="display: inline-block;padding-left: 10px;">
+														<input type="checkbox" class="input-checked" v-model="sycp_name" v-bind:value="aa.id" />{{aa.productName}}
+												</label>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">备注 :</label>
+											<div class="controls">
+												<textarea class="span11" name="distributionName" v-model="note"></textarea>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+							</button>
+						<button type="button" class="btn btn-primary" @click="newPay">
+								添加
+							</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+
+
+		<div class="modal fade" id="myModal-one" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+								修改资金渠道
+							</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<input type="hidden" id="druleId" name="druleId">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">渠道名称 :</label>
+											<div class="controls">
+												<input type="text" v-model="qd_name"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">限额状态 :</label>
+											<div class="controls">
+												<select name="" id="" v-model="limit">
+													<option value="">选择</option>
+													<option value="1">限额</option>
+													<option value="2">不限额</option>
+												</select>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">单日额度 :</label>
+											<div class="controls">
+												<input type="text" v-model="e_day" class="e_day1" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">适用产品 :</label>
+											<div class="controls">
+												<label v-for="aa in ProList" style="display: inline-block;padding-left: 10px;">
+														<input type="checkbox" class="input-checked" v-model="sycp_name" v-bind:value="aa.id" />{{aa.productName}}
+												</label>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">备注 :</label>
+											<div class="controls">
+												<textarea class="span11" name="distributionName" v-model="note"></textarea>
+											</div>
+										</div>
+
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+							</button>
+						<button type="button" class="btn btn-primary" @click="upPay(qd_id)">
+								提交更改
+							</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+
+		<hr>
+		<div class="row-fluid">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5><button type="button" style="margin-top: 4px" id="submit" class="btn btn-primary btn-mini position_right" data-toggle="modal" data-target="#myModal" >添加资金渠道</button></h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>资金渠道id</th>
+									<th>渠道名称</th>
+									<th>适用产品</th>
+									<th>限额状态</th>
+									<th>单日额度</th>
+									<th>备注</th>
+									<th width="100" style="white-space: nowrap;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+							<tr v-for="msg in qdList">
+									<td v-text="msg.id"></td>
+									<td v-text="msg.name"></td>
+									<td v-text="msg.productName"></td>
+									<td v-if="msg.status=='1'">限额</td>
+									<td v-if="msg.status=='2'">不限额</td>
+									<td v-if="msg.quota=='0'">--</td>
+									<td v-if="msg.quota!='0'">{{msg.quota/100}}</td>
+									<td v-text="msg.remarks"></td>
+									<td width="100" style="white-space: nowrap;">
+										<a style="color:#2f96b4" data-toggle="modal" href="javascript:;" data-target="#myModal-one" @click="upOne(msg.id)">管理</a>
+
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<% include ../footer.ejs %>
+<script src="/javascripts/vue-resource.js"></script>
+<!-- <script src="/javascripts/public_page.js"></script> -->
+<script type="text/javascript">
+
+    var products = new Vue({
+        el: '#content',
+        data: {
+        	qdList:"",
+        	ProList:"",
+        	qd_name:"",
+        	sycp_name:[],
+        	e_day:"",
+        	note:"",
+        	qd_id:"",
+        	limit:"",
+        },
+        watch: {
+            limit:function(newValue,oldValue){
+            	if(this.limit=="1" || this.limit==""){
+            		$(".e_day1").removeAttr("disabled");
+            	}else{
+            		$(".e_day1").attr("disabled","disabled");
+            		this.e_day="";
+            	}
+            }
+        },
+        mounted:function(){
+			this.capitalList();
+			this.productList();
+		},
+        methods:{
+        	//查询列表
+            capitalList:function(){
+            	$(".loading").show();
+            	var _this = this;
+                this.$http.post("/push/capitalChannel/jsonCap").then(function(res){
+                	////console.log(res);
+                	$(".loading").hide();
+                	if(res.body.code=="D1007"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 if(res.body.code=="D1006"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					_this.qdList=res.body.res.capitalChannel;
+					  $(".table_toggle").show();
+				});
+            },
+            //适用产平查询
+            productList:function(){
+            	var _this = this;
+                this.$http.post("/pay/product/jsonPro",{}).then(function(res){
+					_this.ProList=res.body.res.products;
+					  // //console.log(res)
+				});
+            },
+            //添加渠道
+            newPay:function(){
+				var _this = this;
+				var qd_name = this.qd_name;
+				var sycp_name = this.sycp_name;
+				var e_day = this.e_day*100;
+				var note = this.note;
+				var cpId = sycp_name.join(",");
+				var e_day_reg = /^[0-9]*$/;
+				var limit = this.limit;
+				if(qd_name==""){
+					alert("请填写渠道通道名称");
+					return false;
+				}else if(limit==""){
+					alert("请选择适限额状态");
+					return false;
+				}else if(limit=="2"){
+					// if(sycp_name.length==""){
+					// 	alert("请选择适用产品");
+					// 	return false;
+					// }else 
+					if(note==""){
+						alert("请填写备注");
+						return false;
+					}else{
+						var _this = this;
+						 ////console.log(cpId);
+						this.$http.post("/push/capitalChannel/saveCap",{"status":limit,"quota":e_day,"remarks":note,"name":qd_name,"productId":cpId}).then(function(res){
+							// //console.log(res);
+							var code=res.body.code;
+							var msg=res.body.msg;
+							if(code=="0000"){
+								alert(msg)
+								$("#myModal").modal("hide");
+								_this.capitalList();
+								this.qd_name="",
+								this.sycp_name=[];
+								this.e_day="";
+								this.note="";
+								this.limit="";
+							}else if(code=="0001"){
+								alert(msg)
+							}
+						});
+					}
+				}else if(limit=="1"){
+					if(e_day==""){
+						alert("请填写单日额度");
+						return false;
+					}else if(!e_day_reg.exec(e_day)){
+						alert("单日额度为数字");
+						return false;
+					}else if(e_day.length>"18"){
+						alert("填写单日额度过大");
+						return false;
+					}
+					// else if(sycp_name.length==""){
+					// 	alert("请选择适用产品");
+					// 	return false;
+					// }
+					else if(note==""){
+						alert("请填写备注");
+						return false;
+					}else{
+						var _this = this;
+						// //console.log(cpId);
+						this.$http.post("/push/capitalChannel/saveCap",{"status":limit,"quota":e_day,"remarks":note,"name":qd_name,"productId":cpId}).then(function(res){
+							//console.log(cpId);
+							var code=res.body.code;
+							var msg=res.body.msg;
+							if(code=="0000"){
+								alert(msg)
+								$("#myModal").modal("hide");
+								_this.capitalList();
+								this.qd_name="",
+								this.sycp_name=[];
+								this.e_day="";
+								this.note="";
+								this.limit="";
+							}else if(code=="0001"){
+								alert(msg)
+							}
+						});
+					}
+				}
+		    },
+		    //id查询
+		    upOne:function(id){
+                var _this = this;
+            	 this.$http.post("/push/capitalChannel/oneCap",{"id":id}).then(function(res){
+            	 	console.log(res)
+                	 _this.qd_name=res.body.res.capitalChannel.name;
+                	 _this.sycp_name=res.body.res.capitalChannel.productId;
+                	 _this.note=res.body.res.capitalChannel.remarks;
+                	 _this.e_day=res.body.res.capitalChannel.quota/100;
+                	 _this.qd_id=res.body.res.capitalChannel.id;
+                	 _this.limit=res.body.res.capitalChannel.status;
+                	 var str =  this.sycp_name;
+                	 var array = str.split(",");
+                	 _this.sycp_name=array;
+				});
+            },
+            //修改
+            upPay:function(id){
+				var _this = this;
+				var qd_name = this.qd_name;
+				var sycp_name = this.sycp_name;
+				var e_day = this.e_day*100;
+				var note = this.note;
+				var limit = this.limit;
+				var cpId = sycp_name.join(",");
+				if(cpId.substr(0,1)==","){
+					cpId=cpId.substr(1);
+				}
+				var e_day_reg = /^[0-9]*$/;
+				if(qd_name==""){
+					alert("请填写渠道通道名称");
+					return false;
+				}else if(limit==""){
+					alert("限额状态不能为空");
+					return false;
+				}else if(limit=="1"){
+					if(e_day==""){
+                        alert("填写单日额度不能为空");
+						return false;
+					}
+					else if(e_day.length>"18"){
+						alert("填写单日额度过大");
+						return false;
+					}
+					// else if(sycp_name.length==""){
+					// 	alert("请选择适用产品");
+					// 	return false;
+					// }
+					else if(note==""){
+						alert("请填写备注");
+						return false;
+					}else{
+						var _this = this;
+						////console.log(status);
+						this.$http.post("/push/capitalChannel/updateCap",{"status":limit,"quota":e_day,"remarks":note,"name":qd_name,"productId":cpId,"id":id}).then(function(res){
+							////console.log(cpId);
+							var code=res.body.code;
+							var msg=res.body.msg;
+							if(code=="0000"){
+								alert(msg)
+								$("#myModal-one").modal("hide");
+								_this.capitalList();
+							}else if(code=="0001"){
+								alert(msg)
+							}
+						});
+					}
+				}else if(limit=="2"){
+					// if(sycp_name.length==""){
+					// 	alert("请选择适用产品");
+					// 	return false;
+					// }else
+					if(note==""){
+						alert("请填写备注");
+						return false;
+					}else{
+						var _this = this;
+						this.$http.post("/push/capitalChannel/updateCap",{"status":limit,"quota":e_day,"remarks":note,"name":qd_name,"productId":cpId,"id":id}).then(function(res){
+							////console.log(cpId);
+							var code=res.body.code;
+							var msg=res.body.msg;
+							if(code=="0000"){
+								alert(msg)
+								$("#myModal-one").modal("hide");
+								_this.capitalList();
+							}else if(code=="0001"){
+								alert(msg)
+							}
+						});
+					}
+				}
+
+		    },
+        }
+    })
+</script>

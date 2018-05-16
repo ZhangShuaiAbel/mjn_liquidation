@@ -1,0 +1,406 @@
+<% include ../header.ejs %>
+
+<!--代扣管理--外部扣款管理-->
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>代扣管理</a>
+			<a href="#" class="current">外部扣款管理</a>
+		</div>
+		<h1>外部扣款管理</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+		<div class="row-fluid">
+			<div class="widget-box">
+				<div class="widget-content nopadding">
+					<form class="form-horizontal" id="signupForm" method="post" action="">
+						<table class="table table-striped">
+							<tbody>
+								<tr class="odd gradeX">
+									<td width="100" style="white-space: nowrap;">平台名称 :</td>
+									<td width="180" style="white-space: nowrap;">
+										<input type="text" value="" class="" name="loanUserName" v-model="pt_name">
+									</td>
+									<td width="100" style="white-space: nowrap;">
+										<button type="button" id="submit" class="btn btn-success" @click="listenDate(1)">查找</button>
+									</td>
+									<td></td>
+									<td width="100" style="white-space: nowrap;"></td>
+									<td></td>
+									<td></td>
+								</tr>
+							</tbody>
+						</table>
+
+						</td>
+						</tr>
+
+						</tbody>
+						</table>
+					</form>
+
+				</div>
+			</div>
+		</div>
+
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+								添加平台
+							</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<input type="hidden" id="druleId" name="druleId">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">平台名称 :</label>
+											<div class="controls">
+												<input type="text" v-model="ptName"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">单日失败限制 :</label>
+											<div class="controls">
+											<!-- <div class="box_11"> -->
+												<input class="box_input" type="text" v-model="dayLose" style="float: left;" />
+												<span class="box_span" style="display: block;width: 30px;height: 30px;text-align: center;line-height: 30px;float: left;margin: 0;position: relative;left: -30px">次</span>
+											</div>
+										</div>
+										<!-- <div class="control-group">
+											<label class="control-label" style="width: 150px">总限制次数 :</label>
+											<div class="controls">
+												<input type="text" style="width: 78px;" v-model="total_number"/>
+												<span style="display: inline-block;width: 20px;text-align: center;position: relative;left: -26px;margin: 0;">次</span>
+												<span style="display: inline-block;text-align: center;position: relative;left: -12px">/</span>
+												<input style="width: 78px;" type="text" v-model="day"/>
+												<span style="display: inline-block;width: 30px;text-align: center;position: relative;left: -30px;margin: 0">天</span>
+											</div>
+										</div> -->
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default"  data-dismiss="modal">关闭
+							</button>
+						<button type="button" class="btn-primary" @click="addPt">
+								提交
+							</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+<div class="modal fade" id="myModal-one" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+								修改平台
+							</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<input type="hidden" id="druleId" name="druleId">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">平台名称 :</label>
+											<div class="controls">
+												<input type="text" v-model="ptName_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">单日失败限制 :</label>
+											<div class="controls">
+												<input type="text" v-model="dayLose_1"/>
+											</div>
+										</div>
+										<!-- <div class="control-group">
+											<label class="control-label" style="width: 150px">总限制次数 :</label>
+											<div class="controls">
+												<input type="text" style="width: 80px;" v-model="total_number_1"/><span style="display: inline-block;width: 30px;text-align: center;">/</span><input style="width: 80px;" type="text" v-model="day_1"/>
+											</div>
+										</div> -->
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+						<button type="button" class="btn btn-primary" @click="upDeList(wb_id_1)">提交更改</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+		<hr>
+		<div class="row-fluid">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>			<button type="button" id="submit" class="btn btn-primary position_right" data-toggle="modal" data-target="#myModal">添加平台</button>
+</h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>平台id</th>
+									<th>平台名称</th>
+									<th>单日失败限制</th>
+									<!-- <th>总限制次数</th> -->
+									<th>状态</th>
+									<th width="100" style="white-space: nowrap;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+							    <tr v-for="msg in externalList">
+									<td v-text="msg.id"></td>
+									<td v-text="msg.name"></td>
+									<td v-text="msg.failCount"></td>
+									<!-- <td v-text="msg.countNo"></td> -->
+									<td >
+										<p v-if="msg.status=='1'">已启用</p>
+                                        <p v-else-if="msg.status=='2'">已禁用</p>
+									</td>
+									<td width="150" style="white-space: nowrap;">
+										<button class=" btn-info btn-mini float_btn_margin" data-toggle="modal" data-target="#myModal-one" @click="upOne(msg.id)">管理</button>
+										<button class=" btn-warning btn-mini float_btn_margin" @click="jin(msg.id,msg.status)">禁用</button>
+										<button class=" btn-warning btn-mini float_btn_margin" @click="qi(msg.id,msg.status)">启用</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+					</div>
+					<div class="table_toggle1" style="display: none;">暂无数据</div>
+
+				</div>
+
+			</div>
+		</div>
+		<div id="page">
+		    <vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+		</div>
+	</div>
+</div>
+
+<% include ../footer.ejs %>
+<script src="/javascripts/public_page.js"></script>
+<script src="/javascripts/vue-resource.js"></script>
+<script type="text/javascript">
+var total = "";
+
+    var pageBar = new Vue({
+        el: '#content',
+        data: {
+            all: 0, //总页数
+            cur: 1,//当前页码
+            msg:'',
+            pt_name:"",
+            externalList:"",
+            pageTotal:"",
+            ptName:"",
+            dayLose:"1",
+            // total_number:"",
+            // day:"",
+            wb_id:"",
+            ptName_1:"",
+            dayLose_1:"",
+            // total_number_1:"",
+            // day_1:"",
+            wb_id_1:"",
+        },
+        components:{
+            'vue-nav':pagenav
+        },
+        watch: {
+            cur: function(oldValue , newValue){
+                ////console.log('监听cur前与后的值：');
+                ////console.log(arguments);
+            }
+        },
+        mounted:function(){
+			this.listenDate(this.cur);
+
+		},
+        methods:{
+             //分页查询
+			listenDate:function(data){
+				$(".loading").show();
+				var _this = this;
+				var pt_name = this.pt_name;
+				var pageSize = 10;
+				////console.log(pt_name);
+				this.$http.post("/withhold/externalWithhold/jsonExt",{"pageNum":data,"pageSize":pageSize,"name":pt_name}).then(function(res){
+					$(".loading").hide();
+					if(res.body.code=="D1007"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 if(res.body.code=="D1006"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					   _this.externalList = res.body.res.externalWithhold.res;
+					   _this.pageTotal = res.body.res.externalWithhold.total;
+					   if(_this.externalList==""){
+							$(".table_toggle1").show();
+						}else{
+							$(".table_toggle1").hide();
+						}
+					   $(".table_toggle").show();
+					if (data<=1) {
+						total = Math.ceil(_this.pageTotal/10);
+					}
+					   _this.all = total;
+					   _this.cur = data;
+				});
+	        },
+	        //添加平台
+	        addPt:function(){
+				var _this = this;
+				var ptName = this.ptName;
+				var dayLose = this.dayLose;
+				// var total_number = this.total_number;
+				// var day = this.day;
+				var num_reg = /^[0-9]*$/;
+				if(ptName==""){
+					alert("请填写平台名称");
+					return false;
+				}else if(ptName.length>20){
+					alert("平台名称不能超过20字");
+					return false;
+				}else if(dayLose==""){
+					alert("请填写单日失败限制次数错误");
+					return false;
+				}else if(dayLose=="0"){
+					alert("单日失败限制");
+					return false;
+				}else if(!num_reg.exec(dayLose)){
+					alert("单日失败限制为数字");
+					return false;
+				}else{
+					var _this = this;
+					this.$http.post("/withhold/externalWithhold/saveExt",{"name":ptName,"failCount":dayLose}).then(function(res){
+						 ////console.log(res)
+						var code=res.body.code;
+						var msg=res.body.msg;
+						if(code=="0000"){
+							alert("添加成功")
+							$("#myModal").modal("hide");
+							_this.listenDate(this.cur);
+							_this.ptName="";
+							_this.dayLose="1";
+							// _this.total_number="";
+							// _this.day="";
+						}else if(code=="0001"){
+							alert(msg);
+						}
+					});
+				}
+		    },
+		    //按ID查询外部扣款
+		    upOne:function(id){
+                var _this = this;
+            	 this.$http.post("/withhold/externalWithhold/oneExt",{"id":id}).then(function(res){
+            	 	////console.log(res)
+                	 _this.ptName_1=res.body.res.externalWithhold.name;
+                	 _this.dayLose_1=res.body.res.externalWithhold.failCount;
+                	 // _this.total_number_1=res.body.res.externalWithhold.countNo;
+                	 // _this.day_1=res.body.res.externalWithhold.day;
+                	 _this.wb_id_1=res.body.res.externalWithhold.id;
+				});
+            },
+   //          //更新外部扣款通道
+		    upDeList:function(id){
+            	var _this = this;
+				var ptName = this.ptName_1;
+				var dayLose = this.dayLose_1;
+				// var total_number = this.total_number_1;
+				// var day = this.day_1;
+				var num_reg = /^[0-9]*$/;
+				if(ptName==""){
+					alert("请填写平台名称");
+					return false;
+				}else if(ptName.length>20){
+					alert("平台名称不能超过20字");
+					return false;
+				}else if(dayLose==""){
+					alert("请填写单日失败限制");
+					return false;
+				}else if(dayLose=="0"){
+					alert("单日失败限制");
+					return false;
+				}else if(!num_reg.exec(dayLose)){
+					alert("单日失败限制为数字");
+					return false;
+				}else{
+					var _this = this;
+					this.$http.post("/withhold/externalWithhold/updateExt",{"name":ptName,"failCount":dayLose,"id":id}).then(function(res){
+						////console.log(res);
+						var code=res.body.code;
+						var msg=res.body.msg;
+						if(code=="0000"){
+							alert(msg)
+							$("#myModal-one").modal("hide");
+							_this.listenDate(this.cur);
+						}else if(code=="0001"){
+							alert(msg);
+						}
+					});
+				}
+            },
+            //启用
+			qi:function(id,status){
+				////console.log(id,status);
+				var _this = this;
+				if(status=="2"){
+					this.$http.post("/withhold/externalWithhold/updateStatus",{"id":id,"status":1}).then(function(res){
+						////console.log(res);
+                	    alert("请求成功，已启用");
+                	    _this.listenDate(this.cur);
+				    });
+				}else{
+                	alert("已启用");
+				}
+			},
+		    //禁用
+			jin:function(id,status){
+				////console.log(id,status);
+				var _this = this;
+				if(status=="1"){
+					this.$http.post("/withhold/externalWithhold/updateStatus",{"id":id,"status":2}).then(function(res){
+						////console.log(res);
+                	    alert("请求成功，已禁用");
+				    });
+				    _this.listenDate(this.cur);
+				}else{
+					alert("已禁用");
+				}
+
+			},
+        }
+    })
+</script>

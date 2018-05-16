@@ -1,0 +1,348 @@
+<% include ../header.ejs %>
+
+<div id="content" style="min-height: 1000px;">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>交易管理</a>
+			<a href="#" class="current">兑付</a>
+		</div>
+					<h1>兑付</h1>
+
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+
+		<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+			<a  class="btn2" href="/deal/credit" target="liquidation">放款</a>
+			<a  class="btn2" href="/deal/pushSingle" target="liquidation">推单</a>
+			<a  class="btn2" href="/deal/gatheringDeal" target="liquidation">还款</a>
+			<a  class="btn2" href="/deal/refund"  target="liquidation">退款</a>
+<!--			<a  class="btn2" href="/deal/serviceCharge" target="liquidation">服务费</a>
+-->			<!--<a  class="btn btn-primary" href="/deal/capitalLoan" class="btn btn-primary" target="liquidation">资金放款</a>-->
+			<a  class="btn2 cur1" href="/deal/cash"  target="liquidation">兑付</a>
+            <a  class="btn2" href="/deal/repayearly"  target="liquidation">提前还款</a>
+		</div>
+		
+		<hr>
+		<div class="row-fluid">
+			<div class="widget-box">
+				<div class="widget-content nopadding">
+					<form class="form-horizontal" method="post" action="">
+						<table class="table table-striped">
+							<tbody>
+								<tr class="odd gradeX">
+									<td width="85" style="white-space: nowrap;">时间 :</td>
+									<td width="500" style="white-space: nowrap;">
+									    <input type="text" class="input" id="datepicker" readonly="readonly" name="repaymentStart">
+										<input type="text" class="input" id="datepicker1" readonly="readonly" name="repaymentEnd">
+									</td>
+									<td width="20" style="white-space: nowrap;"></td>
+									<td width="100" style="white-space: nowrap;">
+										<button type="button" onclick="dataTime(2)" class="btn btn-success">最近3天</button> 
+										<button type="button" onclick="dataTime(6)" class="btn btn-success">最近7天</button> 
+										<button type="button" onclick="dataTime(30)" class="btn btn-success">1个月</button>
+										<button type="button" onclick="dataTime(90)" class="btn btn-success">3个月</button>
+									</td>
+									<td width="100" style="white-space: nowrap;"></td>
+									<td width="100" style="white-space: nowrap;"></td>
+									<td width="100" style="white-space: nowrap;"></td>
+								</tr>
+							
+								<tr class="odd gradeX">
+									<td width="85" style="white-space: nowrap;">我方账户 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" id="" required v-model="company">
+											<option value="">所有</option>
+											<option v-for="bb in licenseList" v-bind:value="bb.id" v-text="bb.enterpriseName"></option>
+										</select>
+									</td>
+									<td width="85" style="white-space: nowrap;">资方 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" v-model="channelType">
+											<option value="">所有</option>
+											<option value="1">玖富</option>
+											<option value="2">蜡笔</option>
+											<option value="3">团贷</option>
+											<option value="4">小鸡</option>
+											<option value="5">自放款</option>
+											<option value="6">拿财</option>
+											<option value="7">中业兴融</option>
+											<option value="8">玖财通</option>
+										</select>
+										<span style="margin-left: 20px">
+											<button type="button" id="submit" class="btn btn-success" @click="listenDate(1)">查找</button>
+                                    	</span>
+									</td>
+									<td width="100" style="white-space: nowrap;"></td>
+									<td width="100" style="white-space: nowrap;"></td>
+									<td width="100" style="white-space: nowrap;"></td>
+
+								</tr>
+
+							</tbody>
+						</table>
+						<table class="table table-striped">
+							<tbody>
+								<tr class="odd gradeX">
+
+								</tr>
+							</tbody>
+						</table>
+					</form>
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row-fluid tab-two" style="display: none">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>日还款计划</h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>还款日期</th>
+									<th>还款金额</th>
+									<th>还款笔数</th>
+									<th>我方</th>
+									<th>资方</th>
+									<th>已销账金额</th>
+									<th>差额</th>
+									<th width="100" style="white-space: nowrap;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+								<tr v-for="msg in collectionList">
+									<td v-text="msg.timeStr"></td>
+									<td v-text="msg.amount/100"></td>
+									<td v-text="msg.count"></td>
+									<td v-text="msg.enterprise"></td>
+									<td v-text="msg.channel"></td>
+									<td v-text="msg.amountPayed/100"></td>
+									<td v-text="msg.amountNotPay/100"></td>
+									<td><a class=" btn-info btn-mini float_btn_margin" href="/deal/cash_table" @click="xiangqing(msg.timeStr)">详情</a></td>
+								</tr>
+								<!--<tr v-for="msg in param">
+								  <td v-text="msg.param"></td>
+								</tr>-->
+							</tbody>
+						</table>
+					</div>
+					<div class="table_toggle1" style="display: none;">暂无数据</div>
+				</div>
+			</div>
+			<div id="page" style="display: none">
+				<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+			</div>
+		</div>
+	</div>
+	<% include ../footer.ejs %>
+
+		<script>
+		$(function() {
+			//dataTime(1);
+			$("#time_one").click();
+			$(".pay_list").click();
+			$(".enquiries").click();
+		})
+	</script>
+	<script>
+	
+	
+	
+		function dataTime(num) {
+		////console.log(num)
+		var yugi = function(num) {
+			var now1 = new Date;
+			var getFullYear = now1.getFullYear();
+			var getMonth = now1.getMonth() + 1;
+			var getDate = now1.getDate();
+			var DateTime1 = getFullYear + "-" + getMonth + "-" + getDate;
+			$("#datepicker1").val(DateTime1)
+			var now = new Date;
+			now.setDate(now.getDate() - num);
+			var getFullYear = now.getFullYear();
+			var getMonth = now.getMonth() + 1;
+			var getDate = now.getDate();
+			var DateTime = getFullYear + "-" + getMonth + "-" + getDate;
+			$("#datepicker").val(DateTime)
+			if(num == "1") {
+				$("#datepicker").val(DateTime);
+				$("#datepicker1").val(DateTime)
+			}
+			var timestamp = new Date();
+			//alert(starttimeHaoMiao);
+			var DateTime_starttimeHaoMiao = DateTime;
+			var DateTime_starttimeHaoMiao1 = DateTime1;
+			var starttimeHaoMiao = (new Date(DateTime_starttimeHaoMiao)).getTime();
+			var starttimeHaoMiao1 = (new Date(DateTime_starttimeHaoMiao1)).getTime();
+
+			$("#starttimeHaoMiao").val(starttimeHaoMiao)
+			$("#starttimeHaoMiao1").val(starttimeHaoMiao1)
+			return now;
+
+		}
+		yugi(num);
+	}
+		$(function() {
+
+			$("#datepicker").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+			$("#datepicker1").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+		});
+	</script>
+	<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+
+	<script src="/javascripts/jquery-ui.js"></script>
+	<script src="/javascripts/vue-2.42.js"></script>
+	<script src="/javascripts/vue-resource.js"></script>
+	<script src="/javascripts/public_page.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+	<script src="/javascripts/bootstrap.min.js"></script>
+	<script src="/javascripts/jquery.flot.min.js"></script>
+	<script src="/javascripts/jquery.flot.pie.min.js"></script>
+	<script src="/javascripts/jquery.flot.resize.min.js"></script>
+	<script src="/javascripts/matrix.js"></script>
+	<script src="/javascripts/jquery.peity.min.js"></script>
+	<script>
+	
+		var total = "";
+		var datasets = "";
+		new Vue({
+			el: '#content',
+			data: {
+				all: 0, //总页数
+				cur: 1, //当前页码
+				channelType:"",
+				company: "", //公司主体
+				licenseList: "",
+				collectionList:"",
+				param:"",
+
+			},
+			components: {
+				'vue-nav': pagenav
+			},
+			watch: {
+				cur: function(oldValue, newValue) {
+					// this.data();
+				}
+			},
+			mounted: function() {
+				this.qyList();
+				this.time();
+				this.listenDate(this.cur);
+			},
+			methods: {
+				listenDate: function(data) {
+					
+					var _this = this;
+					var timeStart = parseInt((new Date($("#datepicker").val())).getTime()-28800000);
+					var timeEnd = parseInt((new Date($("#datepicker1").val())).getTime()-28800000+86399000);
+					var accountType = parseInt(this.company);
+					var channelType = parseInt(this.channelType);
+					var pageSize = 10;
+					/*if(isNaN(accountType)){
+						alert("请选择我方账户");
+					    return false;
+					}*/
+					
+					$(".loading").show();
+					$(".tab-two").show();
+					$("#page").show();
+					this.$http.post("/deal/transactionManager/cashed", {
+						"pageNum": data,
+						"pageSize": pageSize,
+						"timeStart":timeStart,
+						"timeEnd":timeEnd,
+						"accountType":accountType,
+						"channelType":channelType,
+
+					}).then(function(res) {
+						////console.log(res);
+						$(".loading").hide();
+						$(".table_toggle").show();
+						if(res.body.code == "D1007") {
+							alert(res.body.msg);
+							return false;
+						}
+						if(res.body.code == "D1006") {
+							alert(res.body.msg);
+							return false;
+						}
+						_this.collectionList = res.body.res.data;
+						_this.param = res.body.res.param;
+						var paramString=JSON.stringify(_this.param);
+						localStorage.setItem("param", paramString);
+						_this.pageTotal = res.body.res.total;
+						_this.totalNum = res.body.res.totalNum;
+						_this.totalAmount = res.body.res.totalAmount;
+						if(_this.collectionList==""){
+							$(".table_toggle1").show();
+						}else{
+							$(".table_toggle1").hide();
+						}
+						$(".table_toggle").show();
+						if(data <= 1) {
+							total = Math.ceil(_this.pageTotal / 10);
+						}
+						_this.all = total;
+						_this.cur = data;
+					});
+
+				},
+				time:function(){
+				    var seperator1 = "-";
+
+	                var startDate = new Date();
+	                startDate.setDate(startDate.getDate()+7);
+	                var startYear = startDate.getFullYear();
+	                var startMonth = startDate.getMonth()+1;
+	                if(startMonth < 10) startMonth = "0"+startMonth;
+	                var startDay = startDate.getDate();
+	                if(startDay < 10) startDay = "0"+startDay;
+	                var endDate = new Date();
+	                var endYear = endDate.getFullYear();
+	                var endMonth = endDate.getMonth()+1;
+	                if(endMonth < 10) endMonth = "0"+endMonth;
+	                var endDay = endDate.getDate();
+	                if(endDay < 10) endDay = "0"+endDay;
+	                var currentdate = startYear + seperator1 + startMonth + seperator1 + startDay;
+	                var currentdate1 = endYear + seperator1 + endMonth + seperator1 + endDay;
+	                $("#datepicker").val(currentdate1);
+	                $("#datepicker1").val(currentdate);
+           		},
+
+				//详情
+				xiangqing:function(time){
+					////console.log(id,status);
+					localStorage.setItem("time", time);
+
+				},
+				//企业列表查询
+				qyList: function() {
+					var _this = this;
+					this.$http.post("/pay/product/jsonEnt").then(function(res) {
+						// //console.log(res)
+						this.licenseList = res.body.res.enterprise;
+					});
+				},
+
+			}
+		})
+	</script>
+
+	<!--Real-time-chart-js-->

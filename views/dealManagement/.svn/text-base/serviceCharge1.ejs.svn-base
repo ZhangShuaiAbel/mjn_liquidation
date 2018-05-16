@@ -1,0 +1,366 @@
+<% include ../header.ejs %>
+
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>往来交易</a>
+			<a href="#" class="current">服务费</a>
+		</div>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+		
+		<a  class="btn btn-primary" href="/deal/credit" class="btn btn-primary" target="liquidation">放款</a>
+		<a  class="btn btn-primary" href="/deal/pushSingle" class="btn btn-primary" target="liquidation">推单</a>
+		<a  class="btn btn-primary" href="/deal/repayment" class="btn btn-primary" target="liquidation">还款</a>
+		<a  class="btn btn-primary" href="/deal/refund" class="btn btn-primary" target="liquidation">退款</a>
+		<!--<a  class="btn btn-primary" href="/deal/serviceCharge" class="btn btn-primary" target="liquidation">服务费</a>
+		<a  class="btn btn-primary" href="/deal/capitalLoan" class="btn btn-primary" target="liquidation">资金放款</a>-->
+		<a  class="btn btn-primary" href="/deal/cash" class="btn btn-primary" target="liquidation">兑付</a>
+		
+
+		<hr>
+		<div class="row-fluid">
+			<div class="widget-box">
+				<div class="widget-content nopadding">
+					<form class="form-horizontal" method="post" action="">
+						<table class="table table-striped">
+							<tbody>
+								<tr class="odd gradeX">
+									<td width="85" style="white-space: nowrap;">时间类型 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" >
+											<option value="">请选择</option>
+											<option value="1">创建时间</option>
+											<option value="2">完成时间</option>
+											<option value="3">打款时间</option>
+										</select>
+									</td>
+									<td width="85" style="white-space: nowrap;">交易时间 :</td>
+									<td width="600" style="white-space: nowrap;">
+										<input type="text" class="input" id="datepicker" readonly="readonly" name="repaymentStart">
+										<input type="text" class="input" id="datepicker1" readonly="readonly" name="repaymentEnd">
+									</td>
+									
+									<td width="85" style="white-space: nowrap;">业务类型 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" >
+											<option value="">请选择</option>
+											<option value="1">创建时间</option>
+											<option value="2">完成时间</option>
+											<option value="3">打款时间</option>
+										</select>
+									</td>
+								</tr>
+								<tr class="odd gradeX">
+									<td width="85" style="white-space: nowrap;">交易订单号 :</td>
+									<td width="" style="white-space: nowrap;">
+										<input type="text" class="input" >
+									</td>
+									<td width="85" style="white-space: nowrap;">交易状态 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" >
+											<option value="">请选择</option>
+											<option value="1">待打款</option>
+											<option value="2">打款成功</option>
+											<option value="3">打款失败</option>
+											<option value="4">异常</option>
+											<option value="5">所有</option>
+										</select>
+									</td>
+									<td width="85" style="white-space: nowrap;">商户订单号 :</td>
+									<td width="" style="white-space: nowrap;">
+										<input type="text" class="input" name="" >
+									</td>
+								</tr>
+								<tr class="odd gradeX">
+									<td width="85" style="white-space: nowrap;">账户主体 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" id="" required v-model="company">
+											<option value="">请选择</option>
+											<option v-for="bb in licenseList" v-bind:value="bb.id" v-text="bb.enterpriseName"></option>
+										</select>
+									</td>
+									<td width="85" style="white-space: nowrap;">支付渠道 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" >
+											<option value="">请选择</option>
+											<option value="1">连连</option>
+											<option value="2">宝付</option>
+										</select>
+									</td>
+									<td width="85" style="white-space: nowrap;">基础订单号 :</td>
+									<td width="" style="white-space: nowrap;"><input type="text" class="input" name="" ></td>						
+								</tr>
+								<tr>
+										<td width="85" style="white-space: nowrap;">对账账户 :</td>
+									<td width="" style="white-space: nowrap;"><input type="text" class="input" name="" ></td>
+										<td width="85" style="white-space: nowrap;"><button type="button" id="submit" class="btn btn-success" @click="listenDate(1)">查找</button></td>
+									<td width="" style="white-space: nowrap;"></td>
+									<td></td>
+									<td></td>
+								</tr>
+							</tbody>
+						</table>
+						<table class="table table-striped">
+							<tbody>
+								<tr class="odd gradeX">
+
+								</tr>
+							</tbody>
+						</table>
+					</form>
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row-fluid">
+			<div class="span6">
+				<div class="row-fluid">
+					<div class="span12">
+						<div class="span-box-one" style="background: rgb(255, 255, 255);">
+							<!--<p><span style="font-size: 28px;" v-text="totalNum">0</span><br><span style="margin: 0px 10px;">总订单数</span></p>-->
+						</div>
+					</div>
+					<!---->
+				</div>
+			</div>
+			<div class="span6">
+				<div class="row-fluid">
+					<div class="span12">
+						<div class="span-box-one" style="background: rgb(255, 255, 255);">
+							<!--<p><span style="font-size: 28px;" v-text="totalAmount+'(元)'">0</span><br><span style="margin: 0px 10px;">总交易额</span></p>-->
+						</div>
+					</div>
+					<!---->
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row-fluid tab-two" style="display: none">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>订单明细</h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>订单编号</th>
+									<th>用户名</th>
+									<th>用户手机号</th>
+									<th>身份证号</th>
+									<th>合同金额（元）</th>
+									<th>我方</th>
+									<th>资方</th>
+									<th>状态</th>
+									<th>创建时间</th>
+									<th width="100" style="white-space: nowrap;">操作</th>
+								</tr>
+							</thead>
+							<!--<tbody class="table_toggle">
+								<tr v-for="msg in collectionList">
+									<td v-text="msg.id"></td>
+									<td v-text="msg.userName"></td>
+									<td v-text="msg.phone"></td>
+									<td v-text="msg.idCard"></td>
+									<td v-text="msg.approveAmount"></td>
+									<td v-text="msg.appName"></td>
+									<td v-if="msg.fundChannel=='1'">玖富</td>
+									<td v-else-if="msg.fundChannel=='2'">蜡笔</td>
+									<td v-else-if="msg.fundChannel=='3'">团贷</td>
+									<td v-else-if="msg.fundChannel=='4'">小鸡</td>
+									<td v-else-if="msg.fundChannel=='5'">自己放款</td>
+									<td v-else-if="msg.fundChannel=='6'">拿财</td>
+									<td v-if="msg.status=='0'">未提交</td>
+									<td v-else-if="msg.status=='1'">申请</td>
+									<td v-else-if="msg.status=='2'">审核通过</td>
+									<td v-else-if="msg.status=='3'">审核拒绝</td>
+									<td v-else-if="msg.status=='4'">放弃签合同</td>
+									<td v-else-if="msg.status=='5'">还款中</td>
+									<td v-else-if="msg.status=='6'">渠道拒绝</td>
+									<td v-else-if="msg.status=='7'">待人工审核</td>
+									<td v-else-if="msg.status=='8'">待打款</td>
+									<td v-else-if="msg.status=='10'">已还清</td>
+									<td v-else-if="msg.status=='11'">用户借款确认</td>
+									<td v-else-if="msg.status=='12'">撤单</td>
+									<td v-else></td>
+									<td>{{msg.createTime | time}}</td>
+									<td>详情</td>
+								</tr>
+							</tbody>-->
+						</table>
+					</div>
+				</div>
+			</div>
+			<div id="page" style="display: none">
+				<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+			</div>
+		</div>
+	</div>
+	<% include ../footer.ejs %>
+
+	<script>
+		$(function() {
+			//dataTime(1);
+			$("#time_one").click();
+			$(".pay_list").click();
+			$(".enquiries").click();
+		})
+	</script>
+	<script>
+		function dataTime(num) { ////console.log(num)
+			var yugi = function(num) {
+				var now1 = new Date;
+				var getFullYear = now1.getFullYear();
+				var getMonth = now1.getMonth() + 1;
+				var getDate = now1.getDate();
+				var DateTime1 = getFullYear + "-" + getMonth + "-" + getDate;
+				$("#datepicker1").val(DateTime1)
+				var now = new Date;
+				now.setDate(now.getDate() - num);
+				var getFullYear = now.getFullYear();
+				var getMonth = now.getMonth() + 1;
+				var getDate = now.getDate();
+				var DateTime = getFullYear + "-" + getMonth + "-" + getDate;
+				$("#datepicker").val(DateTime)
+				if(num == "1") {
+					$("#datepicker").val(DateTime);
+					$("#datepicker1").val(DateTime);
+				}
+				var timestamp = new Date();
+				//alert(starttimeHaoMiao);
+				var DateTime_starttimeHaoMiao = DateTime;
+				var DateTime_starttimeHaoMiao1 = DateTime1;
+				var starttimeHaoMiao = (new Date(DateTime_starttimeHaoMiao)).getTime();
+				var starttimeHaoMiao1 = (new Date(DateTime_starttimeHaoMiao1)).getTime();
+				$("#starttimeHaoMiao").val(starttimeHaoMiao)
+				$("#starttimeHaoMiao1").val(starttimeHaoMiao1)
+				return now;
+			}
+			yugi(num);
+		}
+
+		$(function() {
+
+			$("#datepicker").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+			$("#datepicker1").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+		});
+	</script>
+	<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+
+	<script src="/javascripts/jquery-ui.js"></script>
+	<script src="/javascripts/vue-2.42.js"></script>
+	<script src="/javascripts/vue-resource.js"></script>
+	<script src="/javascripts/public_page.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+	<script src="/javascripts/bootstrap.min.js"></script>
+	<script src="/javascripts/jquery.flot.min.js"></script>
+	<script src="/javascripts/jquery.flot.pie.min.js"></script>
+	<script src="/javascripts/jquery.flot.resize.min.js"></script>
+	<script src="/javascripts/matrix.js"></script>
+	<script src="/javascripts/jquery.peity.min.js"></script>
+	<script>
+		var total = "";
+		var datasets = "";
+		new Vue({
+			el: '#content',
+			data: {
+				all: 0, //总页数
+				cur: 1, //当前页码
+		
+				company: "", //公司主体
+				licenseList: "",
+		
+			},
+			components: {
+				'vue-nav': pagenav
+			},
+			watch: {
+				cur: function(oldValue, newValue) {
+					// this.data();
+				}
+			},
+			mounted: function() {
+				this.qyList();
+				this.listenDate(this.cur);
+			},
+			methods: {
+				listenDate: function(data) {
+					var _this = this;
+					var beginDate = $("#datepicker").val();
+					var endDate = $("#datepicker1").val();
+					var status = this.status;
+					var cashId = parseInt(this.cashId);
+					var userName = this.userName;
+					var mobile = this.mobile;
+					var idCard = this.idCard;
+					var company = this.company;
+					var fundChannel = parseInt(this.fundChannel);
+					var pageSize = 10;
+					$(".loading").show();
+					$(".tab-two").show();
+					$("#page").show();
+					this.$http.post("/basics/cash/getCashList", {
+						"pageNum": data,
+						"pageSize": pageSize,
+						"status": status,
+						"beginDate": beginDate,
+						"endDate": endDate,
+						"cashId": cashId,
+						"userName": userName,
+						"mobile": mobile,
+						"idCard": idCard,
+						"company": company,
+						"fundChannel": fundChannel
+					}).then(function(res) {
+						//console.log(res);
+						$(".loading").hide();
+						if(res.body.code == "D1007") {
+							alert(res.body.msg);
+							return false;
+						}
+						if(res.body.code == "D1006") {
+							alert(res.body.msg);
+							return false;
+						}
+						_this.collectionList = res.body.res.cashList.res;
+						_this.pageTotal = res.body.res.cashList.total;
+						_this.totalNum = res.body.res.totalNum;
+						_this.totalAmount = res.body.res.totalAmount;
+						$(".table_toggle").show();
+						if(data <= 1) {
+							total = Math.ceil(_this.pageTotal / 10);
+						}
+						_this.all = total;
+						_this.cur = data;
+					});
+
+				},
+				//企业列表查询
+				qyList: function() {
+					var _this = this;
+					this.$http.post("/pay/product/jsonEnt").then(function(res) {
+						// //console.log(res)
+						this.licenseList = res.body.res.enterprise;
+					});
+				},
+
+			}
+		})
+	</script>
+	
+	<!--Real-time-chart-js-->

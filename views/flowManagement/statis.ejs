@@ -1,0 +1,404 @@
+<% include ../header.ejs %>
+
+<!--交易管理--收款交易查询-->
+
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>对账管理</a>
+			<a href="#" class="current">账单汇总</a>
+		</div>
+		<h1>账单汇总</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		
+        <hr>
+        <div class="row-fluid">
+            <div class="widget-box">
+                <div class="widget-content nopadding">
+                    <form class="form-horizontal" id="signupForm" method="post" action="">
+                        <table class="table table-striped">
+                            <tbody>
+                            <tr class="odd gradeX">
+                                <td width="85" style="white-space: nowrap;">我方账号 :</td>
+                                <td width="" style="white-space: nowrap;">
+                                    <select name="" id="" v-model="ourAccountId">
+                                        <option v-for="account in accounts" v-bind:value="account.accountId" v-text="account.accountName"></option>
+                                    </select>
+                                </td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+        <hr>
+
+        <span v-if="hasMonth">
+            <a  class="btn btn-primary" href="#" target="liquidation">日账单</a>
+            <a  class="btn" href="/flow/statisyear"  target="liquidation">月账单</a>
+        </span>
+        <span v-else>
+            <a  class="btn" href="/flow/statismonth" target="liquidation">日账单</a>
+            <a  class="btn btn-primary" href="#"  target="liquidation">月账单</a>
+        </span>
+
+        <a  class="btn" href="#" @click="datePre()" target="liquidation">上</a>
+        <span v-if="hasMonth">{{year}}年{{month}}月</span>
+        <span v-else>{{year}}年</span>
+        <a  class="btn" href="#" @click="dateNext()" target="liquidation">下</a>
+
+        <hr>
+		<div class="row-fluid tab-two">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5><span @click="downLoad" id="submit_down" class="badge badge-success"  style="position: absolute;cursor: pointer;top: 8px;right: 10px;padding: 3px 10px;">下载</span></h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>入账时间</th>
+									<th>期初余额</th>
+									<th>期末余额</th>
+									<th>收入（已对账）</th>
+									<th>支出（已对账）</th>
+									<th>收入（未对账）</th>
+									<th>支出（未对账）</th>
+								</tr>
+							</thead>
+							<tbody class="">
+                                <tr v-for="msg in collectionList">
+                                    <!--<td>{{msg.time | time}}</td>-->
+                                    <td v-text="msg.time"></td>
+                                    <td v-text="msg.startBalance/100"></td>
+                                    <td v-text="msg.endBalance/100"></td>
+                                    <td v-text="msg.receiveD/100"></td>
+                                    <td v-text="msg.payD/100"></td>
+                                    <td v-text="msg.receive/100"></td>
+                                    <td v-text="msg.pay/100"></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="table_toggle1">暂无数据</div>
+				</div>
+			</div>
+		</div>
+        <% include applyAlert.ejs %>
+		<!--<div id="page" style="display: none">-->
+			<!--<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>-->
+		<!--</div>-->
+	</div>
+</div>
+
+<% include ../footer.ejs %>
+
+<script src="/javascripts/jquery.min.js"></script>
+
+<script>
+
+	$(function(){
+		// $("#one").click();
+		// $("#submit").click();
+		$("#ADDsubmit").click(function(){
+			$("#shangchuan_list").show();
+			$("#logoUrl").val("");
+			$("#fsUploadProgress").html("");
+		})
+	})
+	function closes(){
+		$("#shangchuan_list").hide();
+	}
+	function dels(e) {
+		    var attrsVal=$("#attrs").val();
+		    var arr=attrsVal.split(',');
+		    arr.splice($(e).parent(".qiniu").index(),1);
+		    var arrs= arr.join(",");
+		    $("#attrs").val(arrs);
+		    $(e).parents(".qiniu").remove();
+		    return arr;
+		}
+</script>
+
+
+<script>
+
+    function dataTime(num) {
+        ////console.log(num)
+        var yugi = function(num) {
+            var now1 = new Date;
+            var getFullYear = now1.getFullYear();
+            var getMonth = now1.getMonth() + 1;
+            var getDate = now1.getDate();
+            var DateTime1 = getFullYear + "-" + getMonth + "-" + getDate;
+            $("#datepicker1").val(DateTime1)
+            var now = new Date;
+            now.setDate(now.getDate() - num);
+            var getFullYear = now.getFullYear();
+            var getMonth = now.getMonth() + 1;
+            var getDate = now.getDate();
+            var DateTime = getFullYear + "-" + getMonth + "-" + getDate;
+            $("#datepicker").val(DateTime)
+            if(num == "1") {
+                $("#datepicker").val(DateTime);
+                $("#datepicker1").val(DateTime);
+            }
+            var timestamp = new Date();
+            //alert(starttimeHaoMiao);
+            var DateTime_starttimeHaoMiao = DateTime;
+            var DateTime_starttimeHaoMiao1 = DateTime1;
+            var starttimeHaoMiao = (new Date(DateTime_starttimeHaoMiao)).getTime();
+            var starttimeHaoMiao1 = (new Date(DateTime_starttimeHaoMiao1)).getTime();
+
+            $("#starttimeHaoMiao").val(starttimeHaoMiao)
+            $("#starttimeHaoMiao1").val(starttimeHaoMiao1)
+            return now;
+
+        }
+        yugi(num);
+    }
+
+    $(function() {
+
+        $("#datepicker").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "1900:2050",
+        })
+        $("#datepicker1").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "1900:2050",
+        })
+        /*$("#reset").click(function(){
+         $("#signupForm").find("input,select").val("")
+         })*/
+    });
+
+    dataTime(0);
+</script>
+
+<script src="/javascripts/vue-resource.js"></script>
+<script src="/javascripts/public_page.js"></script>
+<script src="/javascripts/time_filter.js"></script>
+
+<script type="text/javascript" src="/javascripts/bower_components/plupload/js/moxie.js"></script>
+<script type="text/javascript" src="/javascripts/bower_components/plupload/js/plupload.dev.js"></script>
+<script type="text/javascript" src="/javascripts/bower_components/plupload/js/i18n/zh_CN.js"></script>
+<script src="/javascripts/jquery-ui.js"></script>
+
+<script type="text/javascript">
+
+var total = "";
+	var pageBar = new Vue({
+        el: '#content',
+        data: {
+            all: 0, //总页数
+            cur: 1,//当前页码
+            msg:'',
+            ourAccountId:'1',
+            year:'',
+            month:'',
+            hasMonth:false,
+            dateOffset:'',
+
+            accounts:'',
+            pageTotal:"",
+            collectionList:"",
+
+            id1:'',
+            time1:'',
+            amount1:'',
+            ourAccountName1:'',
+            ourAccountNo1:'',
+            reciprocalAccountName1:'',
+            reciprocalAccountNo1:'',
+            payType1:"",
+            payTypeStr:"",
+            applyReason:"",
+        },
+        components:{
+            'vue-nav':pagenav
+        },
+        watch: {
+            cur: function(oldValue , newValue){
+                // //console.log('监听cur前与后的值：');
+                // //console.log(arguments);
+            },
+            ourAccountId: function (oldValue, newValue) {
+                this.listenDate(1);
+            }
+        },
+        mounted:function(){
+            this.initfor();
+        	this.time();
+            this.getAccounts();
+            var accountId = sessionStorage.getItem('accountId');
+            if(accountId!=null){
+            	this.ourAccountId=accountId;
+            }
+			
+		},
+        methods:{
+            listenDate:function(data){
+				var _this = this;
+                var ourAccountId = this.ourAccountId;
+                if(ourAccountId == ""){
+                    alert("请选择我方账号");
+                }
+                var year = this.year;
+                var month = "";
+                if(this.hasMonth){
+                    month = this.month;
+                }
+
+				$(".loading").show();
+            	$(".tab-two").show();
+            	$("#page").show();
+				this.$http.post("/flow/json/statis",{
+                    "ourAccountId": ourAccountId,
+                    "year": year,
+                    "month": month,
+                }).then(function(res){
+                	sessionStorage.removeItem("accountId");
+					 //console.log(res);
+					$(".loading").hide();
+					 if(res.body.code=="D1007"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 if(res.body.code=="D1006"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 this.collectionList = res.body.res.main;
+					 this.pageTotal = 1;
+					 if(this.collectionList==""){
+							$(".table_toggle1").show();
+						}else{
+							$(".table_toggle1").hide();
+						}
+					 $(".table_toggle").show();
+                    if (data<=1) {
+						total = Math.ceil(_this.pageTotal/10);
+					}
+					   this.all = total;
+					   this.cur = data;
+				});
+	        },
+            initfor:function(){
+                var unit = "<%=unit%>";
+                if("month" == unit){
+                    this.hasMonth = true;
+                }
+            },
+	        time:function(){
+                var endDate = new Date();
+                dateOffset = 0;
+                this.year = endDate.getFullYear();
+                this.month = endDate.getMonth()+1;
+                if(this.month < 10) this.month = "0"+this.month;
+            },
+
+            datePre:function(){
+                dateOffset = dateOffset - 1;
+                var endDate = new Date();
+                if(this.hasMonth){
+                    endDate.setMonth(endDate.getMonth()+dateOffset);
+                }else{
+                    endDate.setFullYear(endDate.getFullYear()+dateOffset);
+                }
+                this.year = endDate.getFullYear();
+                this.month = endDate.getMonth()+1;
+                if(this.month < 10) this.month = "0"+this.month;
+                this.listenDate(1);
+            },
+            dateNext:function(){
+                dateOffset = dateOffset + 1;
+                var endDate = new Date();
+                if(this.hasMonth){
+                    endDate.setMonth(endDate.getMonth()+dateOffset);
+                }else{
+                    endDate.setFullYear(endDate.getFullYear()+dateOffset);
+                }
+                this.year = endDate.getFullYear();
+                this.month = endDate.getMonth()+1;
+                if(this.month < 10) this.month = "0"+this.month;
+                this.listenDate(1);
+            },
+	        resets:function(){
+
+                $("#datepicker").val("");
+                $("#datepicker1").val("");
+
+                this.startTime='';
+                this.endTime='';
+                this.payType='';
+                this.status='';
+                this.reciprocalAccountNo='';
+                this.reciprocalAccountName='';
+                this.ourAccountId='';
+                this.orderId='';
+            },
+            getAccounts:function(){
+            	this.$http.post("/flow/json/accounts").then(function(res){
+                	 this.accounts=res.body.res;
+				});
+            },
+            apply:function(msg){
+                this.id1 = msg.id;
+                this.time1 = msg.time;
+                this.amount1 = msg.amount;
+                this.payType1 = msg.payType;
+                this.ourAccountName1 = msg.ourAccountName;
+                this.ourAccountNo1 = msg.ourAccountNo;
+                this.reciprocalAccountName1 = msg.reciprocalAccountName;
+                this.reciprocalAccountNo1 = msg.reciprocalAccountNo;
+            },
+            //提交申请
+            applySubmit: function() {
+
+                var reconciliationOrderId = this.id1;
+                var payType = this.payType1;
+                var payTypeStr = this.payTypeStr;
+                var comment = this.applyReason;
+                this.$http.post("/flow/json/apply",{"reconciliationOrderId":reconciliationOrderId,"payType":payType,"payTypeStr":payTypeStr,"comment":comment}).then(function(res){
+                    ////console.log(res)
+                    var code=res.body.code;
+                    var msg=res.body.msg;
+                    if(code=="0000"){
+                        alert(msg);
+                        // $("#myModal").modal("hide");
+                        $("#btn-default").click();
+                        _this.listenDate(this.cur);
+                    }else if(code=="0001"){
+                        alert(msg);
+                    }
+                });
+            },
+            downLoad:function(){
+                if(this.all > 5000){
+                    alert("单次下载页数不能超过5000页");
+                }
+					var ourAccountId = this.ourAccountId;
+	                var year = this.year;
+	                var month = "";
+	                if(this.hasMonth){
+	                    month = this.month;
+	                }
+	            	this.$http.get("/flow/reconciliation/reconciliationManagerDownload").then(function(res){
+	            		//window.location.href="http://192.168.10.232:8080/liquidation/reconciliation/reconciliationManagerDownload?ourAccountId="+ourAccountId+"&year="+year+"&month="+month+"&authToken="+res.body;
+	            		window.location.href="https://api.lqd.91naxia.com/liquidation/reconciliation/reconciliationManagerDownload?ourAccountId="+ourAccountId+"&year="+year+"&month="+month+"&authToken="+res.body;
+	            	});
+	            }
+        }
+    })
+</script>

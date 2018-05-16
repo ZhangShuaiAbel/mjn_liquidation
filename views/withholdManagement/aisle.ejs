@@ -1,0 +1,516 @@
+<% include ../header.ejs %>
+
+<!--代扣管理--代扣通道管理-->
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>代扣管理</a>
+			<a href="#" class="current">代扣通道管理</a>
+		</div>
+		<h1>代扣通道管理</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+		<div class="row-fluid">
+			<div class="widget-box">
+				<div class="widget-content nopadding">
+					<form class="form-horizontal" id="signupForm" method="post" action="">
+						<table class="table table-striped">
+							<tbody>
+								<tr class="odd gradeX">
+									<td width="100" style="white-space: nowrap;">扣款通道名称 :</td>
+									<td>
+										<!-- <select name="productLine" id="productLine" v-model="deductions_name">
+											<option value="">请选择</option>
+											<option v-for="bb in kkNameList" v-bind:value="bb.id" v-text="bb.name"></option>
+										</select> -->
+										<input type="text" v-model="deductions_name">
+									</td>
+									<td width="100" style="white-space: nowrap;">
+										签约企业 :</td>
+									<td>
+										<select name="productLine" id="productLine" v-model="qy_name">
+											<option value="">所有</option>
+											<option v-for="bb in licenseList" v-bind:value="bb.id" v-text="bb.enterpriseName"></option>
+										</select>
+									</td>
+									<td>
+										<button type="button" id="submit" class="btn btn-success" @click="listenDate(1)">查找</button>
+										
+									</td>
+									<td width="200"></td>
+									<td width="200"></td>
+								</tr>
+							</tbody>
+						</table>
+
+						</td>
+						</tr>
+
+						</tbody>
+						</table>
+					</form>
+
+				</div>
+			</div>
+		</div>
+
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+								添加扣款通道
+							</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<input type="hidden" id="druleId" name="druleId">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">扣款渠道名称 :</label>
+											<div class="controls">
+												<select name="productLine" id="productLine" v-model="kk_name">
+											     <option value="">请选择</option>
+											     <option v-for="bb in kkNameList" v-bind:value="bb.id" v-text="bb.name"></option>
+										    </select>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">扣款方式 :</label>
+											<div class="controls">
+												<select name="" id="" v-model="kk_if">
+												<option value="">请选择</option>
+													<option value="1">三要素</option>
+													<option value="2">四要素</option>
+												</select>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">是否鉴权 :</label>
+											<div class="controls">
+												<select name="" id="" v-model="xz_if">
+												<option value="">请选择</option>
+													<option value="1">是</option>
+													<option value="2">否</option>
+												</select>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">单日次数限制 :</label>
+											<div class="controls">
+												<input type="text" v-model="day_num">
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">扣款顺序 :</label>
+											<div class="controls">
+												<input type="text" v-model="kk_sort">
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn-default" data-dismiss="modal">关闭
+							</button>
+						<button type="button" class="btn-primary" @click="addDeList">
+								提交
+							</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+<div class="modal fade" id="myModal-one" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+								编辑扣款通道
+							</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<input type="hidden" id="druleId" name="druleId">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">扣款渠道名称 :</label>
+											<div class="controls">
+												<select name="productLine" id="productLine" v-model="kk_name">
+											     <option value="">请选择</option>
+											     <option v-for="bb in kkNameList" v-bind:value="bb.id" v-text="bb.name"></option>
+										    </select>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">扣款方式 :</label>
+											<div class="controls">
+												<select name="" id="" v-model="kk_if">
+												<option value="">请选择</option>
+													<option value="1">三要素</option>
+													<option value="2">四要素</option>
+												</select>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">是否鉴权 :</label>
+											<div class="controls">
+												<select name="" id="" v-model="xz_if">
+												<option value="">请选择</option>
+													<option value="1">是</option>
+													<option value="2">否</option>
+												</select>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">单日次数限制 :</label>
+											<div class="controls">
+												<input type="text" v-model="day_num">
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">扣款顺序 :</label>
+											<div class="controls">
+												<input type="text" v-model="kk_sort">
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+							</button>
+						<button type="button" class="btn btn-primary" @click="upDeList(kk_id)">
+								提交更改
+							</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+		<hr>
+		<div class="row-fluid">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>			<button type="button" id="submit" class="btn btn-primary position_right" data-toggle="modal" data-target="#myModal">添加扣款通道</button>
+</h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>渠道标识</th>
+									<th>扣款渠道名称</th>
+									<th>签约主体</th>
+									<th>扣款方式</th>
+									<th>是否鉴权</th>
+									<th>单日次数限制</th>
+									<th>扣款顺序</th>
+									<th>状态</th>
+									<th width="150" style="white-space: nowrap;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+							    <tr v-for="msg in deductionsList">
+									<td v-text="msg.id"></td>
+									<td v-text="msg.name"></td>
+									<td v-text="msg.enterpriseName"></td>
+									<!-- <td v-text="msg.mode"></td> -->
+									<td v-if="msg.mode=='1'">三要素</td>
+									<td v-if="msg.mode=='2'">四要素</td>
+									<!-- <td v-text="msg.auth"></td> -->
+									<td v-if="msg.auth=='1'">是</td>
+									<td v-if="msg.auth=='2'">否</td>
+									<td v-text="msg.frequency"></td>
+									<td v-text="msg.orders"></td>
+									<td>
+										<p v-if="msg.status=='1'">已上线</p>
+                                        <p v-else-if="msg.status=='2'">已下线</p>
+									</td>
+									<td width="150" style="white-space: nowrap;">
+										<button class=" btn-info btn-mini float_btn_margin" data-toggle="modal" data-target="#myModal-one" @click="upOne(msg.id)">编辑</button>
+										<button class=" btn-success btn-mini float_btn_margin" @click="qi(msg.id,msg.status)">上线</button>
+										<button class=" btn-warning btn-mini float_btn_margin" @click="jin(msg.id,msg.status)">下线</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+					</div>
+					<div class="table_toggle1" style="display: none;">暂无数据</div>
+
+				</div>
+
+			</div>
+		</div>
+				<div id="page">
+		    <vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+		</div>
+	</div>
+</div>
+
+<!--<div class="row-fluid">
+  <div id="footer" class="span12"> 2013 &copy; Matrix Admin. More Templates <a href="http://www.mycodes.net/" target="_blank">源码之家</a></div>
+</div>-->
+
+<% include ../footer.ejs %>
+<script src="/javascripts/vue-resource.js"></script>
+<script src="/javascripts/public_page.js"></script>
+<script type="text/javascript">
+var total = "";
+    var pageBar = new Vue({
+        el: '#content',
+        data: {
+            all: 0, //总页数
+            cur: 1,//当前页码
+            msg:'',
+            licenseList:"",
+            deductions_name:"",
+            qy_name:"",
+            deductionsList:"",
+            pageTotal:"",
+            kkNameList:"",
+            kk_name:"",
+            qy_id:"",
+            kk_if:"",
+            xz_if:"",
+            day_num:"",
+            kk_sort:"",
+            kk_id:"",
+            kk_status:""
+        },
+        components:{
+            'vue-nav':pagenav
+        },
+        watch: {
+            cur: function(oldValue , newValue){
+                //console.log('监听cur前与后的值：');
+                //console.log(arguments);
+            }
+        },
+        mounted:function(){
+			this.listenDate(this.cur);
+			this.qyList();
+			this.kkList();
+		},
+        methods:{
+             //分页查询
+			listenDate:function(data){
+				$(".loading").show();
+				var _this = this;
+				var deductions_name = this.deductions_name;
+				////console.log(typeof(zftd_name))
+				var qy_name = this.qy_name;
+				var pageSize = 10;
+				 ////console.log(deductions_name,qy_name)
+				this.$http.post("/withhold/withholdChannel/jsonWit",{"pageNum":data,"pageSize":pageSize,"name":deductions_name,"enterpriseId":qy_name}).then(function(res){
+					$(".loading").hide();
+					 if(res.body.code=="D1007"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 if(res.body.code=="D1006"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 _this.deductionsList = res.body.res.withholdChannel.res;
+					 // //console.log(_this.payList)
+					  _this.pageTotal = res.body.res.withholdChannel.total;
+					  if(_this.deductionsList==""){
+							$(".table_toggle1").show();
+						}else{
+							$(".table_toggle1").hide();
+						}
+					  	$(".table_toggle").show();
+					if (data<=1) {
+						total = Math.ceil(_this.pageTotal/10);
+					}
+					   _this.all = total;
+					   _this.cur = data;
+				});
+	        },
+            //签约企业
+            qyList:function(){
+            	var _this = this;
+                this.$http.post("/pay/product/jsonEnt").then(function(res){
+                	this.licenseList=res.body.res.enterprise;
+				});
+            },
+            //扣款通道名称查询
+            kkList:function(){
+            	var _this = this;
+                this.$http.post("/withhold/withholdChannel/jsonPay").then(function(res){
+                	this.kkNameList=res.body.res.paymentChannel;
+                	// //console.log(res)
+				});
+            },
+            addDeList:function(){
+            	var _this = this;
+				var kk_name = this.kk_name;
+				// var qy_id = this.qy_id;
+				var kk_if = this.kk_if;
+				var xz_if = this.xz_if;
+				var day_num = this.day_num;
+				var kk_sort = this.kk_sort;
+				var num_reg = /^[0-9]*$/;
+				if(kk_name==""){
+					alert("请选择扣款通道名称");
+					return false;
+				}else if(kk_if==""){
+					alert("请选择扣款方式");
+					return false;
+				}else if(xz_if==""){
+					alert("请选择是否鉴权");
+					return false;
+				}else if(day_num==""){
+					alert("请填写单日次数限制");
+					return false;
+				}else if(day_num=="0"){
+					alert("单日次数限制不能为0");
+					return false;
+				}else if(!num_reg.exec(day_num)){
+					alert("单日次数限制为数字");
+					return false;
+				}else if(kk_sort==""){
+					alert("请填写扣款顺序");
+					return false;
+				}else if(!num_reg.exec(kk_sort)){
+					alert("扣款顺序为数字");
+					return false;
+				}else{
+					var _this = this;
+					this.$http.post("/withhold/withholdChannel/saveWit",{"channelId":kk_name,"mode":kk_if,"auth":xz_if,"frequency":day_num,"orders":kk_sort}).then(function(res){
+						////console.log(res);
+						var code=res.body.code;
+						var msg=res.body.msg;
+						if(code=="0000"){
+							alert("添加成功")
+							$("#myModal").modal("hide");
+							_this.listenDate(this.cur);
+							_this.kk_name="";
+							_this.kk_if="";
+							_this.xz_if="";
+							_this.day_num="";
+							_this.kk_sort="";
+						}else if(code=="0001"){
+							alert(msg);
+						}
+					});
+
+				}
+            },
+            //id查询单条信息
+            upOne:function(id){
+                var _this = this;
+				zf_id = id;
+				////console.log(zf_id);
+            	 this.$http.post("/withhold/withholdChannel/oneWit",{"id":id}).then(function(res){
+            	 	////console.log(res)
+                	 _this.kk_name=res.body.res.withholdChannel.channelId;
+                	 _this.kk_if=res.body.res.withholdChannel.mode;
+                	 _this.xz_if=res.body.res.withholdChannel.auth;
+                	 _this.day_num=res.body.res.withholdChannel.frequency;
+                	 _this.kk_sort=res.body.res.withholdChannel.orders;
+                	 _this.kk_id=res.body.res.withholdChannel.id;
+				});
+            },
+            upDeList:function(id){
+            	var _this = this;
+				var kk_name = this.kk_name;
+				var kk_if = this.kk_if;
+				var xz_if = this.xz_if;
+				var day_num = this.day_num;
+				var kk_sort = this.kk_sort;
+				var num_reg = /^[0-9]*$/;
+				if(kk_name==""){
+					alert("请选择扣款通道名称");
+					return false;
+				}else if(kk_if==""){
+					alert("请选择扣款方式");
+					return false;
+				}else if(xz_if==""){
+					alert("请选择是否鉴权");
+					return false;
+				}else if(day_num==""){
+					alert("请填写单日次数限制");
+					return false;
+				}else if(day_num=="0"){
+					alert("单日次数限制不能为0");
+					return false;
+				}else if(!num_reg.exec(day_num)){
+					alert("单日次数限制为数字");
+					return false;
+				}else if(kk_sort==""){
+					alert("请填写扣款顺序");
+					return false;
+				}else if(!num_reg.exec(kk_sort)){
+					alert("扣款顺序为数字");
+					return false;
+				}else{
+					var _this = this;
+					this.$http.post("/withhold/withholdChannel/updateWit",{"channelId":kk_name,"mode":kk_if,"auth":xz_if,"frequency":day_num,"orders":kk_sort,"id":id}).then(function(res){
+						var code=res.body.code;
+						var msg=res.body.msg;
+						if(code=="0000"){
+							alert(msg)
+							$("#myModal-one").modal("hide");
+							_this.listenDate(this.cur);
+						}else if(code=="0001"){
+                            alert(msg)
+						}
+					});
+				}
+            },
+            //启用
+			qi:function(id,status){
+				////console.log(id,status);
+				var _this = this;
+				if(status=="2"){
+					this.$http.post("/withhold/withholdChannel/updateStatus",{"id":id,"status":1}).then(function(res){
+						////console.log(res);
+                	    alert("请求成功，已上线");
+                	    _this.listenDate(this.cur);
+				    });
+				}else{
+                	alert("已上线");
+				}
+			},
+			//禁用
+			jin:function(id,status){
+				////console.log(id,status);
+				var _this = this;
+				if(status=="1"){
+					this.$http.post("/withhold/withholdChannel/updateStatus",{"id":id,"status":2}).then(function(res){
+						////console.log(res);
+                	    alert("请求成功，已下线");
+				    });
+				    _this.listenDate(this.cur);
+				}else{
+					alert("已下线");
+				}
+
+			},
+        }
+    })
+</script>

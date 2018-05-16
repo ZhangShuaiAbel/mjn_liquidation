@@ -1,0 +1,438 @@
+<% include ../header.ejs %>
+
+<!--交易管理--收款交易查询-->
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>交易管理</a>
+			<a href="#" class="current">异常收款订单</a>
+		</div>
+					<h1>异常收款订单</h1>
+
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+		<div class="row-fluid">
+			<div class="widget-box">
+				<div class="widget-content nopadding">
+					<form class="form-horizontal" id="signupForm" method="post" action="">
+						<table class="table table-striped">
+							<tbody>
+								<tr class="odd gradeX">
+									<td width="85" style="white-space: nowrap;">时间 :</td>
+									<td width="500" style="white-space: nowrap;">
+										<input type="text" class="input" style="float: left;" id="datepicker" readonly="readonly" name="repaymentStart">
+										<input type="text" class="input" style="float: left;" id="datepicker1" readonly="readonly" name="repaymentEnd">
+										<input type="hidden"  id="starttimeHaoMiao" />
+										<input type="hidden"  id="starttimeHaoMiao1" />
+									</td>
+									<td width="20" style="white-space: nowrap;">
+									</td>
+									<td width="100" style="white-space: nowrap;">
+										<button type="button" onclick="dataTime(0)" class="btn btn-success">今日</button>
+										<button type="button" onclick="dataTime(1)" class="btn btn-success">昨日</button>
+										<button type="button" onclick="dataTime(7)" class="btn btn-success">最近7天</button>
+										<button type="button" onclick="dataTime(30)" class="btn btn-success">最近30天</button>
+									</td>
+
+									<td width="100" style="white-space: nowrap;"></td>
+									<td width="100" style="white-space: nowrap;"></td>
+								
+								</tr>
+							
+								<tr class="odd gradeX">
+									<td width="100" style="white-space: nowrap;">支付通道</td>
+									<td width="500" style="white-space: nowrap;">
+										<select name="" v-model="channelId">
+											<option value="">所有</option>
+											<option v-for="msg in zfList" :value="msg.id" v-text="msg.name"></option>
+										</select>
+									</td>
+									<td width="100" style="white-space: nowrap;">用户手机号</td>
+									<td width="500" style="white-space: nowrap;">
+									<input type="text" value="" class="" name="loanUserName"  v-model="buyersPhone">
+									</td>
+									<td width="100" style="white-space: nowrap;"></td>
+									<td width="100" style="white-space: nowrap;"></td>
+								</tr>
+								<tr class="odd gradeX">
+									<td width="100" style="white-space: nowrap;">
+										用户姓名
+									</td>
+									<td>
+									<input type="text" value="" class="" name="loanUserName" v-model="buyers">
+									</td>
+									<td width="100" style="white-space: nowrap;">身份证号</td>
+									<td width="500" style="white-space: nowrap;">
+									<input type="text" value="" class="" name="loanUserName" v-model="buyersIdCard">
+									<span style="margin-left: 20px">
+											<button type="button" id="submit" class="btn btn-success" @click="listenDate(1)">查找</button>
+	                                    	<button type="button" id="submit" class="btn btn-success" @click="resets()" >重置</button>
+                                    	</span>
+									</td>
+									<td width="100" style="white-space: nowrap;"></td>
+									<td width="100" style="white-space: nowrap;"></td>
+									
+								</tr>
+							</tbody>
+						</table>
+						</td>
+						</tr>
+
+						</tbody>
+						</table>
+					</form>
+
+				</div>
+			</div>
+		</div>
+
+		<hr>
+		<div class="row-fluid tab-two" style="display: none">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5></h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+                                    <th>支付订单Id</th>
+									<th>金额</th>
+									<th>用户姓名</th>
+									<th>买方账号</th>
+									<th>身份证号</th>
+									<th>用户手机号</th>
+									<th>商品名称</th>
+									<th>还款计划ID</th>
+									<th width="100" style="white-space: nowrap;">操作</th>
+								</tr>
+
+							</thead>
+							<tbody class="table_toggle">
+							    <tr v-for="msg in collectionList">
+							        <td v-text="msg.payOrderId"></td>
+									<td v-text="msg.amount/100"></td>
+									<td v-text="msg.buyers"></td>
+									<td v-text="msg.buyersAccount"></td>
+									<td v-text="msg.buyersIdCard"></td>
+									<td v-text="msg.buyersPhone"></td>
+									<td v-text="msg.commodityName"></td>
+									<td v-text="msg.extId"></td>
+									<td width="100" style="white-space: nowrap;">
+										<a class="btn_a" href="/deal/abnormalGatheringList" target="liquidation" @click="tui(msg.extId)">退款</a>
+									</td>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+					</div>
+					<div class="table_toggle1" style="display: none;">暂无数据</div>
+
+				</div>
+
+			</div>
+		</div>
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+								申请退款
+							</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<input type="hidden" id="druleId" name="druleId">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">创建时间 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="createTime_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">商户订单号 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="buyersIdCard_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">商品名称 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="commodityName_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">支付通道 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="channelName_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">退款金额 :</label>
+											<div class="controls">
+												<input type="text" v-model="amount_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">退款户名 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="buyers_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">退款账号 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="buyersAccount_1"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">退款原因 :</label>
+											<div class="controls">
+												<textarea name="" rows="" cols=""></textarea>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">附件材料 :</label>
+											<div class="controls">
+												<button type="button" id="submit" class="btn btn-success">添加附件</button>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+							</button>
+						<button type="button" class="btn btn-primary">
+								申请退款
+							</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+		<div id="page" style="display: none">
+			<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+		</div>
+	</div>
+</div>
+
+<!--<script src="/javascripts/jquery.min.js"></script>
+<script src="/javascripts/jquery-ui.js"></script>-->
+<% include ../footer.ejs %>
+
+<script src="/javascripts/jquery.min.js"></script>
+<script src="/javascripts/jquery-ui.js"></script>
+<script>
+	function dataTime(num) {
+		//console.log(num)
+		var yugi = function(num) {
+			var now1 = new Date;
+			var getFullYear = now1.getFullYear();
+			var getMonth = now1.getMonth() + 1;
+			var getDate = now1.getDate();
+			var DateTime1 = getFullYear + "-" + getMonth + "-" + getDate;
+			$("#datepicker1").val(DateTime1)
+			var now = new Date;
+			now.setDate(now.getDate() - num);
+			var getFullYear = now.getFullYear();
+			var getMonth = now.getMonth() + 1;
+			var getDate = now.getDate();
+			var DateTime = getFullYear + "-" + getMonth + "-" + getDate;
+			$("#datepicker").val(DateTime)
+			if(num == "1") {
+				$("#datepicker").val(DateTime);
+				$("#datepicker1").val(DateTime)
+			}
+			var timestamp = new Date();
+			//alert(starttimeHaoMiao);
+			var DateTime_starttimeHaoMiao = DateTime;
+			var DateTime_starttimeHaoMiao1 = DateTime1;
+			var starttimeHaoMiao = (new Date(DateTime_starttimeHaoMiao)).getTime();
+			var starttimeHaoMiao1 = (new Date(DateTime_starttimeHaoMiao1)).getTime();
+
+			$("#starttimeHaoMiao").val(starttimeHaoMiao)
+			$("#starttimeHaoMiao1").val(starttimeHaoMiao1)
+			return now;
+
+		}
+		yugi(num);
+	}
+
+	$(function() {
+
+		$("#datepicker").datepicker({
+			changeMonth: true,
+			changeYear: true,
+			yearRange: "1900:2050"
+		})
+		$("#datepicker1").datepicker({
+			changeMonth: true,
+			changeYear: true,
+			yearRange: "1900:2050"
+		})
+
+	});
+</script>
+<script src="/javascripts/vue-resource.js"></script>
+<script src="/javascripts/public_page.js"></script>
+<script type="text/javascript">
+var total = "";
+	var pageBar = new Vue({
+        el: '#content',
+        data: {
+            all: 0, //总页数
+            cur: 1,//当前页码
+            msg:'',
+            channelId:"",
+            buyersPhone:"",
+            buyers:"",
+            buyersIdCard:"",
+            zfList:"",
+            pageTotal:"",
+            collectionList:"",
+            refundList:"",
+            amount_1:"",
+            buyers_1:"",
+            buyersAccount_1:"",
+            buyersIdCard_1:"",
+            buyersPhone_1:"",
+            channelName_1:"",
+            commodityName_1:"",
+            createTime_1:"",
+            id_1:"",
+        },
+        components:{
+            'vue-nav':pagenav
+        },
+        watch: {
+            cur: function(oldValue , newValue){
+            }
+        },
+        mounted:function(){
+			
+			this.time();
+			this.payList();
+			this.listenDate(this.cur);
+		},
+        methods:{
+            listenDate:function(data){
+				var _this = this;
+				var start = parseInt((new Date($("#datepicker").val())).getTime());
+				var end = parseInt((new Date($("#datepicker1").val())).getTime());
+				var cha = end-start;
+				if(isNaN(start)){
+					alert("请选择查询的时间段");
+				    return false;
+				}
+				if(isNaN(end)){
+					alert("请选择查询的时间段");
+				    return false;
+				}
+				if(cha>2678400000){
+					alert("时间间隔过长，请重新选择时间段");
+					return false;
+				}
+				var channelId = this.channelId;
+				var buyersPhone = this.buyersPhone;
+				var buyers = this.buyers;
+				var buyersIdCard = this.buyersIdCard;
+				var pageSize = 10;
+				$(".loading").show();
+            	$(".tab-two").show();
+            	$("#page").show();
+				this.$http.post("/deal/mbTransaction/jsonAoTra",{"pageNum":data,"pageSize":pageSize,"start":start,"end":end,"channelId":channelId,"buyersPhone":buyersPhone,"buyers":buyers,"buyersIdCard":buyersIdCard}).then(function(res){
+					//console.log(res);
+					$(".loading").hide();
+					if(res.body.code=="D1007"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 if(res.body.code=="D1006"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 _this.collectionList = res.body.res.mbTransaction.res;
+					 _this.pageTotal = res.body.res.mbTransaction.total;
+					 if(_this.collectionList==""){
+							$(".table_toggle1").show();
+						}else{
+							$(".table_toggle1").hide();
+						}
+					 $(".table_toggle").show();
+                    if (data<=1) {
+						total = Math.ceil(_this.pageTotal/10);
+					}
+					   _this.all = total;
+					   _this.cur = data;
+				});
+	        },
+	        resets:function(){
+	        		$("#datepicker").val("");
+	        		$("#datepicker1").val("");
+					this.channelId="";
+					this.buyersPhone="";
+					this.buyers="";
+					this.buyersIdCard="";
+	        },
+            payList:function(){
+            	this.$http.post("/deal/mbTransaction/jsonPayCfg").then(function(res){
+                	 // console.log(res)
+                	 this.zfList=res.body.res.payChannelConfig;
+				});
+            },
+            time:function(){
+                var seperator1 = "-";
+
+                var startDate = new Date();
+                startDate.setDate(startDate.getDate()-7);
+                var startYear = startDate.getFullYear();
+                var startMonth = startDate.getMonth()+1;
+                if(startMonth < 10) startMonth = "0"+startMonth;
+                var startDay = startDate.getDate();
+                if(startDay < 10) startDay = "0"+startDay;
+                var endDate = new Date();
+                var endYear = endDate.getFullYear();
+                var endMonth = endDate.getMonth()+1;
+                if(endMonth < 10) endMonth = "0"+endMonth;
+                var endDay = endDate.getDate();
+                if(endDay < 10) endDay = "0"+endDay;
+                var currentdate = startYear + seperator1 + startMonth + seperator1 + startDay;
+                var currentdate1 = endYear + seperator1 + endMonth + seperator1 + endDay;
+                $("#datepicker").val(currentdate);
+                $("#datepicker1").val(currentdate1);
+            },
+            refund:function(id){
+            	// console.log(id);
+            	this.$http.post("/deal/mbTransaction/oneTra",{"id":id}).then(function(res){
+                	var amount_1=res.body.res.mbTransaction.amount;
+                	this.createTime_1=res.body.res.mbTransaction.createTime;
+                	this.buyers_1=res.body.res.mbTransaction.buyers;
+                	this.buyersAccount_1=res.body.res.mbTransaction.buyersAccount;
+                	this.buyersIdCard_1=res.body.res.mbTransaction.buyersIdCard;
+                	this.buyersPhone_1=res.body.res.mbTransaction.buyersPhone;
+                	this.channelName_1=res.body.res.mbTransaction.channelName;
+                	this.commodityName_1=res.body.res.mbTransaction.commodityName;
+                	this.id_1=res.body.res.mbTransaction.id;
+				});
+            },
+            tui:function(id){
+            	sessionStorage.setItem('id', id);
+            }
+        }
+    })
+</script>

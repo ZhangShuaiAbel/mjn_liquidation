@@ -1,0 +1,160 @@
+<% include ../header.ejs %>
+
+<!--代扣管理--代扣通道管理-->
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>差错管理</a>
+			<a href="#" class="current">风险管理</a>
+		</div>
+		<h1>风险管理</h1>
+	</div>
+	<div class="container-fluid">
+<!--		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>-->
+		<hr>
+		<div class="row-fluid">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5></h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>清算规则编号</th>
+									<th>规则</th>
+									<th>对象-1</th>
+									<th>对象-2</th>
+									<th>状态</th>
+									<th width="150" style="white-space: nowrap;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+							    <tr v-for="msg in data">
+									<td v-text="msg.id"></td>
+									<td v-text="msg.rule"></td>
+									<td v-text="msg.objectFirst"></td>
+									<td v-text="msg.objectSecond"></td>
+									<td v-if="msg.status=='0'"></td>
+									<td v-else-if="msg.status=='1'">启用</td>
+									<td v-else-if="msg.status=='2'">暂停</td>
+									
+									<td width="150" style="white-space: nowrap;">
+										<a class="float_btn_margin" style="color: #49afcd;" href="/risk/risk_table" @click="xiangqing(msg.id)">详情</a>
+										<a class="btn-mini float_btn_margin" style="color: #5bb75b;" href="javascript:;" @click="qi(msg.id,msg.status)">启用</a>
+										<a class="btn-mini float_btn_margin" style="color: #faa732;" href="javascript:;" @click="jin(msg.id,msg.status)">暂停</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="table_toggle1" style="display: none;">暂无数据</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--<div class="row-fluid">
+  <div id="footer" class="span12"> 2013 &copy; Matrix Admin. More Templates <a href="http://www.mycodes.net/" target="_blank">源码之家</a></div>
+</div>-->
+
+<% include ../footer.ejs %>
+<script src="/javascripts/vue-resource.js"></script>
+<script src="/javascripts/public_page.js"></script>
+<script type="text/javascript">
+var total = "";
+    var pageBar = new Vue({
+        el: '#content',
+        data: {
+            all: 0, //总页数
+            cur: 1,//当前页码
+            data:"",
+       
+        },
+        components:{
+            'vue-nav':pagenav
+        },
+        watch: {
+            cur: function(oldValue , newValue){
+               
+            }
+        },
+        mounted:function(){
+			this.listenDate(this.cur);
+		},
+        methods:{
+             //分页查询
+			listenDate:function(data){
+				$(".loading").show();
+				var _this = this;
+				var pageSize = 10;
+				
+				this.$http.post("/risk/rule/ruleJson",{"pageNum":data,"pageSize":pageSize}).then(function(res){
+					$(".loading").hide();
+					//console.log(res)
+					 if(res.body.code=="D1007"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 if(res.body.code=="D1006"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 _this.data = res.body.res.data;
+					 if(_this.data==""){
+							$(".table_toggle1").show();
+						}else{
+							$(".table_toggle1").hide();
+						}
+					 // //console.log(_this.payList)
+					  //_this.pageTotal = res.body.res.withholdChannel.total;
+					  	$(".table_toggle").show();
+					if (data<=1) {
+						total = Math.ceil(_this.pageTotal/10);
+					}
+					   _this.all = total;
+					   _this.cur = data;
+				});
+	        },
+           //详情
+			xiangqing:function(id){
+				////console.log(id,status);
+				localStorage.setItem("id", id);
+			},
+            //启用
+			qi:function(id,status){
+				//console.log(id,status);
+				var _this = this;
+				if(status=="2"){
+					this.$http.post("/risk/rule/updateRule",{"id":id,"status":1}).then(function(res){
+						////console.log(res);
+                	    alert("请求成功，已启用");
+                	    _this.listenDate(this.cur);
+				    });
+				}else{
+                	//alert("已启用");
+				}
+			},
+			//暂停
+			jin:function(id,status){
+				//console.log(id,status);
+				var _this = this;
+				if(status=="1"){
+					this.$http.post("/risk/rule/updateRule",{"id":id,"status":2}).then(function(res){
+						////console.log(res);
+                	    alert("请求成功，已暂停");
+                	    _this.listenDate(this.cur);
+				    });
+				    
+				}else{
+					//alert("已暂停");
+				}
+
+			},
+        }
+    })
+</script>

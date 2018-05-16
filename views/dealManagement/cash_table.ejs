@@ -1,0 +1,381 @@
+<% include ../header.ejs %>
+
+<div id="content">
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+		<div class="row-fluid">
+			<div class="widget-box">
+				<div class="widget-content nopadding">
+					<form class="form-horizontal" method="post" action="">
+						<table class="table table-striped">
+							<tbody>
+								<tr class="odd gradeX">
+									<td width="85" style="white-space: nowrap;">时间 :</td>
+									<td width="500" style="white-space: nowrap;">
+									    <input type="text" class="input" id="datepicker" readonly="readonly" name="repaymentStart">
+										<input type="text" class="input" id="datepicker1" readonly="readonly" name="repaymentEnd">
+									</td>
+									<td width="20" style="white-space: nowrap;"></td>
+									<td width="100" style="white-space: nowrap;">
+										<button type="button" onclick="dataTime(2)" class="btn btn-success">最近3天</button> 
+										<button type="button" onclick="dataTime(6)" class="btn btn-success">最近7天</button> 
+										<button type="button" onclick="dataTime(30)" class="btn btn-success">1个月</button>
+										<button type="button" onclick="dataTime(90)" class="btn btn-success">3个月</button>
+									</td>
+									<td width="100" style="white-space: nowrap;"></td>
+									<td width="100" style="white-space: nowrap;"></td>
+								</tr>
+								<tr class="odd gradeX">
+									<td width="85" style="white-space: nowrap;">资方还款计划编号 :</td>
+									<td width="500" style="white-space: nowrap;">
+									    <input type="text" class="input"  name="repaymentStart" v-model="transactionOrderId">
+									</td>
+									<td width="85" style="white-space: nowrap;">基础订单号 :</td>
+									<td width="500" style="white-space: nowrap;">
+									    <input type="text" class="input"  name="repaymentStart" v-model="basicOrderId">
+									</td>
+									<td width="" style="white-space: nowrap;">
+										<td width="85" style="white-space: nowrap;"><button type="button" id="submit" class="btn btn-success" @click="listenDate(1,2)">查找</button></td>
+									</td>
+								</tr>
+								
+								<tr>
+									<td width="85" style="white-space: nowrap;">交易状态 :</td>
+									<td>
+										<!--<button class="btn" @click="listenDate(1,2)">所有</button>-->
+										<!--<button class="btn" @click="listenDate(1,2,0)">待还款</button>
+										<button class="btn" @click="listenDate(1,2,1)">已还款</button>-->
+										<button type="button" id="submit" class="btn btn-success" @click="listenDate(1,2,0)">待还款</button>
+										<button type="button" id="submit" class="btn btn-success" @click="listenDate(1,2,1)">已还款</button>
+									</td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+							</tbody>
+						</table>
+
+					</form>
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row-fluid tab-two" style="display: none">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>资方还款计划明细-还款日期 :<span class="time"></span><span id="submit_down" @click="downLoad" class="badge badge-success" style="position: absolute; cursor: pointer; top: 8px; right: 10px; padding: 3px 10px;">下载</span></h5>
+
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>还款时间</th>
+									<th>资方还款计划编号</th>
+									<th>我方账户</th>
+									<th>资方</th>
+									<th>用户|银行卡</th>
+									<th>本期兑付金额</th>
+									<th>状态</th>
+									<th>基础订单号</th>
+									<th width="100" style="white-space: nowrap;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+								<tr v-for="msg in collectionList">
+									<td v-text="msg.repayDate"></td>
+									<td v-text="msg.channelPayPlanId"></td>
+									<td v-text="msg.account"></td>
+									<td v-text="msg.channelType"></td>
+									<td>{{msg.name}}|{{msg.bankNo}} </td>
+									<td v-text="msg.amount/100"></td>
+									<td v-text="msg.status"></td>
+									<td v-text="msg.dealId"></td>
+									<td>
+								<a href="/basics/particulars" target="liquidation" class="btn_a" @click="tui(msg.appid,msg.dealId)">详情</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div id="page" style="display: none">
+				<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+			</div>
+		</div>
+	</div>
+	<% include ../footer.ejs %>
+
+		<script>
+		$(function() {
+			//dataTime(1);
+			$("#time_one").click();
+			$(".pay_list").click();
+			$(".enquiries").click();
+		})
+	</script>
+	<script>
+
+		function dataTime(num) {
+		//console.log(num)
+		var yugi = function(num) {
+			var seperator1 = "-";
+            var startDate = new Date();
+            startDate.setDate(startDate.getDate()-num);
+            var startYear = startDate.getFullYear();
+            var startMonth = startDate.getMonth()+1;
+            if(startMonth < 10) startMonth = "0"+startMonth;
+            var startDay = startDate.getDate();
+            if(startDay < 10) startDay = "0"+startDay;
+            var endDate = new Date();
+            var endYear = endDate.getFullYear();
+            var endMonth = endDate.getMonth()+1;
+            if(endMonth < 10) endMonth = "0"+endMonth;
+            var endDay = endDate.getDate();
+            if(endDay < 10) endDay = "0"+endDay;
+            var currentdate = startYear + seperator1 + startMonth + seperator1 + startDay;
+            var currentdate1 = endYear + seperator1 + endMonth + seperator1 + endDay;
+			$("#datepicker").val(currentdate);
+            $("#datepicker1").val(currentdate1);
+
+		}
+		yugi(num);
+	}
+		$(function() {
+
+			$("#datepicker").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+			$("#datepicker1").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+		});
+	</script>
+	<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+
+	<script src="/javascripts/jquery-ui.js"></script>
+	<script src="/javascripts/vue-2.42.js"></script>
+	<script src="/javascripts/vue-resource.js"></script>
+	<script src="/javascripts/public_page.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+	<script src="/javascripts/bootstrap.min.js"></script>
+	<script src="/javascripts/jquery.flot.min.js"></script>
+	<script src="/javascripts/jquery.flot.pie.min.js"></script>
+	<script src="/javascripts/jquery.flot.resize.min.js"></script>
+	<script src="/javascripts/matrix.js"></script>
+	<script src="/javascripts/jquery.peity.min.js"></script>
+	<script>
+	
+		var total = "";
+		var datasets = "";
+		new Vue({
+			el: '#content',
+			data: {
+				all: 0, //总页数
+				cur: 1, //当前页码
+				channelType:"",
+				company: "", //公司主体
+				licenseList: "",
+				collectionList:"",
+				basicOrderId:"",
+				transactionOrderId:"",
+
+			},
+			components: {
+				'vue-nav': pagenav
+			},
+			watch: {
+				cur: function(oldValue, newValue) {
+					// this.data();
+				}
+			},
+			mounted: function() {
+				this.qyList();
+				this.listenDate(this.cur,1);
+			},
+			methods: {
+				listenDate: function(data,num,status) {
+					var timeStart = parseInt((new Date($("#datepicker").val())).getTime()-28800000);
+						var timeEnd = parseInt((new Date($("#datepicker1").val())).getTime()-28800000+86399000);
+					if(isNaN(timeStart) || isNaN(timeEnd)) {
+						num =1;
+					}else{
+						num =2;
+					}
+					if(num!="2"){
+						//alert("首次加载")
+						var param=localStorage.getItem("param");
+						var time=localStorage.getItem("time");
+						$(".time").text(time);
+						var param1String=JSON.stringify(param);
+						//console.log(param)
+						var _this = this;
+						var pageSize = 10;
+						$(".loading").show();
+						$(".tab-two").show();
+						$("#page").show();
+						
+						var str=new Object();
+
+						
+						 var param = JSON.parse(param);
+							 param.status = status;
+						var param_1 = $.extend(str,param);
+						var param1String=JSON.stringify(param_1);
+						//console.log(param1String)
+						
+						this.$http.post("/deal/transactionManager/cashedDetail", {
+							"pageNum": data,
+							"pageSize": pageSize,
+							"param":param1String,
+							"time":time,
+
+						}).then(function(res) {
+							//console.log(res);
+							$(".loading").hide();
+							$(".table_toggle").show();
+
+							if(res.body.code == "D1007") {
+								alert(res.body.msg);
+								return false;
+							}
+							if(res.body.code == "D1006") {
+								alert(res.body.msg);
+								return false;
+							}
+							_this.collectionList = res.body.res.data;
+							_this.pageTotal = res.body.res.total;
+							_this.totalNum = res.body.res.totalNum;
+							_this.totalAmount = res.body.res.totalAmount;
+							//console.log(_this.pageTotal);
+							$(".table_toggle").show();
+							if(data <= 1) {
+								total = Math.ceil(_this.pageTotal / 10);
+							}
+							_this.all = total;
+							_this.cur = data;
+						});
+					}
+					if(num=="2"){
+						
+						//this.status(0);
+	                    var param=localStorage.getItem("param");
+						var transactionOrderId = this.transactionOrderId;
+						var basicOrderId = this.basicOrderId;
+						var time=localStorage.getItem("time");
+						var timeStart = parseInt((new Date($("#datepicker").val())).getTime()-28800000);
+						var timeEnd = parseInt((new Date($("#datepicker1").val())).getTime()-28800000+86399000);
+
+						var _this = this;
+						var pageSize = 10;
+						
+							//alert("不传time")
+
+							var str=new Object();
+							
+							//str.timeEnd=2222;
+						str.transactionOrderId = transactionOrderId;
+						str.basicOrderId = basicOrderId;
+						 var param = JSON.parse(param);
+						 //console.log(typeof(param))
+						 param.status = status;
+						 param.timeStart = timeStart;
+						 param.timeEnd = timeEnd;
+						//var json = JSON.parse(str);
+						//console.log(param);
+						var param_1 = $.extend(str,param);
+						//alert(str[timeStart])
+						var param1String=JSON.stringify(param_1);
+						//console.log(param1String);
+							var params={
+							"pageNum": data,
+							"pageSize": pageSize,
+							"param":param1String,
+							"time":"",
+							}
+						
+						
+						$(".loading").show();
+						$(".tab-two").show();
+						$("#page").show();
+						this.$http.post("/deal/transactionManager/cashedDetail", params).then(function(res) {
+							//console.log(res);
+							$(".loading").hide();
+							$(".table_toggle").show();
+
+							if(res.body.code == "D1007") {
+								alert(res.body.msg);
+								return false;
+							}
+							if(res.body.code == "D1006") {
+								alert(res.body.msg);
+								return false;
+							}
+							_this.collectionList = res.body.res.data;
+							_this.pageTotal = res.body.res.total;
+							_this.totalNum = res.body.res.totalNum;
+							_this.totalAmount = res.body.res.totalAmount;
+							//console.log(_this.pageTotal);
+							$(".table_toggle").show();
+							if(data <= 1) {
+								total = Math.ceil(_this.pageTotal / 10);
+							}
+							_this.all = total;
+							_this.cur = data;
+						});
+					}
+
+
+				},
+		
+				//企业列表查询
+				qyList: function() {
+					var _this = this;
+					this.$http.post("/pay/product/jsonEnt").then(function(res) {
+						// console.log(res)
+						this.licenseList = res.body.res.enterprise;
+					});
+				},
+				tui:function(appid,dealId){
+            	    sessionStorage.setItem('appid',appid);
+            	    sessionStorage.setItem('dealId',dealId);
+                },
+                
+                downLoad:function(){
+                    if(this.all > 5000){
+                        alert("单次下载页数不能超过5000页");
+                    }
+	                    var param=localStorage.getItem("param");
+						var time=localStorage.getItem("time");
+						var transactionOrderId = this.transactionOrderId;
+						var basicOrderId = this.basicOrderId;
+						var str={};
+						str.transactionOrderId = transactionOrderId;
+						str.basicOrderId = basicOrderId;
+	                    var param = JSON.parse(param);
+						var param_1 = $.extend(str,param);
+						var param1String=JSON.stringify(param_1);
+					var uriec = encodeURI(param1String);
+	            	this.$http.get("/deal/transactionManager/cashedDetailDownload").then(function(res){
+	            		var uriec = encodeURI(param1String);
+                      //window.location.href="http://192.168.10.232:8080/liquidation/transactionManager/cashedDetailDownload?param="+uriec+"&time="+time+"&authToken="+res.body;
+                      window.location.href="https://api.lqd.91naxia.com/liquidation/transactionManager/cashedDetailDownload?param="+uriec+"&time="+time+"&authToken="+res.body;
+	            	
+	            	});
+	            }
+			}
+		})
+	</script>
+
+	<!--Real-time-chart-js-->

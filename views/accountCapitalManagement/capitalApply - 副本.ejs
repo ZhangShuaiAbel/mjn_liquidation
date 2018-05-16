@@ -1,0 +1,255 @@
+<% include ../header.ejs %>
+
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>账户资金</a>
+			<a href="#" class="current">现金流水分析</a>
+		</div>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+		<div class="row-fluid">
+			<div class="widget-box">
+				<div class="widget-content nopadding">
+					<form method="post" action="" class="form-horizontal">
+						<table class="table table-striped">
+							<tbody>
+								<tr>
+									<td><lable style="width: 80px;display: inline-block;float: left;">统计月份：</lable>
+										<a  class="btn" href="#" @click="datePre()" target="liquidation">上</a>
+							        <span v-if="hasMonth">{{year}}年{{month}}月</span>
+							        <span v-else>{{year}}年</span>
+							        <a  class="btn" href="#" @click="dateNext()" target="liquidation">下</a>
+									</td>
+								</tr>
+								<tr>
+									<td><lable style="width: 80px;display: inline-block;float: left;">主体：</lable>
+										<button type="button" class="btn">所有</button>
+										<button type="button" class="btn btn-primary">想就拿</button>
+										<button type="button" class="btn">喵财有道</button>
+										<button type="button" class="btn">沐金农</button>
+									</td>
+								</tr>
+								
+								<tr>
+									<td style="white-space: nowrap;" class="span5"><lable style="width: 80px;display: inline-block;float: left;">账户名：</lable><select >
+											<option value="">想就拿招商银行0901</option>
+											<option value="">想就拿民生银行0876</option>
+											<option value="">沐金农招商银行0908</option>
+											<option value="">想就拿-练练</option>
+											<option value="">想就拿-支付宝</option>
+											<option value="">喵财有道-支付宝</option>
+										</select>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
+				</div>
+			</div>
+		</div>
+		
+		<div class="row-fluid">
+					<div id="container" style="min-width:400px;height:400px"></div>
+
+		</div>
+
+		
+	</div>
+
+	<% include ../footer.ejs %>
+
+	<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+
+	<script src="/javascripts/jquery-ui.js"></script>
+	<script src="/javascripts/vue-2.42.js"></script>
+	<script src="/javascripts/vue-resource.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+	<script src="/javascripts/matrix.js"></script>
+	<script src="/javascripts/jquery.peity.min.js"></script>
+	
+	<script src="/javascripts/highcharts.js"></script>
+	<script src="/javascripts/data.js"></script>
+	<script src="/javascripts/highcharts-zh_CN.js"></script>
+	<script>
+
+		$(function () {
+		
+	
+    $('#container').highcharts({
+        chart: {
+            zoomType: 'xy'
+        },
+        title: {
+            text: '东京月平均温度和降雨量'
+        },
+        subtitle: {
+            text: '数据来源: WorldClimate.com'
+        },
+        xAxis: [{
+            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            crosshair: true
+        }],
+        yAxis: [{ // Primary yAxis
+            labels: {
+                format: '{value}°C',
+                style: {
+                    color: Highcharts.getOptions().colors[1]
+                }
+            },
+            title: {
+                text: '温度',
+                style: {
+                    color: Highcharts.getOptions().colors[1]
+                }
+            }
+        }, { // Secondary yAxis
+            title: {
+                text: '降雨量',
+                style: {
+                    color: Highcharts.getOptions().colors[0]
+                }
+            },
+            labels: {
+                format: '{value} mm',
+                style: {
+                    color: Highcharts.getOptions().colors[0]
+                }
+            },
+            opposite: true
+        }],
+        tooltip: {
+            shared: true
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'left',
+            x: 120,
+            verticalAlign: 'top',
+            y: 100,
+            floating: true,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+        },
+        series: [{
+            name: '降雨量',
+            type: 'column',
+            yAxis: 1,
+            data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4],
+            tooltip: {
+                valueSuffix: ' mm'
+            }
+        }, {
+            name: '温度',
+            type: 'spline',
+            data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6],
+            tooltip: {
+                valueSuffix: '°C'
+            }
+        }]
+    });
+});
+
+	</script>
+	<script>
+		var total = "";
+		var datasets = "";
+		new Vue({
+			el: '#content',
+			data: {
+				all: 0, //总页数
+				cur: 1, //当前页码
+				ourAccountId:"",//我方账户id
+				reciprocalAccountId:"",// 往来账户id
+				payType:"",//交易类型
+				receiveAmount:"",//收入金额
+				payAmount:"",//支出金额
+				balance:"",//余额
+				accountId:"",
+				collectionList:"",
+				year:"";
+				month:"",
+		
+			},
+			mounted: function() {
+				
+				this.time();
+				//this.listenDate(this.cur);
+				
+			},
+			methods: {
+				listenDate: function(data) {
+					var _this = this;
+					var startTime = parseInt((new Date($("#datepicker").val())).getTime()-28800000);
+					var endTime =parseInt((new Date($("#datepicker1").val())).getTime()-28800000+86400000);
+					var accountId = parseInt(this.accountId);
+					$(".loading").show();
+					
+					this.$http.post("/accountCapital/reconciliation/getAccountings", {
+						
+					}).then(function(res) {
+						console.log(res);
+						$(".loading").hide();
+						if(res.body.code == "D1007") {
+							alert(res.body.msg);
+							return false;
+						}
+						if(res.body.code == "D1006") {
+							alert(res.body.msg);
+							return false;
+						}
+						_this.collectionList = res.body.res.data;
+						_this.pageTotal = res.body.res.total;
+
+						if(data <= 1) {
+							total = Math.ceil(_this.pageTotal / 10);
+						}
+						_this.all = total;
+						_this.cur = data;
+					});
+
+				},
+				
+				time:function(){
+					var endDate = new Date();
+                dateOffset = 0;
+                this.year = endDate.getFullYear();
+                this.month = endDate.getMonth()+1;
+                if(this.month < 10) this.month = "0"+this.month;
+		    	
+           		},
+           		datePre:function(){
+                dateOffset = dateOffset - 1;
+                var endDate = new Date();
+                if(this.hasMonth){
+                    endDate.setMonth(endDate.getMonth()+dateOffset);
+                }else{
+                    endDate.setFullYear(endDate.getFullYear()+dateOffset);
+                }
+                this.year = endDate.getFullYear();
+                this.month = endDate.getMonth()+1;
+                if(this.month < 10) this.month = "0"+this.month;
+                this.listenDate(1);
+            },
+            dateNext:function(){
+                dateOffset = dateOffset + 1;
+                var endDate = new Date();
+                if(this.hasMonth){
+                    endDate.setMonth(endDate.getMonth()+dateOffset);
+                }else{
+                    endDate.setFullYear(endDate.getFullYear()+dateOffset);
+                }
+                this.year = endDate.getFullYear();
+                this.month = endDate.getMonth()+1;
+                if(this.month < 10) this.month = "0"+this.month;
+                this.listenDate(1);
+            },
+				
+
+			}
+		})
+	</script>

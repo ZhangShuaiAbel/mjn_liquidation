@@ -1,0 +1,507 @@
+<% include ../header.ejs %>
+
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>渠道管理</a>
+			<a href="#" class="current">资金渠道费率配置</a>
+		</div>
+		<h1>资金渠道费率配置</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+
+		<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+			
+			<a href="/push/capitalChannel" target="liquidation" class="btn2">资金渠道管理</a>
+
+			<a href="/push/pushSingleFlux" target="liquidation" class="btn2">推单流量管理</a>
+
+			<a href="/push/configuration" target="liquidation" class="btn2 cur1">资金渠道费率配置</a>
+		</div>
+
+		<hr>
+		<div class="row-fluid">
+			<div class="widget-box">
+				<div class="widget-content nopadding">
+					<form class="form-horizontal" method="post" action="">
+						<table class="table table-striped">
+							<tbody>
+								<tr class="odd gradeX">
+									<td width="85" style="white-space: nowrap;line-height: 28px;">渠道 :</td>
+									<td style="white-space: nowrap;">
+										<select name="" v-model="channel">
+											<option value="">请选择</option>
+											<option v-for="(item,index) in qdList" :value="item.id" v-text="item.name"></option>
+										</select>
+									</td>
+									<td width="85" style="white-space: nowrap;line-height: 28px;">期次 :</td>
+									<td width="" style="white-space: nowrap;">
+										<input type="number" onkeyup="var v=this.value||'';v=v.replace(/[^\d]/g,'');this.value=v.substr(0,3);" v-model="period" placeholder="只能输入三位以下数字">
+									</td>									
+								</tr>
+								<tr>
+									<td width="85" style="white-space: nowrap;line-height: 28px;">状态 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" v-model="status">
+											<option value="">请选择</option>
+											<option value="1">有效</option>
+											<option value="2">无效</option>
+										</select>
+									</td>
+									<td width="85" style="white-space: nowrap;line-height: 28px;"> 期数单位 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" v-model="periodUnit">
+											<option value="">请选择</option>
+											<option value="0">月</option>
+											<option value="2">日</option>
+										</select>
+										<span style="margin-left: 20px">
+											<button type="button" id="submit" class="btn btn-success" @click="listenDate()">查找</button>
+											<button type="button" id="submit" class="btn btn-success" @click="resets()" >重置</button>
+										</span>
+									</td>
+								</tr>								
+							</tbody>
+						</table>
+					</form>
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row-fluid tab-two" style="display: none">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>订单明细</h5>
+						<h5><button type="button" style="margin-top: 4px" class="btn btn-primary btn-mini position_right" data-toggle="modal" data-target="#myModal-two" >新增</button></h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>ID</th>
+									<th>修改时间</th>
+									<th>创建时间</th>
+									<th>期数单位</th>
+									<th>期次</th>
+									<!-- <th>渠道ID</th> -->
+									<th>渠道名称</th>
+									<th>费率</th>
+									<th>状态</th>
+									<th width="100" style="white-space: nowrap;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+								<tr v-for="msg in collectionList">
+									<td v-text="msg.id"></td>
+									<td >{{msg.updateTime | time}}</td>
+									<td >{{msg.createTime | time}}</td>
+									<td v-if="msg.periodUnit==0">月</td>
+									<td v-else-if="msg.periodUnit==2">日</td>	
+									<td v-else></td>
+									<td v-text="msg.period"></td>
+									<!-- <td v-text="msg.channel"></td> {{msg.rate | rates}}%-->
+									<td v-text="msg.channelName"></td>									
+									<td v-text="msg.rate"></td>
+									<td v-if="msg.status==1">有效</td>
+									<td v-else-if="msg.status==2">无效</td>	
+									<td v-else></td>																	
+									<td>
+										<a style="color:#2f96b4" data-toggle="modal" href="javascript:;" data-target="#myModal-one" @click="details(msg.id)">管理</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="table_toggle1" style="display: none;">暂无数据</div>
+				</div>
+			</div>
+			<!-- <div id="page" style="display: none">
+				<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+			</div> -->
+		</div>
+	</div>
+	<div class="modal fade" id="myModal-one" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">修改</h4>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid">
+						<div class="row-fluid">
+							<form id="addNewRule">
+								<div class="widget-content nopadding form-horizontal">
+									<input type="hidden" id="druleId" name="druleId">
+									<div class="control-group">
+										<label class="control-label" style="width: 150px">渠道名称 :</label>
+										<div class="controls">
+											<select name="" v-model="up_channel">
+												<option v-for="(item,index) in qdList" :value="item.id" v-text="item.name"></option>
+											</select>
+										</div>
+									</div>
+									<div class="control-group">
+										<label class="control-label" style="width: 150px">期次 :</label>
+										<div class="controls">
+											<input type="number" v-model="up_period" placeholder="只能输入三位以下数字">
+										</div>
+									</div>
+									<div class="control-group">
+										<label class="control-label" style="width: 150px">期数单位 :</label>
+										<div class="controls">
+											<select name="" v-model="up_periodUnit">
+												<option value="0">月</option>
+												<option value="2">日</option>
+											</select>
+										</div>
+									</div>
+									<div class="control-group">
+										<label class="control-label" style="width: 150px">费率 :</label>
+										<div class="controls">
+											<input type="number" v-model="up_rate" placeholder="费率小于1">
+										</div>
+									</div>									
+									<div class="control-group">
+										<label class="control-label" style="width: 150px">状态 :</label>
+										<div class="controls">
+											<select name="" v-model="up_status" disabled>
+												<option value="1">有效</option>
+												<option value="2">无效</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="guanbi_up" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="button" class="btn btn-primary" @click="modify()">提交更改</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal -->
+	</div>
+	<div class="modal fade" id="myModal-two" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">新增</h4>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid">
+						<div class="row-fluid">
+							<form id="addNewRule">
+								<div class="widget-content nopadding form-horizontal">
+									<input type="hidden" id="druleId" name="druleId">
+									<div class="control-group">
+										<label class="control-label" style="width: 150px">渠道名称 :</label>
+										<div class="controls">
+											<select name="" v-model="new_channel">
+												<option value="">请选择</option>
+												<option v-for="(item,index) in qdList" :value="item.id" v-text="item.name"></option>
+											</select>
+										</div>
+									</div>
+									<div class="control-group">
+										<label class="control-label" style="width: 150px">期次 :</label>
+										<div class="controls">
+											<input type="number" v-model="new_period" placeholder="只能输入三位以下数字">
+										</div>
+									</div>
+									<div class="control-group">
+										<label class="control-label" style="width: 150px">期数单位 :</label>
+										<div class="controls">
+											<select name="" v-model="new_periodUnit">
+												<option value="">请选择</option>
+												<option value="0">月</option>
+												<option value="2">日</option>
+											</select>
+										</div>
+									</div>
+									<div class="control-group">
+										<label class="control-label" style="width: 150px">费率 :</label>
+										<div class="controls">
+											<input type="number" v-model="new_rate" placeholder="费率小于1">
+										</div>
+									</div>									
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="guanbi_new" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="button" class="btn btn-primary" @click="add()">提交</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal -->
+	</div>
+	<% include ../footer.ejs %>
+
+	<!-- <script>
+		function dataTime(num) { ////console.log(num)
+			var yugi = function(num) {
+				var now1 = new Date;
+				var getFullYear = now1.getFullYear();
+				var getMonth = now1.getMonth() + 1;
+				var getDate = now1.getDate();
+				var DateTime1 = getFullYear + "-" + getMonth + "-" + getDate;
+				$("#datepicker1").val(DateTime1)
+				var now = new Date;
+				now.setDate(now.getDate() - num);
+				var getFullYear = now.getFullYear();
+				var getMonth = now.getMonth() + 1;
+				var getDate = now.getDate();
+				var DateTime = getFullYear + "-" + getMonth + "-" + getDate;
+				$("#datepicker").val(DateTime)
+				if(num == "1") {
+					$("#datepicker").val(DateTime);
+					$("#datepicker1").val(DateTime);
+				}
+				var timestamp = new Date();
+				//alert(starttimeHaoMiao);
+				var DateTime_starttimeHaoMiao = DateTime;
+				var DateTime_starttimeHaoMiao1 = DateTime1;
+				var starttimeHaoMiao = (new Date(DateTime_starttimeHaoMiao)).getTime();
+				var starttimeHaoMiao1 = (new Date(DateTime_starttimeHaoMiao1)).getTime();
+				$("#starttimeHaoMiao").val(starttimeHaoMiao)
+				$("#starttimeHaoMiao1").val(starttimeHaoMiao1)
+				return now;
+			}
+			yugi(num);
+		}
+
+		$(function() {
+
+			$("#datepicker").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+			$("#datepicker1").datepicker({
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2050",
+			})
+		});
+	</script> -->
+	<script src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+
+	<script src="/javascripts/jquery-ui.js"></script>
+	<script src="/javascripts/vue-2.42.js"></script>
+	<script src="/javascripts/vue-resource.js"></script>
+	<!-- <script src="/javascripts/public_page.js"></script> -->
+	<script src="/javascripts/time_filter.js"></script>
+	<script src="/javascripts/jquery.flot.min.js"></script>
+	<script src="/javascripts/jquery.flot.pie.min.js"></script>
+	<script src="/javascripts/jquery.flot.resize.min.js"></script>
+	<script src="/javascripts/matrix.js"></script>
+	<script src="/javascripts/jquery.peity.min.js"></script>
+	<script>
+		var total = "";
+		var datasets = "";
+		new Vue({
+			el: '#content',
+			data: {
+				// all: 0, //总页数
+				// cur: 1, //当前页码
+				collectionList:"",
+				qdList:"",
+				periodUnit:"",
+				channel:"",
+				period:"",
+				status:"",
+				up_periodUnit:"",  //修改 期数单位
+				up_channel:"",  //修改 渠道
+				up_period:"",   //修改 期次	
+				up_rate:"",  //修改 费率	
+				up_status:"",		//修改 状态	
+				up_id:"",   // id
+				new_periodUnit:"",  //新增 期数单位
+				new_channel:"",  //新增 渠道
+				new_period:"",   //新增 期次	
+				new_rate:"",  //新增 费率	
+			},
+			components: {
+				// 'vue-nav': pagenav
+			},
+			watch: {
+				// timeType: function(oldValue, newValue) {
+				// 	if(this.timeType==""){
+				// 		$("#datepicker").val("");
+				// 		$("#datepicker1").val("");
+				// 	}
+				// }
+				new_rate:function(){
+					if(this.new_rate>=1){
+						this.new_rate = "";
+					}
+				},
+				up_rate:function(){
+					if(this.up_rate>=1){
+						this.up_rate = "";
+					}
+				},
+				up_period:function(){
+					if(this.up_period>1000){
+						this.up_period = "";
+					}					
+				},
+				new_period:function(){
+					if(this.new_period>1000){
+						this.new_period = "";
+					}					
+				}
+			},
+			mounted: function() {
+				// this.time();
+				// this.qyList();
+				this.capitalList();
+				this.listenDate();
+			},
+			methods: {
+				listenDate: function() {
+					$(".loading").show();
+					$(".tab-two").show();
+					var _this = this;
+
+					this.$http.post("/push/capitalChannel/rateJson", {
+						"channel": _this.channel,
+						"period": _this.period,
+						"status": _this.status,
+						"periodUnit": _this.periodUnit,
+					}).then(function(res) {
+						console.log(res);
+						$(".loading").hide();
+						if(res.body.code == "D1007") {
+							alert(res.body.msg);
+							return false;
+						}
+						if(res.body.code == "D1006") {
+							alert(res.body.msg);
+							return false;
+						}
+						_this.collectionList = res.body.res.rateConfig;
+						if(_this.collectionList==""){
+							$(".table_toggle1").show();
+						}else{
+							$(".table_toggle1").hide();
+						}
+						$(".table_toggle").show();
+					});
+
+				},
+				resets:function(){
+					this.channel="";
+					this.period="";
+					this.status="";
+					this.periodUnit="";
+	        	},				
+				capitalList:function(){
+					var _this = this;
+					this.$http.post("/push/capitalChannel/jsonCap").then(function(res){
+						_this.qdList=res.body.res.capitalChannel;
+						console.log(_this.qdList);
+					});
+				},
+				details:function(id){
+					var _this = this;
+					this.$http.post("/push/capitalChannel/rateDetail",{
+						"id":id
+					}).then(function(res){
+						_this.up_channel=res.body.res.rateConfig.channel;
+						_this.up_status=res.body.res.rateConfig.status;
+						_this.up_period=res.body.res.rateConfig.period;
+						_this.up_periodUnit=res.body.res.rateConfig.periodUnit;
+						_this.up_rate=res.body.res.rateConfig.rate;
+						_this.up_id=res.body.res.rateConfig.id;
+					});
+				},
+				modify:function(){
+					var _this = this;
+					if(_this.up_period==""){
+						alert("期次不能为空");
+						return false
+					}else if(_this.up_rate==""){
+						alert("费率不能为空");
+						return false
+					}
+					this.$http.post("/push/capitalChannel/updateRate",{
+						"id":_this.up_id,
+						"channel":_this.up_channel,
+						"periodUnit":_this.up_periodUnit,
+						"rate":_this.up_rate,
+						"period":_this.up_period,
+					}).then(function(res){
+						var code = res.body.code;
+						var msg = res.body.msg;
+						if(code != "0000"){
+							alert(msg);
+					 	    return false;
+						}else{
+							alert(msg);
+							$("#guanbi_up").click();
+							_this.listenDate();
+						}
+					});
+				},
+				add:function(){
+					var _this = this;
+					if(_this.new_channel==""){
+						alert("渠道名称不能为空");
+						return false
+					}else if(_this.new_period==""){
+						alert("期次不能为空");
+						return false
+					}else if(_this.new_periodUnit==""){
+						alert("期数单位不能为空");
+						return false
+					}else if(_this.new_rate==""){
+						alert("费率不能为空");
+						return false
+					}else if(_this.new_rate>="1"){
+						alert("费率不能大于1");
+						return false
+					}
+					this.$http.post("/push/capitalChannel/saveRate",{
+						"channel":_this.new_channel,
+						"period":_this.new_period,
+						"periodUnit":_this.new_periodUnit,
+						"rate":_this.new_rate,
+					}).then(function(res){
+						var code = res.body.code;
+						var msg = res.body.msg;
+						if(code != "0000"){
+							alert(msg);
+					 	    return false;
+						}else{
+							alert(msg);
+							$("#guanbi_new").click();
+							_this.listenDate();
+						}
+					});					
+				}
+			},
+			filters:{
+				rates:function(value){
+					var data = value*100;
+		        	return parseFloat(data.toFixed(2));
+		        },
+			},
+		})
+	</script>
+	
+	<!--Real-time-chart-js-->

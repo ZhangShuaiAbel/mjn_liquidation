@@ -1,0 +1,375 @@
+<% include ../header.ejs %>
+
+<!--交易管理--收款交易查询-->
+
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>交易管理</a>
+			<a href="#" class="current">提前还款</a>
+		</div>
+		<h1 class="breadcrumb_text">提前还款查询</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+        <hr>
+
+        <div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+            <a  class="btn2" href="/deal/credit" target="liquidation">放款</a>
+            <a  class="btn2" href="/deal/pushSingle" target="liquidation">推单</a>
+            <a  class="btn2" href="/deal/gatheringDeal" target="liquidation">还款</a>
+            <a  class="btn2" href="/deal/refund"  target="liquidation">退款</a>
+            <!--<a  class="btn2" href="/deal/serviceCharge" target="liquidation">服务费</a>-->
+            <!--<a  class="btn btn-primary" href="/deal/capitalLoan" class="btn btn-primary" target="liquidation">资金放款</a>-->
+            <a  class="btn2" href="/deal/cash"  target="liquidation">兑付</a>
+            <a  class="btn2 cur1" href="/deal/repayearly"  target="liquidation">提前还款</a>
+        </div>
+
+        <hr>
+		<div class="row-fluid">
+			<div class="widget-box">
+				<div class="widget-content nopadding">
+					<form class="form-horizontal" id="signupForm" method="post" action="">
+						<table class="table table-striped">
+							<tbody>
+								<tr class="odd gradeX">
+									<td width="85" style="white-space: nowrap;">还款时间 :</td>
+									<td width="600" style="white-space: nowrap;" colspan="3">
+										<input type="text" class="input" id="datepicker" readonly="readonly" name="startTime">
+                                    </td>
+                                    <td width="" style="white-space: nowrap;">
+                                        <span style="margin-left: 20px">
+											<button type="button" id="submit" class="btn btn-success" @click="listenDate(1)">查找</button>
+	                                    	<button type="button" id="submit" class="btn btn-success" @click="updatestatus()" >修改为已充值</button>
+                                    	</span>
+                                    </td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
+				</div>
+			</div>
+		</div>
+        <hr>
+        <div class="row-fluid">
+            <div class="span6">
+                <div class="row-fluid">
+                    <div class="span12">
+                        <div class="span-box-one" style="background: rgb(255, 255, 255);">
+                            <p><span style="font-size: 28px;" id="tjCount">0</span><br><span style="margin: 0px 10px;">总订单数</span></p>
+                        </div>
+                    </div>
+                    <!---->
+                </div>
+            </div>
+            <div class="span6">
+                <div class="row-fluid">
+                    <div class="span12">
+                        <div class="span-box-one" style="background: rgb(255, 255, 255);">
+                            <p><span style="font-size: 28px;" id="tjAmount">0</span><br><span style="margin: 0px 10px;">总推单额</span></p>
+                        </div>
+                    </div>
+                    <!---->
+                </div>
+            </div>
+        </div>
+        <hr>
+		<div class="row-fluid tab-two" style="display: none">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5><span @click="downLoad" id="submit_down" class="badge badge-success"  style="position: absolute;cursor: pointer;top: 8px;right: 10px;padding: 3px 10px;">下载</span></h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>订单号</th>
+									<th>渠道订单号</th>
+									<th>姓名</th>
+									<th>推单时间</th>
+									<th>用户应还时间</th>
+									<th>推单金额</th>
+									<th>状态</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+                                <tr v-for="msg in collectionList">
+                                    <td v-text="msg.orderId"></td>
+                                    <td v-text="msg.channelId"></td>
+                                    <td v-text="msg.name"></td>
+                                    <td>{{msg.pushTime*1000 | time}}</td>
+                                    <td>{{msg.repayTime*1000 | time}}</td>
+                                    <td v-text="msg.pushAmount/100"></td>
+
+                                    <td v-if="msg.status=='0'">未充值</td>
+                                    <td v-else-if="msg.status=='1'">已充值</td>
+                                    <td v-else-if="msg.status=='2'">已还款</td>
+                                    <td v-else>其他</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="table_toggle1">暂无数据</div>
+				</div>
+			</div>
+		</div>
+		<div id="page" style="display: none">
+			<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+		</div>
+	</div>
+</div>
+
+<% include ../footer.ejs %>
+
+<script src="/javascripts/jquery.min.js"></script>
+
+<script>
+
+	$(function(){
+		// $("#one").click();
+		// $("#submit").click();
+		$("#ADDsubmit").click(function(){
+			$("#shangchuan_list").show();
+			$("#logoUrl").val("");
+			$("#fsUploadProgress").html("");
+		})
+	})
+	function closes(){
+		$("#shangchuan_list").hide();
+	}
+	function dels(e) {
+		    var attrsVal=$("#attrs").val();
+		    var arr=attrsVal.split(',');
+		    arr.splice($(e).parent(".qiniu").index(),1);
+		    var arrs= arr.join(",");
+		    $("#attrs").val(arrs);
+		    $(e).parents(".qiniu").remove();
+		    return arr;
+		}
+</script>
+
+
+<script>
+
+    function dataTime(num) {
+        ////console.log(num)
+        var yugi = function(num) {
+            var now1 = new Date;
+            var getFullYear = now1.getFullYear();
+            var getMonth = now1.getMonth() + 1;
+            var getDate = now1.getDate();
+            var DateTime1 = getFullYear + "-" + getMonth + "-" + getDate;
+            $("#datepicker1").val(DateTime1)
+            var now = new Date;
+            now.setDate(now.getDate() - num);
+            var getFullYear = now.getFullYear();
+            var getMonth = now.getMonth() + 1;
+            var getDate = now.getDate();
+            var DateTime = getFullYear + "-" + getMonth + "-" + getDate;
+            $("#datepicker").val(DateTime)
+            if(num == "1") {
+                $("#datepicker").val(DateTime);
+                $("#datepicker1").val(DateTime);
+            }
+            var timestamp = new Date();
+            //alert(starttimeHaoMiao);
+            var DateTime_starttimeHaoMiao = DateTime;
+            var DateTime_starttimeHaoMiao1 = DateTime1;
+            var starttimeHaoMiao = (new Date(DateTime_starttimeHaoMiao)).getTime();
+            var starttimeHaoMiao1 = (new Date(DateTime_starttimeHaoMiao1)).getTime();
+
+            $("#starttimeHaoMiao").val(starttimeHaoMiao)
+            $("#starttimeHaoMiao1").val(starttimeHaoMiao1)
+            return now;
+
+        }
+        yugi(num);
+    }
+
+    $(function() {
+
+        $("#datepicker").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "1900:2050",
+        })
+        $("#datepicker1").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "1900:2050",
+        })
+        /*$("#reset").click(function(){
+         $("#signupForm").find("input,select").val("")
+         })*/
+    });
+
+    dataTime(0);
+</script>
+
+<script src="/javascripts/vue-resource.js"></script>
+<script src="/javascripts/public_page.js"></script>
+<script src="/javascripts/time_filter.js"></script>
+
+<script type="text/javascript" src="/javascripts/bower_components/plupload/js/moxie.js"></script>
+<script type="text/javascript" src="/javascripts/bower_components/plupload/js/plupload.dev.js"></script>
+<script type="text/javascript" src="/javascripts/bower_components/plupload/js/i18n/zh_CN.js"></script>
+
+<script src="/javascripts/jquery-ui.js"></script>
+
+<script type="text/javascript">
+
+var total = "";
+	var pageBar = new Vue({
+        el: '#content',
+        data: {
+            all: 0, //总页数
+            cur: 1,//当前页码
+            msg:'',
+
+            startTime:'',
+
+            pageTotal:"",
+            collectionList:"",
+
+        },
+        components:{
+            'vue-nav':pagenav
+        },
+        watch: {
+            cur: function(oldValue , newValue){
+                // //console.log('监听cur前与后的值：');
+                // //console.log(arguments);
+            }
+        },
+        mounted:function(){
+        	this.time();
+            this.listenDate(this.cur);
+            //this.traCountFun();
+//            this.qyList();
+//			this.payList();
+//			this.disableBtn();
+			
+		},
+        methods:{
+            listenDate:function(data){
+				var _this = this;
+				var startTime = parseInt((new Date($("#datepicker").val())).getTime()-28800000);
+
+				var pageSize = 10;
+
+				$(".loading").show();
+            	$(".tab-two").show();
+            	$("#page").show();
+				this.$http.post("/deal/json/repayearly/query",{
+                    "pageNum": data,
+                    "pageSize": pageSize,
+                    "time": startTime,
+
+                }).then(function(res){
+					 //console.log(res);
+					$(".loading").hide();
+					 if(res.body.code=="D1007"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 if(res.body.code=="D1006"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 _this.collectionList = res.body.res.data;
+					 _this.pageTotal = res.body.res.total;
+					 if(_this.collectionList==""){
+							$(".table_toggle1").show();
+						}else{
+							$(".table_toggle1").hide();
+						}
+					 $(".table_toggle").show();
+                    if (data<=1) {
+						total = Math.ceil(_this.pageTotal/10);
+                        $("#tjCount").html(res.body.res.totalCount);
+                        $("#tjAmount").html(res.body.res.totalAmount/100+"元");
+					}
+					   _this.all = total;
+					   _this.cur = data;
+				});
+	        },
+            updatestatus:function(){
+                var seperator1 = "-";
+                var startDate = new Date();
+                var startYear = startDate.getFullYear();
+                var startMonth = startDate.getMonth()+1;
+                if(startMonth < 10) startMonth = "0"+startMonth;
+                var startDay = startDate.getDate();
+                if(startDay < 10) startDay = "0"+startDay;
+                var currentdate = startYear + seperator1 + startMonth + seperator1 + startDay;
+                var curTime = parseInt((new Date(currentdate)).getTime());
+				var startTime = parseInt((new Date($("#datepicker").val())).getTime()-28800000);
+
+                if(curTime - startTime > 3*24*60*60*1000){
+                    alert("3天前的禁止操作");
+                    return;
+                }
+
+
+				$(".loading").show();
+				this.$http.post("/deal/json/repayearly/updatestatus",{
+                    "time": startTime,
+
+                }).then(function(res){
+					 //console.log(res);
+					$(".loading").hide();
+					 if(res.body.code=="0000"){
+					 	alert("修改成功");
+                         listenDate(1);
+					 	return false;
+					 }else{
+                         alert(res.body.msg);
+                         return false;
+                     }
+				});
+	        },
+	        time:function(){
+                var seperator1 = "-";
+
+                var startDate = new Date();
+//                startDate.setDate(startDate.getDate()-7);
+                var startYear = startDate.getFullYear();
+                var startMonth = startDate.getMonth()+1;
+                if(startMonth < 10) startMonth = "0"+startMonth;
+                var startDay = startDate.getDate();
+                if(startDay < 10) startDay = "0"+startDay;
+                var endDate = new Date();
+                var endYear = endDate.getFullYear();
+                var endMonth = endDate.getMonth()+1;
+                if(endMonth < 10) endMonth = "0"+endMonth;
+                var endDay = endDate.getDate();
+                if(endDay < 10) endDay = "0"+endDay;
+                var currentdate = startYear + seperator1 + startMonth + seperator1 + startDay;
+                var currentdate1 = endYear + seperator1 + endMonth + seperator1 + endDay;
+                $("#datepicker").val(currentdate);
+            },
+	        resets:function(){
+
+                $("#datepicker").val("");
+            },
+            downLoad:function(){
+                if(this.all > 5000){
+                    alert("单次下载页数不能超过5000页");
+                }
+                var startTime = parseInt((new Date($("#datepicker").val())).getTime()-28800000);
+                this.$http.get("/flow/reconciliation/getReconciliationsDownload").then(function(res){
+                    var domainName = "";
+                    if(res.body.config.config=="192.168.30.30"){
+                        domainName = "http://192.168.30.30:18087/";
+                    }else{
+                        domainName = "https://api.lqd.91naxia.com/";								
+                    }
+                    window.location.href="https://api.lqd.91naxia.com/liquidation/repayearly/download?time="+startTime+"&authToken="+res.body.cookie;
+                });
+            }
+        }
+    })
+</script>

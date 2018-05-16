@@ -1,0 +1,232 @@
+<% include ../header.ejs %>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap-grid.min.css"/>
+<link rel="stylesheet" type="text/css" href="/stylesheets/zoomify.css"/>
+<style type="text/css">
+	.form-actions {
+		padding: 19px 20px 20px;
+		margin-top: 0 !important;
+		margin-bottom: 20px;
+		background-color: #f5f5f5;
+		border-top: none !important;
+		border-bottom: 1px solid #e5e5e5;
+	}
+</style>
+<!--交易管理--收款交易查询-->
+<div id="content" class="content_min">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>审批管理</a>
+			<a href="#" class="current">撤单审批</a>
+		</div>
+		<h1>撤单详情</h1>
+	</div>
+
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<div class="row-fluid">
+			<div class="span12">				
+				<div class="widget-box" style="background: #ffffff">
+					<div class="widget-title"> <span class="icon"> <i class="icon-align-justify"></i> </span>
+						<h5>申请记录</h5>
+					</div>
+					<div class="widget-content nopadding">
+						<form class="form-horizontal">
+							<div class="control-group">
+										<label class="control-label" style="width: 150px">打款户名 :</label>
+										<div class="controls">
+											<input type="text" disabled v-model="payAccountName" class="colorpicker input-big span4"/>
+										</div>
+									</div>
+									<div class="control-group">
+										<label class="control-label" style="width: 150px">打款账号 :</label>
+										<div class="controls">
+											<input type="text" disabled v-model="payAccountNo" class="colorpicker input-big span4"/>
+										</div>
+									</div>
+									<div class="control-group">
+										<label class="control-label" style="width: 150px">打款方式 :</label>
+										<div class="controls">
+											<input type="text" disabled v-if="payType=='1'" value="支付宝" class="colorpicker input-big span4"/>
+											<input type="text" disabled v-if="payType=='2'" value="对公打款" class="colorpicker input-big span4"/>
+											<input type="text" disabled v-if="payType=='3'" value="线下付款" class="colorpicker input-big span4"/>
+											<input type="text" disabled v-if="payType=='4'" :value="remarks"  class="colorpicker input-big span4"/>
+										</div>
+									</div>
+									<div class="control-group">
+										<label class="control-label" style="width: 150px">打款金额 :</label>
+										<div class="controls">
+											<input type="text" disabled :value="payAmount/100" class="colorpicker input-big span4" style="width: 150px;" /><span style="margin-left: 10px;">元</span>
+										</div>
+									</div>
+									<div class="control-group">
+										<label class="control-label" style="width: 150px">收款账户 :</label>
+										<div class="controls">
+											<input type="text" v-model="ourAccount" class="colorpicker input-big span4" disabled/>
+										</div>
+									</div>
+									<div class="control-group">
+										<label class="control-label" style="width: 150px">交易日期 :</label>
+										<div class="controls">
+											<input type="text" disabled v-model="transDateStr" class="colorpicker input-big span4"/>
+										</div>
+									</div>
+									<div class="control-group">
+										<label class="control-label" style="width: 150px">上传打款单 :</label>
+										<div class="controls example">
+											<div class="example" style="width: 150px;height: 150px;border: 1px dashed #D6D6D6;">
+												<img :src="imageUrl" alt="" style="display:inline-block;width: 150px;height: 150px;" />
+												<!--<img class="img_big" src="/images/6.jpg" style="display:inline-block;width: 150px;height: 150px;"/>-->
+											</div>
+										</div>
+									</div>
+									<div class="control-group">
+										<label class="control-label" style="width: 150px">撤单原因 :</label>
+										<div class="controls">
+											<textarea name="" rows="" cols="" v-model="reason" disabled class="input-big span4" style="height: 100px;"></textarea>
+										</div>
+									</div>
+						
+					</div>
+					<div class="form-actions" style="background: #ffffff;">
+						<button style="margin-left: 200px;" class="btn btn-success" onclick="window.history.back(-1);">返回</button>
+					</div>
+					</form>
+					
+				</div>
+				
+			</div>
+		</div>
+	</div>	
+</div>
+
+<% include ../footer.ejs %>
+
+<script src="/javascripts/jquery.min.js"></script>
+<script src="/javascripts/jquery-ui.js"></script>
+<script src="/javascripts/vue-resource.js"></script>
+<script src="/javascripts/public_page.js"></script>
+<script src="/javascripts/time_filter.js"></script>
+<script src="/javascripts/zoomify.js"></script>
+<script>
+//	$(function() {
+//		if($("#content").height() < 1167) {
+//			$("#content").height(1167);
+//		}
+//	})
+</script>
+<script>
+	$(function() {
+		$("#ADDsubmit").click(function() {
+			$("#shangchuan_list").show();
+		})
+
+		var con_height = $(window).height() - 77;
+		$("#content").minHeight(con_height);
+	})
+
+	function closes() {
+		$("#shangchuan_list").hide();
+	}
+
+	function dels(e) {
+		var attrsVal = $("#attrs").val();
+		var arr = attrsVal.split(',');
+		arr.splice($(e).parent(".qiniu").index(), 1);
+		var arrs = arr.join(",");
+		$("#attrs").val(arrs);
+		$(e).parents(".qiniu").remove();
+		return arr;
+	}
+</script>
+<script type="text/javascript">
+	var total = "";
+	var pageBar = new Vue({
+		el: '#content',
+		data: {
+			all: 0, //总页数
+			cur: 1, //当前页码
+			msg: '',
+			collectionList: "",
+			payAccountName: "",
+			payAccountNo: "",
+			payType: "",
+			remarks: "",
+			payAmount: "",
+			ourAccount: "",
+			transDateStr: "",
+			reason: "",
+			imageUrl: "",
+			id: "",
+		},
+		components: {
+			'vue-nav': pagenav
+		},
+		watch: {
+			cur: function(oldValue, newValue) {
+				// //console.log('监听cur前与后的值：');
+				// //console.log(arguments);
+			}
+		},
+		mounted: function() {
+			this.refund();
+		},
+		methods: {			
+			refund: function() {
+				var id=sessionStorage.getItem("sp_id");
+				//console.log(id);
+				var _this = this;
+				this.$http.post("/flow/orderAudit/auditDetail", {
+					"id": id
+				}).then(function(res) {
+					_this.payAccountName = res.body.res.detail.payAccountName; //付款账户名
+					_this.payAccountNo = res.body.res.detail.payAccountNo; //付款账号
+					_this.payType = res.body.res.detail.payType; //付款方式
+					_this.remarks = res.body.res.detail.remarks; //付款方式备注
+					_this.payAmount = res.body.res.detail.payAmount; //付款金额（单位分）
+					_this.ourAccount = res.body.res.detail.ourAccount; //我方账号
+					_this.transDateStr = res.body.res.detail.transDateStr; //交易日期
+					_this.reason = res.body.res.detail.reason; //撤单原因
+					_this.imageUrl = "http://image.mujinnong.com/"+res.body.res.detail.imageUrl; //打款单图片地址
+					_this.id = res.body.res.detail.id; //id
+				});
+			},
+			//通过
+			applyRefund: function(id) {
+				this.$http.post("/flow/orderAudit/success", {
+					"id": id
+				}).then(function(res) {
+					//console.log(res)
+					var code = res.body.code;
+					var msg = res.body.msg;
+					if(code == "0000") {
+						alert(msg);
+						$("#btn-default").click();
+					} else if(code == "0001") {
+						alert(msg);
+					}
+				});
+			},
+			//驳回
+			applyReject: function(id) {
+				this.$http.post("/flow/orderAudit/fail", {
+					"id": id
+				}).then(function(res) {
+					//console.log(res)
+					var code = res.body.code;
+					var msg = res.body.msg;
+					if(code == "0000") {
+						alert(msg);
+						$("#btn-default").click();
+					} else if(code == "0001") {
+						alert(msg);
+					}
+				});
+			}
+		}
+	})
+</script>
+<script type="text/javascript">
+	$('.example img').zoomify();
+</script>

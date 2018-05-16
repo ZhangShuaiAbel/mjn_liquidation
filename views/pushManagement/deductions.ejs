@@ -1,0 +1,504 @@
+<% include ../header.ejs %>
+
+<!--退单管理--资金渠道管理-->
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>渠道管理</a>
+			<a href="#" class="current">扣款渠道管理</a>
+		</div>
+		<h1>扣款渠道管理</h1>
+
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+		<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+
+			<a href="/push/deductions" target="liquidation" class="btn2 cur1">扣款渠道管理</a>
+
+			<a href="/push/allocation" target="liquidation" class="btn2">比例配置</a>
+			
+			<a href="/push/codeback" target="liquidation" class="btn2">返回码配置</a>
+
+			<a href="/push/errorcode" target="liquidation" class="btn2">返回错误码</a>
+		</div>
+
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+								添加资金渠道
+							</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<input type="hidden" id="druleId" name="druleId">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">扣款渠道ID :</label>
+											<div class="controls">
+												<input type="text" v-model="qd_pid" />
+											</div>
+										</div>
+										<!--<div class="control-group">
+											<label class="control-label" style="width: 150px">渠道类型:</label>
+											<div class="controls">
+												<select name="" id="" v-model="qd_type">
+													<option value="1">支付</option>
+													<option value="2">代扣</option>
+												</select>
+											</div>
+										</div>-->
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">渠道名称 :</label>
+											<div class="controls">
+												<input type="text" v-model="qd_name" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">扣款渠道费率 :</label>
+											<div class="controls">
+												<input type="text" v-model="qd_rate" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">最低手续费 :</label>
+											<div class="controls">
+												<input type="text" v-model="qd_fee" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">银行卡 :</label>
+											<div class="controls">
+												<!--<select name="" id="" v-model="qd_bankIds">
+													<option value="">选择 </option>
+													<option v-for="msg in getSupportBankLists" v-bind:value="msg.id" v-text="msg.name"></option>
+												</select>-->
+												<label v-for="msg in getSupportBankLists" style="display: inline-block;padding-left: 10px;">
+														<input type="checkbox" class="input-checked" v-model="qd_bankIds" v-bind:value="msg.id" />{{msg.name}}
+												</label>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">适用产品 :</label>
+											<div class="controls">
+												<label v-for="aa in ProList" style="display: inline-block;padding-left: 10px;">
+														<input type="checkbox" class="input-checked" v-model="qd_appids" v-bind:value="aa.id" />{{aa.productName}}
+												</label>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+							</button>
+						<button type="button" class="btn btn-primary" @click="newPay">
+								添加
+							</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+
+		<div class="modal fade" id="myModal-one" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+								修改扣款渠道
+							</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<input type="hidden" id="druleId" name="druleId">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">扣款渠道ID :</label>
+											<div class="controls">
+												<input type="text" v-model="channelInfo_id" disabled="disabled" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">渠道类型:</label>
+											<div class="controls">
+												<select name="" id="" v-model="channelInfo_type" disabled="disabled">
+													<option value="1">支付</option>
+													<option value="2">代扣</option>
+												</select>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">渠道名称 :</label>
+											<div class="controls">
+												<input type="text" v-model="channelInfo_name" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">扣款渠道费率 :</label>
+											<div class="controls">
+												<input type="text" v-model="channelInfo_rate" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">最低手续费 :</label>
+											<div class="controls">
+												<input type="text" v-model="channelInfo_fee" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">银行卡 :</label>
+											<div class="controls">
+												<label v-for="msg in getSupportBankLists" style="display: inline-block;padding-left: 10px;">
+														<input type="checkbox" class="input-checked" v-model="pname_bankIdsId" v-bind:value="msg.id" />{{msg.name}}
+												</label>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">适用产品 :</label>
+											<div class="controls">
+												<label v-for="aa in ProList" style="display: inline-block;padding-left: 10px;">
+														<input type="checkbox" class="input-checked" v-model="pname_appids" v-bind:value="aa.id" />{{aa.productName}}
+												</label>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+						<button type="button" class="btn btn-primary" @click="upPay(qd_id)">提交更改</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+
+		<hr>
+		<div class="row-fluid" style="margin-top: 13px;">
+			<label style="display: inline-block;padding-left: 10px;">
+				<input type="radio" class="input-checked" v-model="configValue" value="0" />配置优先
+			</label>
+			<label style="display: inline-block;padding-left: 10px;">
+				<input type="radio" class="input-checked" v-model="configValue" value="1" />费率优先
+			</label>
+		</div>
+		<div class="row-fluid">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5><button type="button" id="submit" class="btn btn-primary position_right" data-toggle="modal" data-target="#myModal" >添加扣款渠道</button></h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>id</th>
+									<th>扣款渠道名称</th>
+									<th>最低手手续费</th>
+									<th>手续费率</th>
+									<th width="100" style="white-space: nowrap;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+								<tr v-for="msg in qdList">
+									<td v-text="msg.id"></td>
+									<td v-text="msg.name"></td>
+									<td>{{msg.fee/100}}</td>
+									<td v-text="msg.rate"></td>
+									<td width="100" style="white-space: nowrap;">
+										<span style="color:#2f96b4;cursor: pointer;" data-toggle="modal" data-target="#myModal-one" @click="upOne(msg.id)">管理</span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+					</div>
+					<div class="table_toggle1" style="display: none;">暂无数据</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+<% include ../footer.ejs %>
+<script src="/javascripts/vue-resource.js"></script>
+<!-- <script src="/javascripts/public_page.js"></script> -->
+<script type="text/javascript">
+	var products = new Vue({
+		el: '#content',
+		data: {
+			qdList: "",
+			ProList: "",
+			qd_name: "",
+			sycp_name: [],
+			e_day: "",
+			note: "",
+			qd_id: "",
+			limit: "",
+			qd_pid: "",
+			qd_name: "",
+			qd_rate: "",
+			qd_fee: "",
+			qd_bankIds: [],
+			qd_appids: [],
+			getSupportBankLists: "",
+			qd_type: "2",
+			qd_bankIdsId: "",
+			pname_bankIdsId: [],
+			pname_appids: [],
+			channelInfo_name: "",
+			channelInfo_rate: "",
+			channelInfo_id: "",
+			channelInfo_fee: "",
+			channelInfo_type: "",
+			configValue:"",
+			configId:"",
+		},
+		watch: {
+			limit: function(newValue, oldValue) {
+				if(this.limit == "1" || this.limit == "") {
+					$(".e_day1").removeAttr("disabled");
+				} else {
+					$(".e_day1").attr("disabled", "disabled");
+					this.e_day = "";
+				}
+			},
+			configValue:function(){
+				this.updateFeeFlag();
+			}
+		},
+		mounted: function() {
+			this.getFeeFlag();
+			this.capitalList();
+			this.productList();
+			this.getSupportBankList();
+		},
+		methods: {
+			//查询列表
+			capitalList: function() {
+				$(".loading").show();
+				var _this = this;
+				this.$http.post("/push/payChannel/getPayChannelList").then(function(res) {
+					//console.log(res.body.res);
+					$(".loading").hide();
+					if(res.body.code == "D1007") {
+						alert(res.body.msg);
+						return false;
+					}
+					if(res.body.code == "D1006") {
+						alert(res.body.msg);
+						return false;
+					}
+					_this.qdList = res.body.res;
+					if(_this.qdList==""){
+						$(".table_toggle1").show();
+					}else{
+						$(".table_toggle1").hide();
+					}
+					$(".table_toggle").show();
+				});
+			},
+			//适用产平查询
+			productList: function() {
+				var _this = this;
+				this.$http.post("/pay/product/jsonPro", {}).then(function(res) {
+					_this.ProList = res.body.res.products;
+					// //console.log(res)
+				});
+			},
+			//所有银行卡列表接口
+			getSupportBankList: function() {
+				var _this = this;
+				this.$http.post("/push/payChannel/getSupportBankList", {}).then(function(res) {
+					//console.log(res)
+					_this.getSupportBankLists = res.body.res;
+				});
+			},
+
+			//添加渠道
+			newPay: function() {
+				var _this = this;
+				var qd_pid = this.qd_pid;
+				var qd_name = this.qd_name;
+				var qd_rate = this.qd_rate;
+				var qd_fee = this.qd_fee;
+				var qd_bankIds = this.qd_bankIds;
+				var qd_type = this.qd_type;
+				var qd_bankIdsId = qd_bankIds.join(",");
+				var qd_appids = this.qd_appids;
+				var cpId = qd_appids.join(",");
+				if(qd_pid == "") {
+					alert("请填写扣款渠道ID");
+					return false;
+				} else if(qd_type == "") {
+					alert("请选择渠道类型");
+					return false;
+				} else if(qd_name == "") {
+					alert("请选择扣款渠道名称");
+					return false;
+				} else if(qd_rate == "") {
+					alert("请选择扣款渠道费率");
+					return false;
+				} else if(qd_fee == "") {
+					alert("请选择最低手续费");
+					return false;
+				} else {
+					var _this = this;
+					this.$http.post("/push/payChannel/savePayChannel", {
+						"pid": qd_pid,
+						"name": qd_name,
+						"rate": qd_rate,
+						"fee": qd_fee,
+						"type": qd_type,
+						"bankIds": qd_bankIdsId,
+						"appids": cpId
+					}).then(function(res) {
+						var code = res.body.code;
+						var msg = res.body.msg;
+						if(code == "0000") {
+							alert(msg)
+							$("#myModal").modal("hide");
+							_this.capitalList();
+							this.qd_pid = "",
+								this.qd_name = "";
+							this.qd_rate = "";
+							this.qd_fee = "";
+							this.qd_bankIdsId = [];
+							this.cpId = [];
+						} else if(code == "1") {
+							alert(msg)
+						}
+					});
+				}
+			},
+			//id查询
+			upOne: function(id) {
+				var _this = this;
+				//console.log(id);
+				this.$http.post("/push/payChannel/getPayChannelInfo", {
+					"pid": id
+				}).then(function(res) {
+					//console.log(res)
+
+					var bankList = res.body.res.bankList;
+					var configList = res.body.res.configList;
+					var pname_bankIdsId = '';
+					var pname_appids = '';
+					bankList.forEach(function(v, i) {
+						pname_bankIdsId += v['id'] + ',';
+
+					});
+					configList.forEach(function(v, i) {
+						pname_appids += v['appid'] + ',';
+
+					});
+					_this.pname_bankIdsId = pname_bankIdsId.substr(0, pname_bankIdsId.length - 1).split(",");
+					_this.pname_appids = pname_appids.substr(0, pname_appids.length - 1).split(",");
+					_this.channelInfo_name = res.body.res.channelInfo.name;
+					_this.channelInfo_rate = res.body.res.channelInfo.rate;
+					_this.channelInfo_id = res.body.res.channelInfo.id;
+					_this.channelInfo_fee = res.body.res.channelInfo.fee / 100;
+					_this.channelInfo_type = res.body.res.channelInfo.type;
+					//console.log(_this.pname_appids)
+				});
+			},
+			//修改
+			upPay: function(id) {
+				var _this = this;
+				var channelInfo_id = this.channelInfo_id;
+				var channelInfo_name = this.channelInfo_name;
+				var channelInfo_rate = this.channelInfo_rate;
+				var channelInfo_fee = this.channelInfo_fee;
+				var channelInfo_type = this.channelInfo_type;
+				var pname_bankIdsId = this.pname_bankIdsId.join(",");
+				var pname_appids = this.pname_appids.join(",");
+				if(channelInfo_id == "") {
+					alert("请填写扣款渠道ID");
+					return false;
+				} else if(channelInfo_type == "") {
+					alert("请选择渠道类型");
+					return false;
+				} else if(channelInfo_name == "") {
+					alert("请选择扣款渠道名称");
+					return false;
+				} else if(channelInfo_rate == "") {
+					alert("请选择扣款渠道费率");
+					return false;
+				} else if(channelInfo_fee == "") {
+					alert("请选择最低手续费");
+					return false;
+				} else {
+					var _this = this;
+					this.$http.post("/push/payChannel/savePayChannel", {
+						"pid": channelInfo_id,
+						"name": channelInfo_name,
+						"rate": channelInfo_rate,
+						"fee": channelInfo_fee,
+						"type": channelInfo_type,
+						"bankIds": pname_bankIdsId,
+						"appids": pname_appids
+					}).then(function(res) {
+						var code = res.body.code;
+						var msg = res.body.msg;
+						if(code == "0000") {
+							alert(msg)
+							$("#myModal-one").modal("hide");
+							_this.capitalList();
+							_this.pname_bankIdsId = [];
+							_this.pname_appids = [];
+							_this.channelInfo_name = "";
+							_this.channelInfo_rate = "";
+							_this.channelInfo_id = "";
+							_this.channelInfo_fee = "";
+							_this.channelInfo_type = "";
+						}
+					});
+				}
+			},
+			getFeeFlag:function(){
+				this.$http.post("/push/payChannel/getWithholdFeeFlag").then(function(res) {
+					this.configId = res.body.res.id;
+					this.configValue = res.body.res.configValue;
+				});				
+			},
+			updateFeeFlag:function(){
+				console.log(this.configId,this.configValue);
+				this.$http.post("/push/payChannel/updateWithholdFeeFlag",{
+					"id": this.configId,
+					"configValue": this.configValue,
+				}).then(function(res) {
+					var code = res.body.code;
+					var msg = res.body.msg;
+//					if(code == "0000") {
+//						alert(msg)
+//					}else{
+//						alert(msg)
+//					}
+				});				
+			},
+		}
+	})
+</script>

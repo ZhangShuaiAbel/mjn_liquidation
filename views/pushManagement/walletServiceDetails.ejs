@@ -1,0 +1,177 @@
+<% include ../header.ejs %>
+	<style>
+		.alertFont {
+			color: rgb(47, 150, 180);
+			cursor: pointer;
+		}
+
+		.ming {
+			color: #5bb75b;
+			cursor: pointer;
+		}
+	</style>
+	<div id="content">
+		
+		<div id="content-header">
+			<div id="breadcrumb">
+				<a href="#" class="tip-bottom">
+					<i class="icon-home"></i>结算审核</a>
+				<a href="#" class="current">钱包服务费</a>
+			</div>
+			<h1 v-if="detailStatus=='1'">未结算详情</h1>
+			<h1 v-else-if="detailStatus=='2'">结算审核详情</h1>
+			<h1 v-else-if="detailStatus=='3'">已结算详情</h1>
+			<h1 v-else></h1>
+		</div>
+		<div class="container-fluid">
+			<div class="loading">
+				<img src="/images/jiazai.gif" alt="">
+			</div>
+			<hr>
+			<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+				<a class="btn2 cur1" href="javascript:;" @click="historyGgo">返回上一页</a>
+			</div>
+			<hr>
+			<div class="row-fluid tab-two" style="display: none">
+				<div class="span12">
+					<div class="widget-box">
+						<div class="widget-title">
+							<span class="icon">
+								<i class="icon-th"></i>
+							</span>
+							<h5>列表
+                            <span @click="downLoad" id="submit_down" class="badge badge-success"  style="position: absolute;cursor: pointer;top: 8px;right: 10px;padding: 3px 10px;">下载</span></h5>                                
+                            </h5>
+						</div>
+						<div class="widget-content nopadding" id="common_list">
+							<table class="table table-bordered table-striped">
+								<thead>
+									<tr>
+										<th>上标时间</th>
+										<th>合同编号</th>
+										<th>姓名</th>
+										<th>身份证号</th>
+										<th>主订单金额</th>
+										<th>子订单金额</th>
+										<th>管理费</th>
+										<th>放款时间</th>
+									</tr>
+								</thead>
+								<tbody class="table_toggle">
+									<tr v-for="msg in dataList">
+										<td>{{msg.createTime | time}}</td>
+										<td v-text="msg.channelId"></td>                                   
+										<td v-text="msg.realName"></td>                                   
+										<td v-text="msg.idCard"></td>                                   
+										<td v-text="msg.approveAmount/100"></td>                                   
+										<td v-text="msg.sonMoney/100"></td>                                   
+										<td v-text="msg.poundageCost"></td>                                   
+                                        <td v-if="msg.paySuccessTime==''"></td> 
+                                        <td v-else>{{msg.paySuccessTime | time}}</td>                              
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="table_toggle1" style="display: none;">暂无数据</div>
+					</div>
+				</div>
+				<div id="page" style="display: none">
+					<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+				</div>
+				
+			</div>
+		</div>
+	</div>
+	
+	<% include ../footer.ejs %>
+		<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+		<script src="/javascripts/time_filter.js"></script>
+		<script src="/javascripts/jquery-ui.js"></script>
+		<script src="/javascripts/vue-2.42.js"></script>
+		<script src="/javascripts/vue-resource.js"></script>
+		<script src="/javascripts/public_page.js"></script>
+		<script src="/javascripts/time_filter.js"></script>
+		<script src="/javascripts/jquery.flot.min.js"></script>
+		<script src="/javascripts/jquery.flot.pie.min.js"></script>
+		<script src="/javascripts/jquery.flot.resize.min.js"></script>
+		<script src="/javascripts/matrix.js"></script>
+		<script src="/javascripts/jquery.peity.min.js"></script>
+		<script>
+			var total = "";
+			var datasets = "";
+			new Vue({
+				el: '#content',
+				data: {
+					all: 0, //总页数
+					cur: 1, //当前页码
+                    dataList: "",
+                    detailStatus : sessionStorage.getItem("detailStatus")
+				},
+				components: {
+					'vue-nav': pagenav
+				},
+				watch: {
+
+				},
+				mounted: function () {
+					this.listenDate(this.cur);
+				},
+				methods: {
+					listenDate: function (data) {
+						$(".loading").show();
+						$(".tab-two").show();
+						$("#page").show();
+						var _this = this;
+						var beginDate = $("#datepicker").val();
+						var endDate = $("#datepicker1").val();
+						var pageSize = 10;
+						this.$http.post("/push/costSettlement/detail", {
+							"pageNum": data,
+							"pageSize": 10,
+                            "id": sessionStorage.getItem("detailId"),
+						}).then(function (res) {
+                            console.log(res);
+							$(".loading").hide();
+							if (res.body.code == "D1007") {
+								alert(res.body.msg);
+								return false;
+							}
+							if (res.body.code == "D1006") {
+								alert(res.body.msg);
+								return false;
+							}
+                            _this.dataList = res.body.res.res;
+                            console.log(_this.dataList)
+							_this.pageTotal = res.body.res.total;
+							if (_this.dataList == "") {
+								$(".table_toggle1").show();
+							} else {
+								$(".table_toggle1").hide();
+							}
+							$(".table_toggle").show();
+							if (data <= 1) {
+								total = Math.ceil(_this.pageTotal / 10);
+							}
+							_this.all = total;
+							_this.cur = data;
+						});
+                    },
+                    downLoad(){
+                        this.$http.get("/push/costSettlement/downloadDetail").then(function(res){
+                            var domainName = "";
+                            if(res.body.config.config=="192.168.30.30"){
+								domainName = "http://192.168.30.30:18087/";
+							}else{
+								domainName = "https://api.lqd.91naxia.com/";								
+							}             
+	            		    window.location.href=domainName+"liquidation/costSettlement/downloadDetail?id="+sessionStorage.getItem("detailId")+"&authToken="+res.body.cookie;
+	            	    });
+					},
+					historyGgo(){
+						history.go(-1);
+					}
+				}
+			})
+		</script>
+
+		<!--Real-time-chart-js-->

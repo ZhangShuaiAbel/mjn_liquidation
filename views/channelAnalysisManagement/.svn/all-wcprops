@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/mujinnong/!svn/ver/24971/trunk/naxia/liquidation/liquidation-h5/views/channelAnalysisManagement
+END
+detail.ejs
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/mujinnong/!svn/ver/24814/trunk/naxia/liquidation/liquidation-h5/views/channelAnalysisManagement/detail.ejs
+END
+channelAnalysis.ejs
+K 25
+svn:wc:ra_dav:version-url
+V 120
+/svn/mujinnong/!svn/ver/24971/trunk/naxia/liquidation/liquidation-h5/views/channelAnalysisManagement/channelAnalysis.ejs
+END
+shoukuan.ejs
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svn/mujinnong/!svn/ver/24813/trunk/naxia/liquidation/liquidation-h5/views/channelAnalysisManagement/shoukuan.ejs
+END

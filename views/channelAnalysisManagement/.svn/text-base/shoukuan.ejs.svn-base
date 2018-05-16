@@ -1,0 +1,230 @@
+<% include ../header.ejs %>
+<style>
+	.ui-datepicker-calendar{
+		display: none;
+	}
+</style>
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>统计分析</a>
+			<a href="#" class="current">收款统计</a>
+		</div>
+		<h1>收款统计</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+
+		<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+			<a href="/channelAnalysis/shoukuan" target="liquidation" class="btn2 cur1">收款统计</a>
+		</div>
+
+		<hr>
+		<div class="row-fluid">
+			<div class="widget-box">
+				<div class="widget-content nopadding">
+					<form class="form-horizontal" method="post" action="">
+						<table class="table table-striped">
+							<tbody>
+								<tr>
+									<td width="85" style="white-space: nowrap;line-height: 28px;">时间 :</td>
+									<td width="" style="white-space: nowrap;">
+                                        <input type="text" class="input" id="datepicker" readonly="readonly" name="endTime">
+									</td>
+									<td width="85" style="white-space: nowrap;line-height: 28px;"></td>
+									<td width="" style="white-space: nowrap;">
+										<span style="margin-left: 20px">
+											<button type="button" id="submit" class="btn btn-success" @click="listenDate()">查找</button>
+										</span>
+									</td>
+								</tr>								
+							</tbody>
+						</table>
+					</form>
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row-fluid tab-two" style="display: none">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>订单明细</h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>渠道</th>
+									<th>产品分期</th>
+									<th>现金贷(想就拿)</th>
+									<th>现金贷(沐金农)</th>
+									<th>现金贷(喵财)</th>
+									<th>农贷(沐金农)</th>
+									<th>商城(想就拿)</th>								
+									<th>其他</th>								
+									<th>合计</th>
+									<th>操作</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+								<tr v-for="msg in collectionList">
+									<td v-text="msg.name"></td>
+									<td v-text="msg.fq"></td>
+									<td v-text="msg.xjn"></td>									
+									<td v-text="msg.mjn"></td>																
+									<td v-text="msg.mc"></td>																
+									<td v-text="msg.nd"></td>
+									<td v-text="msg.sc"></td>
+									<td v-text="msg.qt"></td>
+									<td v-text="msg.hj"></td>
+									<td>
+										<a href="/channelAnalysis/detail" target="liquidation" class="btn_a detailA" @click="tui(msg.payType)">明细</a>										
+									</td>
+								</tr>
+								<tr id="showTr">
+									<td>合计</td>
+									<td style="color:#51a351" v-text="heji.fqCount"></td>
+									<td style="color:#51a351" v-text="heji.xjnCount"></td>									
+									<td style="color:#51a351" v-text="heji.mjnCount"></td>																
+									<td style="color:#51a351" v-text="heji.mcCount"></td>																
+									<td style="color:#51a351" v-text="heji.ndCount"></td>
+									<td style="color:#51a351" v-text="heji.scCount"></td>
+									<td style="color:#51a351"></td>
+									<td style="color:#51a351" v-text="heji.hjCount"></td>
+									<td></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="table_toggle1" style="display: none;">暂无数据</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<% include ../footer.ejs %>
+
+	 <script>
+    function dataTime(num) {
+            var now1 = new Date;
+            var getFullYear = now1.getFullYear();
+            var getMonth = now1.getMonth() + 1;
+            var getDate = now1.getDate();
+            var DateTime1 = getFullYear + "-" + getMonth + "-" + getDate;
+    }
+
+    $(function() {
+
+        $("#datepicker").datepicker({
+			monthNamesShort: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],  // 区域化月名为中文  
+			prevText: '上月',         // 前选按钮提示  
+			nextText: '下月',         // 后选按钮提示  
+			changeYear: true,          // 年下拉菜单  
+			changeMonth: true,             // 月下拉菜单  
+			showButtonPanel: true,         // 显示按钮面板  
+			showMonthAfterYear: true,  // 月份显示在年后面  
+			currentText: "本月",         // 当前日期按钮提示文字  
+			closeText: "关闭",           // 关闭按钮提示文字  
+			dateFormat: "yy-mm",       // 日期格式  
+			onClose: function(dateText, inst) {// 关闭事件  
+				var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();  
+				var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();  
+				$(this).datepicker('setDate', new Date(year, month, 1));  
+			} 
+        })
+    });
+
+    dataTime(0);
+	</script> 
+	<script src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+
+	<script src="/javascripts/jquery-ui.js"></script>
+	<script src="/javascripts/vue-2.42.js"></script>
+	<script src="/javascripts/vue-resource.js"></script>
+	<!-- <script src="/javascripts/public_page.js"></script> -->
+	<script src="/javascripts/time_filter.js"></script>
+	<script src="/javascripts/jquery.flot.min.js"></script>
+	<script src="/javascripts/jquery.flot.pie.min.js"></script>
+	<script src="/javascripts/jquery.flot.resize.min.js"></script>
+	<script src="/javascripts/matrix.js"></script>
+	<script src="/javascripts/jquery.peity.min.js"></script>
+	<script>
+		var total = "";
+		var datasets = "";
+		new Vue({
+			el: '#content',
+			data: {
+				collectionList:"",
+				heji:"",
+			},
+			components: {
+				// 'vue-nav': pagenav
+			},
+			watch: {
+
+			},
+			mounted: function() {
+				this.dataTime();
+				this.listenDate();
+			},
+			methods: {
+				dataTime:function () {
+			            var now1 = new Date;
+			            var getFullYear = now1.getFullYear();
+			            var getMonth = now1.getMonth() + 1;
+			            if(getMonth<10){
+			            	getMonth = "0" + getMonth;
+			            }
+			            var getDate = now1.getDate();
+			            var DateTime = getFullYear + "-" + getMonth;
+			            $("#datepicker").val(DateTime);
+			    },
+				listenDate: function() {
+					$(".loading").show();
+					$(".tab-two").show();
+					var _this = this;
+
+					this.$http.post("/channelAnalysis/withholdChannelStatistics/findCurrentAmount", {
+						"dateTime": $("#datepicker").val(),
+					}).then(function(res) {
+						console.log(res);
+						$(".loading").hide();
+						if(res.body.code == "D1007") {
+							alert(res.body.msg);
+							return false;
+						}
+						if(res.body.code == "D1006") {
+							alert(res.body.msg);
+							return false;
+						}
+						_this.collectionList = res.body.res.res;
+						_this.heji = res.body.res.tj;
+						if(_this.collectionList==""){
+							$(".table_toggle1").show();
+							$("#showTr").hide();
+						}else{
+							$(".table_toggle1").hide();
+							$("#showTr").show();
+						}
+						$(".table_toggle").show();
+					});
+				},
+				tui: function(payType) {
+					sessionStorage.setItem('payType', payType);
+					sessionStorage.setItem('dataTime', $("#datepicker").val());
+				},
+			},
+			filters:{
+				rates:function(value){
+					var data = value*100;
+		        	return parseFloat(data.toFixed(2));
+		        },
+			},
+		})
+	</script>
+	
+	<!--Real-time-chart-js-->

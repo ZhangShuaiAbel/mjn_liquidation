@@ -1,0 +1,424 @@
+<% include ../header.ejs %>
+<style>
+	.table th{
+		line-height: 37px
+	}
+	.row-fluid .span12{margin-left: 0;border-bottom: 1px solid #CDCDCD;}
+	.table1-border {
+border: 1px solid #CDCDCD;
+overflow: hidden;
+}
+.table1-width {
+padding: 0 20px;
+}
+</style>
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>基础订单信息</a>
+			<a href="#" class="current">订单详情</a>
+		</div>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+		<div class="xiangqing_list"><h3>订单详情</h3></div>
+		<div class="row-fluid  table1-border" >
+			<div class="table1-width">
+				<div class="span12">
+					<h5>商户信息</h5>
+					<div class="table1">
+						<div class="table1_list span4">
+							<span>商户编号:</span><p v-text="merchantId"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>商户名:</span><p v-text="merchantName"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>企业注册号:</span><p v-text="enterpriseId"></p>
+						</div>
+					</div>
+					<div class="table1">
+						<div class="table1_list span4">
+							<span>企业名:</span><p v-text="enterpriseName"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>企业法人:</span><p v-text="legalPersonName"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>身份证号:</span><p v-text="legalPersonNo"></p>
+						</div>
+					</div>
+					<div class="table1">
+						<div class="table1_list span4">
+							<span>联系电话:</span><p v-text="phone"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>商户地址:</span><p v-text="merchantDetailed"></p>
+						</div>
+						<div class="table1_list span4">
+							<span>银行卡开户行:</span><p v-text="bankName"></p><p v-text="bankNo"></p>
+						</div>
+					</div>
+					
+				</div>
+				<div class="span12">
+					<div class="xiangqing_list" style="border-bottom: 1px solid #CDCDCD;">
+						<h4>商户订单信息</h4>
+						<h4>推单信息</h4>
+
+					</div>
+					<div class="xiangqing_main" style="margin-bottom: -2px;">
+						<div class="row-fluid " style="margin-top: 0;">
+							<div class="span12">
+								<div class="widget-content nopadding" id="common_list">
+									<table class="table table-bordered table-striped">
+										<thead>
+											<tr>
+												<th>用户订单编号</th>
+												<th>账单号</th>
+												<th>用户订单创建时间</th>
+												<th>合同金额</th>
+												<th>首付金额</th>
+												<th>分期金额</th>
+											</tr>
+										</thead>
+										<tbody id="table_toggle11">
+											<tr v-for="msg in productVoList">
+												<td v-text="msg.id"></td>
+												<td v-text="msg.billId"></td>
+												<td>{{msg.createDate | time}}</td>
+												<td v-text="msg.price"></td>
+												<td v-text="msg.downPayment"></td>
+												<td v-text="msg.repaymentAmount"></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<div class="table_toggle1" id="table_toggle1" >暂无数据</div>
+							</div>
+						</div>
+						<div class="row-fluid " style="margin-top: 0;display: none;">
+							<div class="span12">
+								<div class="widget-content nopadding" id="common_list">
+									<table class="table table-bordered table-striped">
+										<thead>
+											<tr>
+												<th>账单订单号</th>
+												<th>第三方支付渠道订单号</th>
+												<th>放款金额</th>
+												<th>收款人</th>
+												<th>收款人手机号</th>
+												<th>收款银行</th>
+												<th>收款银行卡号</th>
+												<th>支付渠道</th>
+												<th>状态</th>
+												<th>放款时间</th>
+												<th>放款成功时间</th>
+											</tr>
+										</thead>
+										<tbody id="table_toggle22">
+											<tr>
+												<td v-text="billVo_rebateNo"></td>
+												<td v-text="billVo_merTrandNo"></td>
+												<td v-text="billVo_rebateMoney"></td>
+												<td v-text="billVo_userName"></td>
+												<td v-text="billVo_phone"></td>
+												<td v-text="billVo_bankName"></td>
+												<td v-text="billVo_bankNo"></td>
+												<td v-text="billVo_payChannelName"></td>
+												<td v-text="billVo_payStatusName"></td>
+												<td v-text="billVo_appropriationTime"></td>
+												<td v-text="billVo_paySuccessTime"></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<div class="table_toggle1" id="table_toggle2" style="display: none;">暂无数据</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--<div class="row-fluid tab-two">
+			<div class="">
+				
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>商户信息  </h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+
+								<tr>
+									<th width="100">联系电话</th>
+									<td v-text="phone"></td>
+									<th width="100">商户地址</th>
+									<td v-text="merchantDetailed"></td>
+								</tr>
+								<tr>
+									<th width="100">银行卡开户行</th>
+									<td v-text="bankName"></td>
+                                    <th v-text="bankName"></th>
+									<td v-text="bankNo"></td>
+								
+								</tr>
+							</thead>
+						</table>
+					</div>
+				</div>
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>商户订单信息</h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>用户订单编号</th>
+									<th>账单号</th>
+									<th>用户订单创建时间<th>
+									<th>合同金额</th>
+									<th>首付金额</th>
+									<th>分期金额</th>
+								</tr>
+							</thead>
+							<tbody id="table_toggle11">
+								<tr v-for="msg in productVoList">
+									<td v-text="msg.id"></td>
+									<td v-text="msg.billId"></td>
+									<td>{{msg.createDate | time}}</td>
+									<td v-text="msg.price"></td>
+									<td v-text="msg.downPayment"></td>
+									<td v-text="msg.repaymentAmount"></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="table_toggle1" id="table_toggle1" >暂无数据</div>
+
+				</div>
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>推单信息</h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>账单订单号</th>
+									<th>第三方支付渠道订单号</th>
+									<th>放款金额</th>
+									<th>收款人</th>
+									<th>收款人手机号</th>
+									<th>收款银行</th>
+									<th>收款银行卡号</th>
+									<th>支付渠道</th>
+									<th>状态</th>
+									<th>放款时间</th>
+									<th>放款成功时间</th>
+								</tr>
+							</thead>
+							<tbody id="table_toggle22">
+								<tr>
+									<td v-text="billVo_rebateNo"></td>
+									<td v-text="billVo_merTrandNo"></td>
+									<td v-text="billVo_rebateMoney"></td>
+									<td v-text="billVo_userName"></td>
+									<td v-text="billVo_phone"></td>
+									<td v-text="billVo_bankName"></td>
+									<td v-text="billVo_bankNo"></td>
+									<td v-text="billVo_payChannelName"></td>
+									<td v-text="billVo_payStatusName"></td>
+									<td v-text="billVo_appropriationTime"></td>
+									<td v-text="billVo_paySuccessTime"></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="table_toggle1" id="table_toggle2" style="display: none;">暂无数据</div>
+				</div>
+			</div>
+		</div>-->
+		
+		
+	</div>
+
+	<% include ../footer.ejs %>
+
+	<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+
+	<script src="/javascripts/jquery-ui.js"></script>
+	<script src="/javascripts/vue-2.42.js"></script>
+	<script src="/javascripts/vue-resource.js"></script>
+	<script src="/javascripts/public_page.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+	<script src="/javascripts/bootstrap.min.js"></script>
+	<script src="/javascripts/jquery.flot.min.js"></script>
+	<script src="/javascripts/jquery.flot.pie.min.js"></script>
+	<script src="/javascripts/jquery.flot.resize.min.js"></script>
+	<script src="/javascripts/matrix.js"></script>
+	<script src="/javascripts/jquery.peity.min.js"></script>
+<script>
+		$(function() {
+			$(".xiangqing_list h4").click(function(){
+				var index = $(this).index();
+				$(".xiangqing_main").find(".row-fluid").eq(index).show().siblings().hide();
+				$(this).addClass("cur").siblings().removeClass("cur");
+				//$(".xiangqing_main").find(".row-fluid").eq(index).$(".table2")
+			})
+		})
+	</script>
+	<script>
+	
+		$(function(){
+			
+	        
+			if($("#table_toggle22 tr").length==0){
+        			$("#table_toggle2").show();
+					}else{
+						$("#table_toggle2").hide();
+					}
+	       
+		})
+	</script>
+	<script>
+		var total = "";
+		//var datasets = "";
+		new Vue({
+			el: '#content',
+			data: {
+				bankName:"",
+				bankNo:"",
+				enterpriseId:"",
+				legalPersonName:"",
+				legalPersonNo:"",
+				merchantDetailed:"",
+				merchantId:"",
+				merchantName:"",
+				enterpriseName:"",
+				phone:"",
+				id: "",
+		        billId: "",      
+				createDate: "",
+				price: "",
+				downPayment: "",
+				repaymentAmount: "",
+				billVo:"",
+				productVoList:"",
+				payStatus: "",
+				payStatusName: "",
+				userName: "",
+				createTime: "",
+				rebateNo: "",
+				merTrandNo: "",
+				payChannelName: "",
+				rebateMoney: "",
+				bankNo: "",
+				bankName: "",
+				phone: "",
+				appropriationTime: "",
+				paySuccessTime: "",
+				
+				billVo_rebateNo:"",
+				billVo_merTrandNo:"",
+				billVo_rebateMoney:"",
+				billVo_userName:"",
+				billVo_phone:"",
+				billVo_bankName:"",	
+				billVo_bankNo:"",
+				billVo_payChannelName:"",
+				billVo_payStatusName:"",
+				billVo_appropriationTime:"",
+				billVo_paySuccessTime:"",
+
+			},
+			components: {
+				'vue-nav': pagenav
+			},
+			watch: {
+				cur: function(oldValue, newValue) {
+					// this.data();
+				}
+			},
+			mounted: function() {
+				this.listenDate();
+			},
+			methods: {
+				listenDate: function(data) {
+					
+					var _this = this;
+					var bid = sessionStorage.getItem('bid');
+           
+                    //console.log(bid);
+					$(".loading").show();
+					$(".tab-two").show();
+					this.$http.post("/basics/bill/getMerBillDetail", {
+						"bid": bid,
+					}).then(function(res) {
+						$(".loading").hide();
+						//console.log(res);
+						
+						//商户订单信息
+						var merchantVo=res.body.res.merchantVo;
+						
+						_this.bankName = merchantVo.bankName;
+						
+						_this.bankNo = merchantVo.bankNo;
+						
+						_this.enterpriseId = merchantVo.enterpriseId;
+							
+						_this.legalPersonName = merchantVo.legalPersonName;
+						
+						_this.legalPersonNo = merchantVo.legalPersonNo;
+					
+						_this.merchantDetailed = merchantVo.merchantDetailed;
+						
+						_this.merchantId = merchantVo.merchantId;
+						
+						_this.merchantName = merchantVo.merchantName;
+						_this.phone = merchantVo.phone;
+						_this.enterpriseName = merchantVo.enterpriseName;
+						
+						
+						
+						//商户信息
+						_this.productVoList=res.body.res.productVoList;
+						if(_this.productVoList==""){
+	        			$("#table_toggle1").show();
+						}else{
+							$("#table_toggle1").hide();
+						}
+						
+						_this.billVo=res.body.res.billVo;
+						_this.billVo_bankName=_this.billVo.bankName;
+						_this.billVo_rebateNo=_this.billVo.rebateNo;
+						_this.billVo_merTrandNo=_this.billVo.merTrandNo;
+						_this.billVo_rebateMoney=_this.billVo.rebateMoney;
+						_this.billVo_userName=_this.billVo.userName;
+						_this.billVo_phone=_this.billVo.phone;
+						_this.billVo_bankName=_this.billVo.bankName;	
+						_this.billVo_bankNo=_this.billVo.bankNo;
+						_this.billVo_payChannelName=_this.billVo.payChannelName;
+						_this.billVo_payStatusName=_this.billVo.payStatusName;
+						_this.billVo_appropriationTime=_this.billVo.appropriationTime;
+						_this.billVo_paySuccessTime=_this.billVo.paySuccessTime;
+						
+
+					
+						
+					});
+
+				},
+
+			}
+		})
+	</script>
+	<!--Turning-series-chart-js-->
+	<script src="/javascripts/matrix.dashboard.js"></script>
+	
+	</script>

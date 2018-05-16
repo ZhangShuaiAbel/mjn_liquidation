@@ -1,0 +1,322 @@
+<% include ../header.ejs %>
+
+<!--交易管理--收款交易查询-->
+<div id="content" class="content_min">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>审批管理</a>
+			<a href="#" class="current">撤单审批</a>
+		</div>
+		<h1>撤单审批</h1>
+	</div>
+
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+			<a  class="btn2 cur1" href="/flow/cancellations" target="liquidation">待审批</a>
+        	<a  class="btn2" href="/flow/cancellations2"  target="liquidation">已审批</a>
+		</div>
+		<hr>
+		<div class="row-fluid">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>申请记录</h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>付款户名</th>
+									<th>付款账号</th>
+									<th>付款方式</th>
+									<th>付款金额</th>
+									<th>收款账号</th>
+									<th>交易日期</th>
+									<th>申请人</th>
+									<th>审批人</th>
+                                    <th>审批结果</th>
+									<th width="100" style="white-space: nowrap;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+								<tr v-for="msg in collectionList">									
+									<td v-text="msg.payAccountName"></td>
+									<td v-text="msg.payAccountNo"></td>
+									<td v-if="msg.payType=='1'">支付宝</td>
+									<td v-if="msg.payType=='2'">对公打款</td>
+									<td v-if="msg.payType=='3'">线下付款</td>
+									<td v-if="msg.payType=='4'">{{msg.remarks}}</td>
+									<td v-text="msg.payAmount/100"></td>
+									<td v-text="msg.ourAccount"></td>
+									<td v-text="msg.transDateStr"></td>
+									
+									<td v-text="msg.applyPerson"></td>
+									<td v-text="msg.auditPerson"></td>
+									<td v-if="msg.auditStatus=='1'">提交</td>
+									<td v-else-if="msg.auditStatus=='2'">通过</td>
+									<td v-else-if="msg.auditStatus=='3'">拒绝</td>
+									<td v-else-if="msg.auditStatus=='4'">已撤单</td>
+									<td v-else></td>
+									<td width="100" style="white-space: nowrap;">
+										<!--<button data-toggle="modal" data-target="#myModal" class="btn-info btn-mini float_btn_cen" @click="refund(msg.id)">审批</button>-->
+										<!--<button data-toggle="modal" data-target="#myModal" class="btn-info btn-mini float_btn_cen" @click="tui(msg.id)">审批</button>-->
+										<a class="btn_a" href="/flow/cancellations_list" target="liquidation" @click="tui(msg.id)">审批</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+					</div>
+                    <div class="table_toggle1" style="display: none;">暂无数据</div>
+				</div>
+
+			</div>
+		</div>
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+								撤单申请
+							</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid" style="height: 300px;">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<input type="hidden" id="druleId" name="druleId">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">打款户名 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="payAccountName" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">打款账号 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="payAccountNo" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">打款方式 :</label>
+											<div class="controls">
+												<input type="text" disabled v-if="payType=='1'" value="支付宝"/>
+												<input type="text" disabled v-if="payType=='2'" value="对公打款"/>
+												<input type="text" disabled v-if="payType=='3'" value="线下付款"/>
+												<input type="text" disabled v-if="payType=='4'" :value="remarks"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">打款金额 :</label>
+											<div class="controls">
+												<input type="text" disabled :value="payAmount/100" style="width: 150px;"/><span style="margin-left: 10px;">元</span>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">收款账户 :</label>
+											<div class="controls">
+												<input type="text" v-model="ourAccount" disabled/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">交易日期 :</label>
+											<div class="controls">
+												<input type="text" disabled v-model="transDateStr" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">上传打款单 :</label>
+											<div class="controls">
+												<img :src="imageUrl" alt="" style="display:inline-block;width: 150px;height: 150px;"/>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">撤单原因 :</label>
+											<div class="controls">
+												<textarea name="" rows="" cols="" v-model="reason" disabled></textarea>
+											</div>
+										</div>																				
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" id="btn-default" data-dismiss="modal">关闭</button>
+						<button type="button" class="btn btn-primary" @click="applyRefund(id)">通过</button>
+						<button type="button" class="btn btn-primary" @click="applyReject(id)">驳回</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="page">
+			<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+		</div>
+	</div>
+
+	<% include ../footer.ejs %>
+
+	<script src="/javascripts/jquery.min.js"></script>
+	<script src="/javascripts/jquery-ui.js"></script>
+	<script src="/javascripts/vue-resource.js"></script>
+	<script src="/javascripts/public_page.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+<script>
+	$(function(){	
+		if ($("#content").height()<1167) {$("#content").height(1167);}
+	})
+</script>
+	<script>
+		$(function() {
+			$("#ADDsubmit").click(function() {
+				$("#shangchuan_list").show();
+			})
+			
+			var con_height = $(window).height()-77;
+			$("#content").minHeight(con_height);
+		})
+
+		function closes() {
+			$("#shangchuan_list").hide();
+		}
+
+		function dels(e) {
+			var attrsVal = $("#attrs").val();
+			var arr = attrsVal.split(',');
+			arr.splice($(e).parent(".qiniu").index(), 1);
+			var arrs = arr.join(",");
+			$("#attrs").val(arrs);
+			$(e).parents(".qiniu").remove();
+			return arr;
+		}
+	</script>
+	<script type="text/javascript">
+		var total = "";
+		var pageBar = new Vue({
+			el: '#content',
+			data: {
+				all: 0, //总页数
+				cur: 1, //当前页码
+				msg: '',
+				collectionList: "",
+				payAccountName:"",
+				payAccountNo:"",
+				payType:"",
+				remarks:"",
+				payAmount:"",
+				ourAccount:"",
+				transDateStr:"",
+				reason:"",
+				imageUrl:"",
+				id:"",
+			},
+			components: {
+				'vue-nav': pagenav
+			},
+			watch: {
+				cur: function(oldValue, newValue) {
+					// //console.log('监听cur前与后的值：');
+					// //console.log(arguments);
+				}
+			},
+			mounted: function() {
+				this.listenDate(this.cur);
+			},
+			methods: {
+				listenDate: function(data) {
+					$(".loading").show();
+					var _this = this;
+					var pageSize = 10;
+					this.$http.post("/flow/orderAudit/auditList", {
+						"pageNum": data,
+						"pageSize": pageSize,
+						"auditStatus": 1
+					}).then(function(res) {
+						$(".loading").hide();
+						//console.log(res);
+						if(res.body.code == "D1007") {
+							alert(res.body.msg);
+							return false;
+						}
+						if(res.body.code == "D1006") {
+							alert(res.body.msg);
+							return false;
+						}
+						_this.collectionList = res.body.res.auditList.res;
+						_this.pageTotal = res.body.res.auditList.total;
+						if(_this.collectionList==""){
+							$(".table_toggle1").show();
+						}else{
+							$(".table_toggle1").hide();
+						}
+					 $(".table_toggle").show();
+						if(data <= 1) {
+							total = Math.ceil(_this.pageTotal / 10);
+						}
+						_this.all = total;
+						_this.cur = data;
+					});
+				},
+				refund: function(id) {
+					var _this = this;
+					this.$http.post("/flow/orderAudit/auditDetail", {
+						"id": id
+					}).then(function(res) {
+						_this.payAccountName = res.body.res.detail.payAccountName;   //付款账户名
+						_this.payAccountNo = res.body.res.detail.payAccountNo;       //付款账号
+						_this.payType = res.body.res.detail.payType;   //付款方式
+						_this.remarks = res.body.res.detail.remarks;   //付款方式备注
+						_this.payAmount = res.body.res.detail.payAmount;   //付款金额（单位分）
+						_this.ourAccount = res.body.res.detail.ourAccount;   //我方账号
+						_this.transDateStr = res.body.res.detail.transDateStr;  //交易日期
+						_this.reason = res.body.res.detail.reason;    //撤单原因
+						_this.imageUrl = res.body.res.detail.imageUrl;  //打款单图片地址
+						_this.id = res.body.res.detail.id;  //id
+					});
+				},
+				//通过
+				applyRefund: function(id) {
+					this.$http.post("/flow/orderAudit/success", {
+						"id": id
+					}).then(function(res) {
+						//console.log(res)
+						var code = res.body.code;
+						var msg = res.body.msg;
+						if(code == "0000") {
+							alert(msg);
+							$("#btn-default").click();
+						} else if(code == "0001") {
+							alert(msg);
+						}
+					});
+				},
+				//驳回
+				applyReject: function(id){
+					this.$http.post("/flow/orderAudit/fail", {
+						"id": id
+					}).then(function(res) {
+						//console.log(res)
+						var code = res.body.code;
+						var msg = res.body.msg;
+						if(code == "0000") {
+							alert(msg);
+							$("#btn-default").click();
+						} else if(code == "0001") {
+							alert(msg);
+						}
+					});
+				},
+				tui:function(data){
+					//console.log(data)
+            	    sessionStorage.setItem('sp_id',data);
+                },
+			}
+		})
+	</script>

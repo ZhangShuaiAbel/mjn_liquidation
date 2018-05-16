@@ -1,0 +1,471 @@
+<% include ../header.ejs %>
+
+<!--支付管理--产品管理-->
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>渠道管理</a>
+			<a href="#" class="current">产品管理</a>
+		</div>
+		<h1>产品管理</h1>
+
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+		<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+			<a href="/pay/PayAisle" target="liquidation" class="btn2">支付通道管理</a>
+
+			<a href="/pay/checkstand" target="liquidation" class="btn2">收银台配置</a>
+
+			<a href="/pay/product" target="liquidation" class="btn2 cur1">产品管理</a>
+		</div>
+		<div class="modal fade" id="myModal-one" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel" @click="qingkong()">添加产品</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<input type="hidden" id="druleId" name="druleId">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">产品ID:</label>
+											<div class="controls">
+												<input type="text" v-model="new_id" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">企业ID :</label>
+											<div class="controls">
+												<select v-model="new_enterpriseId">
+													<option value="">请选择</option>
+													<option v-for="bb in licenseList" :value="bb.id" v-text="bb.enterpriseName"></option>
+												</select>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">产品名称 :</label>
+											<div class="controls">
+												<input type="text" v-model="new_productName" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">还款通知地址 :</label>
+											<div class="controls">
+												<input type="text" v-model="new_repaymentNotifyUrl" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">结清通知	 :</label>
+											<div class="controls">
+												<input type="text" v-model="new_settleNotifyUrl" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">还款提醒通知 :</label>
+											<div class="controls">
+												<input type="text" v-model="new_repaymentRemindNotifyUrl" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">逾期通知	 :</label>
+											<div class="controls">
+												<input type="text" v-model="new_overdueRemindNotifyUrl" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">秘钥:</label>
+											<div class="controls">
+												<input type="text" v-model="new_md5key" />
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+							</button>
+						<button type="button" class="btn btn-primary" @click="addProduct">
+								提交
+							</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+		<div class="modal fade" id="myModal-two" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+								添加企业
+							</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<input type="hidden" id="druleId" name="druleId">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">企业名称 :</label>
+											<div class="controls">
+												<input type="text" v-model="ent_name" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">营业执照号 :</label>
+											<div class="controls">
+												<input type="text" v-model="ent_num" />
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+							</button>
+						<button type="button" class="btn btn-primary" @click="addEnterprise">
+								提交
+							</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+		<div class="modal fade" id="myModal-three" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+						<h4 class="modal-title" id="myModalLabel">
+								修改产品信息
+							</h4>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule">
+									<div class="widget-content nopadding form-horizontal">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">企业ID :</label>
+											<div class="controls">
+												<select v-model="up_enterpriseId">
+													<option value="">请选择</option>
+													<option v-for="bb in licenseList" :value="bb.id" v-text="bb.enterpriseName"></option>
+												</select>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">产品名称 :</label>
+											<div class="controls">
+												<input type="text" v-model="up_productName" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">还款通知地址 :</label>
+											<div class="controls">
+												<input type="text" v-model="up_repaymentNotifyUrl" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">结清通知	 :</label>
+											<div class="controls">
+												<input type="text" v-model="up_settleNotifyUrl" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">还款提醒通知 :</label>
+											<div class="controls">
+												<input type="text" v-model="up_repaymentRemindNotifyUrl" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">逾期通知	 :</label>
+											<div class="controls">
+												<input type="text" v-model="up_overdueRemindNotifyUrl" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">秘钥:</label>
+											<div class="controls">
+												<input type="text" v-model="up_md5key" />
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+							</button>
+						<button type="button" class="btn btn-primary" @click="updateProduct">
+								提交更改
+							</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+		<hr>
+		<div class="row-fluid">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5><button type="button" id="submit" class="btn btn-primary position_right" data-toggle="modal" data-target="#myModal-one">添加产品</button>
+			<button type="button" id="submit" class="btn btn-primary position_right" data-toggle="modal" data-target="#myModal-two" style="right: 100px;">添加企业</button></h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>产品id</th>
+									<th>产品名称</th>
+									<th>运营企业</th>
+									<th width="100" style="white-space: nowrap;">操作</th>
+								</tr>
+
+							</thead>
+							<tbody class="table_toggle">
+								<tr v-for="data in ProList">
+									<td v-text="data.id"></td>
+									<td v-text="data.productName"></td>
+									<td v-text="data.enterpriseName"></td>
+									<td width="100" style="white-space: nowrap;">
+										<button class="btn-info btn-mini float_btn_cen" :data-id="data.id" @click="productQuery(data)" data-toggle="modal" data-target="#myModal-three">修改</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+					</div>
+					<div class="table_toggle1" style="display: none;">暂无数据</div>
+
+				</div>
+
+			</div>
+		</div>
+		<!-- 		<div id="page">
+		    <vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+		    <p style="margin-left:40px;">{{msg}}</p>
+		</div> -->
+	</div>
+</div>
+
+<!--<div class="row-fluid">
+  <div id="footer" class="span12"> 2013 &copy; Matrix Admin. More Templates <a href="http://www.mycodes.net/" target="_blank">源码之家</a></div>
+</div>-->
+
+<% include ../footer.ejs %>
+<!-- <script src="/javascripts/public_page.js"></script> -->
+<script src="/javascripts/vue-resource.js"></script>
+
+<script type="text/javascript">
+	var products = new Vue({
+		el: '#content',
+		data: {
+			new_id: "",
+			ProList: "",
+			licenseList: "",
+			pudate_enterprise_name: "",
+			pudate_license_id: "",
+			enterpriseId: "",
+			pro_name: "",
+			yun_name: "",
+			ent_num: "",
+			ent_name: "",
+			cp_id: "",
+			pro_id: "",
+			new_enterpriseId:"",
+			new_productName:"",
+			new_repaymentNotifyUrl:"",
+			new_settleNotifyUrl:"",
+			new_repaymentRemindNotifyUrl:"",
+			new_overdueRemindNotifyUrl:"",
+			new_md5key:"",
+			
+			up_id:"",
+			up_enterpriseId:"",
+			up_productName:"",
+			up_repaymentNotifyUrl:"",
+			up_settleNotifyUrl:"",
+			up_repaymentRemindNotifyUrl:"",
+			up_overdueRemindNotifyUrl:"",
+			up_md5key:"",			
+		},
+		mounted: function() {
+			this.productList();
+			this.qyList();
+			this.productQuery(data);
+			// this.addProduct();
+		},
+		methods: {
+			productList: function() {
+				var _this = this;
+				$(".loading").show();
+				this.$http.post("/pay/product/jsonProNew", {}).then(function(res) {
+					$(".loading").hide();
+					if(res.body.code == "D1007") {
+						alert(res.body.msg);
+						return false;
+					}
+					if(res.body.code == "D1006") {
+						alert(res.body.msg);
+						return false;
+					}
+					_this.ProList = res.body.res.products;
+					console.log(_this.ProList)
+					if(_this.ProList == "") {
+						$(".table_toggle1").show();
+					} else {
+						$(".table_toggle1").hide();
+					}
+					$(".table_toggle").show();
+				});
+			},
+			productQuery: function(data) {
+				var _this = this;
+				console.log(data)
+				_this.up_id=data.id;
+				_this.up_enterpriseId=data.enterpriseId;
+				_this.up_productName=data.productName;
+				_this.up_repaymentNotifyUrl=data.repaymentNotifyUrl;
+				_this.up_settleNotifyUrl=data.settleNotifyUrl;
+				_this.up_repaymentRemindNotifyUrl=data.repaymentRemindNotifyUrl;
+				_this.up_overdueRemindNotifyUrl=data.overdueRemindNotifyUrl;
+				_this.up_md5key=data.md5key;
+			},
+			qyList: function() {
+				var _this = this;
+				this.$http.post("/pay/product/jsonEnt").then(function(res) {
+					this.licenseList = res.body.res.enterprise;
+				});
+			},
+			addProduct: function() {
+				var _this = this;				
+				if(_this.new_id == "") {
+					alert("请填写产品ID");
+					return false;
+				}else if(_this.new_enterpriseId == "") {
+					alert("请填写企业ID");
+					return false;
+				}else if(_this.new_productName == "") {
+					alert("请填写产品名称");
+					return false;
+				}else if(_this.new_productName.length > 20) {
+					alert("填写的产品名称不能超过20字");
+					return false;
+				}else {
+					this.$http.post("/pay/payChannel/insertMbProduct", {
+						"id": _this.new_id,
+						"enterpriseId": _this.new_enterpriseId,
+						"productName": _this.new_productName,
+						"repaymentNotifyUrl": _this.new_repaymentNotifyUrl,
+						"settleNotifyUrl": _this.new_settleNotifyUrl,
+						"repaymentRemindNotifyUrl": _this.new_repaymentRemindNotifyUrl,
+						"overdueRemindNotifyUrl": _this.new_overdueRemindNotifyUrl,
+						"md5key": _this.new_md5key,
+					}).then(function(res) {
+						var code = res.body.code;
+						var msg = res.body.msg;
+						if(code == "0000") {
+							alert(msg);
+							$("#myModal-one").modal("hide");
+							_this.productList();
+						} else if(code == "0001") {
+							alert(msg);
+						}
+					});
+				}
+			},
+			addEnterprise: function() {
+				var _this = this;
+				var ent_name = this.ent_name;
+				var ent_num = this.ent_num;
+				////console.log(ent_name,ent_num);
+				if(ent_name == "") {
+					alert("请填写企业名称");
+					return false;
+				} else if(ent_num == "") {
+					alert("请填写企业营业执照号");
+					return false;
+				} else {
+					this.$http.post("/pay/product/saveEnt", {
+						"enterpriseName": ent_name,
+						"enterpriseNo": ent_num
+					}).then(function(res) {
+						alert("添加企业成功");
+						$("#myModal-two").modal("hide");
+						_this.qyList();
+					});
+				}
+			},
+			updateProduct: function() {
+				var _this = this;				
+				if(_this.up_enterpriseId == "") {
+					alert("请填写企业ID");
+					return false;
+				}else if(_this.up_productName == "") {
+					alert("请填写产品名称");
+					return false;
+				}else if(_this.up_productName.length > 20) {
+					alert("填写的产品名称不能超过20字");
+					return false;
+				}else {
+					this.$http.post("/pay/payChannel/updateMbProduct", {
+						"id": _this.up_id,
+						"enterpriseId": _this.up_enterpriseId,
+						"productName": _this.up_productName,
+						"repaymentNotifyUrl": _this.up_repaymentNotifyUrl,
+						"settleNotifyUrl": _this.up_settleNotifyUrl,
+						"repaymentRemindNotifyUrl": _this.up_repaymentRemindNotifyUrl,
+						"overdueRemindNotifyUrl": _this.up_overdueRemindNotifyUrl,
+						"md5key": _this.up_md5key,
+					}).then(function(res) {
+						var code = res.body.code;
+						var msg = res.body.msg;
+						if(code == "0000") {
+							alert(msg);
+							$("#myModal-three").modal("hide");
+							_this.productList();
+						} else if(code == "0001") {
+							alert(msg);
+						}
+					});
+				}
+			},
+			qingkong(){
+				var _this = this;
+				_this.new_enterpriseId = "";
+				_this.new_productName = "";
+				_this.new_repaymentNotifyUrl = "";
+				_this.new_settleNotifyUrl = "";
+				_this.new_repaymentRemindNotifyUrl = "";
+				_this.new_overdueRemindNotifyUrl = "";
+				_this.new_md5key = "";
+			}
+		}
+	})
+</script>

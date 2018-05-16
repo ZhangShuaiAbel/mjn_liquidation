@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>登录</title><meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css" />
+    <link rel="stylesheet" href="/stylesheets/bootstrap-responsive.min.css" />
+    <link rel="stylesheet" href="/stylesheets/matrix-login.css" />
+    <link rel="stylesheet" href="/stylesheets/font-awesome/css/font-awesome.css"/>
+    <style>
+        .kouling{display:inline-block;padding:0 10px;height: 36px;line-height: 36px;font-size: 14px;}
+        .kouling1:hover{color: #eb6b33;}
+        .kouling2:hover{color: #A1A1A1;}
+        .kouling1{border: 1px solid #eb6b33;border-radius: 5px;color: #eb6b33;}
+        .kouling2{border: 1px solid #e5e5e5;border-radius: 5px;color: #A1A1A1;}
+    </style>
+</head>
+<body onkeydown="KeyDown()">
+	
+<div id="loginbox">
+    <form id="loginform" class="form-vertical">
+        <div class="control-group normal_text"> <h3>沐金农清结算系统</h3></div>
+        <div class="control-group">
+            <div class="controls">
+                <div class="main_input_box">
+                    <span class="add-on bg_lg"><i class="icon-user"></i></span><input type="text" placeholder="账号" id="login_name" name="login_name" />
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <div class="main_input_box" style="position: relative">
+                    <span class="add-on bg_lo"><i class="icon-lock"></i></span><span style="position: relative;"><input type="text" placeholder="验证码" id="phone_code"/><a href="javascript:void(0);" style="position: absolute;right: 0;" class="kouling kouling2" onclick="sendLoginSMSCode(this)">获取验证码</a></span>
+                    <input type="hidden" id="phone_code_val">
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <div class="main_input_box">
+                    <span class="add-on bg_ly"><i class="icon-lock"></i></span><input type="password" placeholder="密码" id="login_password" name="login_password" />
+                </div>
+            </div>
+        </div>
+        <!--<div class="control-group">
+            <div class="controls">
+                <div class="main_input_box" style="position: relative">
+                    <span class="add-on bg_lo"><i class="icon-lock"></i></span><span style="position: relative;"><input type="text" placeholder="验证码" id="login_Code"/><img src="" id="kaptchaImage" style="position: absolute;right:0;height:38px;width:150px" /></span>
+                </div>
+            </div>
+        </div>-->
+        <p class="tips_error" style="text-align:center;color:red"></p>
+        <div class="form-actions">
+            <p style="width: 200px;margin: 0 auto">
+                <span class="pull-left"><a class="flip-link btn btn-info" id="to-recover">找回密码</a></span>
+                <span class="pull-right"><a id="submit1" class="btn btn-success" />登录</a></span>
+            </p>
+        </div>
+    </form>
+    <form id="recoverform" action="#" class="form-vertical" >
+        <div class="control-group normal_text"> <h3>找回密码</h3></div>
+        <div class="control-group">
+            <div class="controls">
+                <div class="main_input_box">
+                    <span class="add-on bg_lg"><i class="icon-user"></i></span><input type="text" placeholder="账号" id="user_name" />
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <div class="main_input_box" style="position: relative">
+                    <span class="add-on bg_lo"><i class="icon-lock"></i></span><span style="position: relative;"><input type="password" placeholder="验证码" id="user_code"/><a href="javascript:void(0);" style="position: absolute;
+right: 0;" class="kouling kouling2" onclick="sendMobileValidSMSCode(this)">获取验证码</a></span>
+                    <input type="hidden" id="code_val">
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <div class="main_input_box">
+                    <span class="add-on bg_ly"><i class="icon-lock"></i></span><input type="password" placeholder="密码" id="user_psd" />
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <div class="main_input_box">
+                    <span class="add-on bg_ly"><i class="icon-lock"></i></span><input type="password" placeholder="确认新密码" id="user_Newpsd" />
+                </div>
+            </div>
+        </div>
+
+        <p class="tips_error1" style="text-align:center;color:red"></p>
+        <div class="form-actions">
+            <p style="width: 200px;margin: 0 auto">
+            <span class="pull-left"><a class="flip-link btn btn-success" id="to-login">&laquo;返回登录</a></span>
+            <span class="pull-right"><a id="submit2" class="btn btn-info"/>提交</a></span>
+            </p>
+        </div>
+    </form>
+</div>
+
+<script src="/javascripts/jquery.min.js"></script>
+<script src="/javascripts/matrix.login.js"></script>
+<script>
+        if(window != window.top){
+            window.top.location="/login";
+        }
+    function KeyDown()
+	{
+	  if (event.keyCode == 13)
+	  {
+	    $("#submit1").click();
+	  }
+	}   
+        
+    $(function(){
+
+        $('#kaptchaImage').click(function () {
+            $(this).attr('src', '${base}/kaptcha.jpg?'+Math.floor(Math.random()*100) );
+        });
+        $("input").keyup(function () {
+            $(".tips_error,.tips_error1").text("");
+        })
+        /*登录*/
+       $("#submit1").click(function(){
+            var login_name=$('#login_name').val();
+            var login_password=$('#login_password').val();
+            var phone_code=$('#phone_code').val();
+            console.log(login_name,login_password,phone_code);
+            if(login_name==""){
+                $(".tips_error").text("请输入用户名");
+                return false;
+            }else if (login_password=="") {
+                $(".tips_error").text("请输入密码");
+                return false;
+            }/*else if (phone_code=="") {
+                $(".tips_error").text("请输入验证码");
+                return false;
+            }*/else{
+                $.ajax({
+                    url: "/login",
+                    data: {"login_name":login_name,"login_password": login_password,"smsCode":phone_code},
+                    type: "post",
+                    beforeSend: function(request) {
+                        request.setRequestHeader("ajax", "ajax");
+                    },
+                    success: function (data) {
+
+                        var data=JSON.parse(data)
+                        //console.log(data)
+
+                       if(data.code == "0000"){
+                              $(".tips_error").text(data.msg);
+                              document.cookie="mobile="+login_name;
+                              // localStorage.setItem("mobile", login_name);
+                                window.location.href="/home"
+                        } else {
+                            $(".tips_error").text(data.msg);
+                            return false;
+                        }
+
+                    }
+                })
+            }
+            
+
+            
+        })
+
+
+
+
+    })
+
+    /*找回密码*/
+    phoneV = 0;
+    codey = 0;
+    /*账号判断*/
+    $("#user_name").keyup(function(){
+        phoneV = 0;
+        var user_name=$('#user_name').val();
+        if(user_name==false){
+            phoneV = 0;
+            $(".tips_error1").text("请输入用户名");
+            return false;
+        }
+        yanzhenma();
+
+    })
+    $("#user_name").change(function(){
+        phoneV = 0;
+        var user_name=$('#user_name').val();
+        if(user_name==false){
+            phoneV = 0;
+            $(".tips_error1").text("请输入用户名");
+            return false;
+        }
+        yanzhenma();
+
+    })
+    $("#login_name").keyup(function(){
+        phoneV = 0;
+        var login_name=$('#login_name').val();
+        if(login_name==false){
+            phoneV = 0;
+            $(".tips_error").text("请输入用户名");
+            return false;
+        }
+        yanzhenma1();
+
+    })
+    $("#login_name").change(function(){
+        phoneV = 0;
+        var login_name=$('#login_name').val();
+        if(login_name==false){
+            phoneV = 0;
+            $(".tips_error").text("请输入用户名");
+            return false;
+        }
+        yanzhenma1();
+    })
+    
+
+    $(function(){
+        $("#submit2").click(function(){
+            var user_name=$("#user_name").val();
+            var user_psd=$('#user_psd').val();
+            var user_code=$('#user_code').val();
+            var user_Newpsd=$('#user_Newpsd').val();
+            var reg = /^.{6,}$/;
+            if(user_name=="" ){
+                $(".tips_error1").text("请输入用户名");
+                return false;
+            }else
+            if(!codey == 1){
+                $(".tips_error1").text("验证码错误");
+                //return false;
+            }else
+            {
+                if(user_psd==""){
+                    $(".tips_error1").text("请输入密码");
+                    return false;
+                }else if(!reg.test(user_psd)){
+                    $(".tips_error1").text("至少6位数密码");
+                    return false;
+                }else if(user_psd!=user_Newpsd){
+                    $(".tips_error1").text("两次输入密码不一致");
+                    return false;
+                }else{
+
+                    $.ajax({
+                        url: "/retrievepassword",
+                        type:"post",
+                        data:{'mobile' :user_name,'newPassword':user_Newpsd,"smscode":user_code},
+                        success: function(e){
+                            // 1 成功  0 失败
+                            if(e.code == "0000"){
+                                $(".tips_error1").text(e.msg);
+                                window.location.reload();
+                            }else{
+                                $(".tips_error1").text(e.msg);
+                                return false;
+                            }
+                        }
+                    });
+                }
+            }
+        })
+    })
+    /*通过手机号判断验证码*/
+    function yanzhenma(){
+
+        var user_name=$("#user_name").val();
+        var p=(/^1\d{10}$/);
+        if(p.exec(user_name)){
+            $(".kouling").removeClass("kouling2").addClass("kouling1");
+        }else{
+            $(".kouling").removeClass("kouling1").addClass("kouling2");
+        }
+    }
+        /*通过手机号判断验证码*/
+    function yanzhenma1(){
+
+        var login_name=$("#login_name").val();
+        var p=(/^1\d{10}$/);
+        if(p.exec(login_name)){
+            $(".kouling").removeClass("kouling2").addClass("kouling1");
+        }else{
+            $(".kouling").removeClass("kouling1").addClass("kouling2");
+        }
+    }
+    //登录获取验证码
+    function sendLoginSMSCode(e){
+        var login_name=$("#login_name").val();
+        if ($(e).hasClass("kouling1")) {
+            $.ajax({
+                url: "/loginCode",
+                type: "post",
+                data: {"mobile":login_name},
+                success: function (d) {
+                    if (d.code == "0000") {
+                        codey = 1;
+                        $(".tips_error").text(d.msg);
+                        $("#phone_code_val").val(d.res);
+                    } else {
+                        codey = 0;
+                        $(".tips_error").text(d.msg);
+                        wait = 0;
+                    }
+                }
+            });
+            sastime();
+
+        }else{
+            return false;
+        };
+    }
+
+ //找回密码
+ function sendMobileValidSMSCode(e){
+    var user_name=$("#user_name").val();
+    if ($(e).hasClass("kouling1")) {
+        $.ajax({
+            url: "/smscode",
+            type: "post",
+            data: {"mobile":user_name},
+            success: function (d) {
+                if (d.code == "0000") {
+                    codey = 1;
+                    $(".tips_error1").text(d.msg);
+                    $("#code_val").val(d.res);
+                } else {
+                    codey = 0;
+                    $(".tips_error1").text(d.msg);
+                    wait = 0;
+                }
+            }
+        });
+        sastime();
+
+    }else{
+        return false;
+    };
+}
+
+    //找回密码 发送验证码
+
+    var wait=60;
+    function sastime(){
+        if(wait == 0){
+            $(".kouling").removeClass("kouling2").addClass("kouling1");
+            $(".kouling1").text("重新发送");
+            yanzhenma()
+            wait=60;
+        }else {
+            $(".kouling").removeClass("kouling1").addClass("kouling2");
+            $('.kouling2').html("重新发送(" + wait + ")");/*"重新发送(" + wait + ")"*/
+
+            wait--;
+            setTimeout(function() {
+                sastime()
+                },
+            1000)
+        }
+    }
+</script>
+</body>
+
+</html>

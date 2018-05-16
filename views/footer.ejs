@@ -1,0 +1,75 @@
+<!--end-Footer-part-->
+
+<!--		<script src="/javascripts/jquery.min.js"></script>
+-->		
+<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+		<script src="/javascripts/jquery-ui.js"></script>
+		<script src="/javascripts/jquery.ui.custom.js"></script>
+		<script src="/javascripts/bootstrap.min.js"></script>
+		<script src="/javascripts/bootstrap-datepicker.js"></script>
+		<script src="/javascripts/jquery.flot.min.js"></script>
+		<script src="/javascripts/jquery.flot.resize.min.js"></script>
+		<script src="/javascripts/jquery.peity.min.js"></script>
+		<script src="/javascripts/fullcalendar.min.js"></script>
+		<!--<script src="/javascripts/matrix.js"></script>-->
+		<script src="/javascripts/jquery.gritter.min.js"></script>
+		<script src="/javascripts/matrix.chat.js"></script>
+		<script src="/javascripts/jquery.validate.js"></script>
+		<script src="/javascripts/jquery.wizard.js"></script>
+<!--		<script src="/javascripts/jquery.uniform.js"></script>
+-->		<script src="/javascripts/select2.min.js"></script>
+		<script src="/javascripts/matrix.popover.js"></script>
+		<script src="/javascripts/jquery.dataTables.min.js"></script>
+		<script src="/javascripts/bootstrap-datepicker.js"></script>
+		<script src="/javascripts/vue-2.42.js"></script>
+		<script type="text/javascript">
+		/*$(function() {
+			$(".xiangqing_list h4").click(function(){
+				var index = $(this).index();
+				$(".xiangqing_main").find(".row-fluid").eq(index).show().siblings().hide();
+				$(this).addClass("cur").siblings().removeClass("cur")
+			})
+			
+		})*/
+			// This function is called from the pop-up menus to transfer to
+			// a different page. Ignore if the value returned is a null string:
+			function goPage(newURL) {
+
+				// if url is empty, skip the menu dividers and reset the menu selection to default
+				if(newURL != "") {
+
+					// if url is "-", it is this page -- reset the menu:
+					if(newURL == "-") {
+						resetMenu();
+					}
+					// else, send page to designated URL            
+					else {
+						document.location.href = newURL;
+					}
+				}
+			}
+
+			// resets the menu selection upon entry to this page:
+			function resetMenu() {
+				document.gomenu.selector.selectedIndex = 2;
+			}
+			$(function(){
+					$(".submenu ul li").click(function(){
+							if($(this).hasClass("submenu1")){
+								$(this).removeClass("active")
+								$(this).parents(".submenu1").siblings().removeClass("active");
+							}else{
+								$(this).addClass("active").siblings().removeClass("active");
+								$(this).parents().siblings().find("li").removeClass("active");
+								$(this).parents(".submenu1").siblings().removeClass("active");
+								$(this).siblings(".submenu1").find("li").removeClass("active");
+							}
+							
+				
+					})
+				})
+		</script>
+		
+	</body>
+
+</html>

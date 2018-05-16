@@ -1,0 +1,410 @@
+<% include ../header.ejs %>
+<style type="text/css">
+	.kouling1{color: #28b779;}
+</style>
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>审批管理</a>
+			<a href="#" class="current">资金划转审批</a>
+		</div>
+		<h1>资金划转审批</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		
+		<hr>
+		<div class="xiangqing_list1"style="width: 134px;" >
+				<a  class="btn3 cur1" @click="listenDate(1,0)">待审批</a>
+				<a  class="btn3" @click="listenDate(1,1)">已审批</a>
+			</div>
+		<div class="row-fluid tab-two" id="row-fluid-list2">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>申请记录</h5>
+					</div>
+					<div id="common_list" class="widget-content nopadding">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>工单号</th>
+									<th>申请日期</th>
+									<th>申请类型</th>
+									<th>申请人</th>
+									<th>付款账户</th>
+									<th>付款账号</th>
+									<th>收款账户</th>
+									<th>收款账号</th>
+									<th>交易金额</th>
+									<th>审批人</th>
+									<th width="100" style="white-space: nowrap;">审批结果</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+								<tr v-for="msg in res">
+									<td v-text="msg.rebateNo"></td>
+									<td>{{msg.createTime | time}}</td>
+									<td v-if="msg.applyType=='1'">对公</td>
+									<td v-else-if="msg.applyType=='0'">对私</td>
+									<td v-else=""></td>
+									<td v-text="msg.applyUser"></td>
+									
+									<!--<td v-if="msg.applyType=='1'"></td>
+									<td v-else-if="msg.applyType=='2'"></td>-->
+									<td v-text="msg.payAccount"></td>
+									<td v-text="msg.payAccountNo"></td>
+									<td v-text="msg.receiveAccount"></td>
+									<td v-text="msg.receiveBankNo"></td>
+									<td v-text="msg.amount/100"></td>
+									<td v-text="msg.auditUser"></td>
+									<td v-if="msg.auditResult=='0'">待审核</td>
+									<td v-else-if="msg.auditResult=='1'">审核通过</td>
+									<td v-else-if="msg.auditResult=='2'">拒绝</td>
+									<td v-else=""></td>
+								</tr>
+							</tbody>
+							
+						</table>
+					</div>
+					<div class="table_toggle1" >暂无数据</div>
+				</div>
+			</div>
+
+		</div>
+		
+		
+		
+		<div class="row-fluid tab-two" id="row-fluid-list1">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>申请记录</h5>
+					</div>
+					<div id="common_list" class="widget-content nopadding">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>工单号</th>
+									<th>申请日期</th>
+									<th>申请类型</th>
+									<th>申请人</th>
+									<th>付款账户</th>
+									<th>付款账号</th>
+									<th>收款账户</th>
+									<th>收款账号</th>
+									<th>交易金额</th>
+									<th>审批人</th>
+									<th width="100" style="white-space: nowrap;">审批结果</th>
+									<th width="100">操作</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+								<tr v-for="msg in res">
+									<td v-text="msg.rebateNo"></td>
+									<td>{{msg.createTime | time}}</td>
+									<td v-if="msg.applyType=='1'">对公</td>
+									<td v-else-if="msg.applyType=='0'">对私</td>
+									<td v-else=""></td>
+									<td v-text="msg.applyUser"></td>
+									
+									<!--<td v-if="msg.applyType=='1'"></td>
+									<td v-else-if="msg.applyType=='2'"></td>-->
+									<td v-text="msg.payAccount"></td>
+									<td v-text="msg.payAccountNo"></td>
+									<td v-text="msg.receiveAccount"></td>
+									<td v-text="msg.receiveBankNo"></td>
+									<td v-text="msg.amount/100"></td>
+									<td v-text="msg.auditUser"></td>
+									<td v-if="msg.auditResult=='0'">待审核</td>
+									<td v-else-if="msg.auditResult=='1'">审核通过</td>
+									<td v-else-if="msg.auditResult=='2'">拒绝</td>
+									<td v-else=""></td>
+									<td><button type="button"  class="btn btn-mini btn-primary" data-toggle="modal" data-target="#myModal"  @click="tijiao(1,msg.applyUser,msg.payAccount,msg.receiveAccountIdcard,msg.amount,msg.id,msg.transferNote)">通过</button>
+										<button type="button"  class="btn btn-mini btn-danger" data-toggle="modal" data-target="#myModal" @click="tijiao(2,msg.applyUser,msg.payAccount,msg.receiveAccountIdcard,msg.amount,msg.id,msg.transferNote)">驳回</button>
+									</td>
+
+								</tr>
+							</tbody>
+							
+						</table>
+					</div>
+					<div class="table_toggle1" >暂无数据</div>
+				</div>
+			</div>
+
+		</div>
+		<div id="page" style="display: none">
+			<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+		</div>
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+		    <div class="modal-dialog">
+		        <div class="modal-content">
+		            <div class="modal-header">
+		                <button type="button" class="close">
+		                    &times;
+		                </button>
+		                <h4 class="modal-title" id="myModalLabel"  >
+		                    	转账审批
+		                </h4>
+		                <input type="hidden" id="pictureType">
+		            </div>
+		            <div class="modal-body">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule1">
+									<div class="widget-content nopadding form-horizontal">
+										<input type="hidden" class="id" v-mode="id"/>
+										<input type="hidden" class="data" v-model="auditStatus"/>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">我方账户 :</label>
+											<div class="controls applyUser">
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">收款账户名 :</label>
+											<div class="controls payAccount">
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">收款账号 :</label>
+											<div class="controls receiveAccountIdcard">
+											</div>
+										</div>
+
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">付款金额 :</label>
+											<div class="controls amount">
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">付款用途 :</label>
+											<div class="controls transferNote">
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">短信验证码 :</label>
+											<div class="controls">
+												<input type="hidden" id="smsCodes" />
+												<input type="text" v-model="smsCode" style="width: 100px;margin-right: 10px;"/><a href="javascript:void(0);"
+                                                                                           class="kouling kouling1"
+                                                                                           onclick="sendMobileValidSMSCode(this);" style="top: 10px">获取验证码</a>
+											</div>
+										</div>
+										
+							
+									</div>
+								</form>
+							</div>
+						</div>
+		
+					</div>
+		            <div class="modal-footer">
+		                <button type="button" class="btn btn-default close1" data-dismiss="modal" >关闭</button>
+		                <input type="button" class="btn btn-primary addimg fileBtn" value="确认" @click="baocun()"/>
+		
+		            </div>
+		        </div>
+		
+		
+		    </div>
+		
+		</div>
+	</div>
+
+	<% include ../footer.ejs %>
+
+	<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+
+	<script src="/javascripts/jquery-ui.js"></script>
+	<script src="/javascripts/vue-2.42.js"></script>
+	<script src="/javascripts/vue-resource.js"></script>
+	<script src="/javascripts/public_page.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+	
+	<script>
+		//发送验证码
+    function sendMobileValidSMSCode(e) {
+                       
+                if ($(e).hasClass("kouling1")) {
+                            //$("#smsCodes").val(1111);
+                          $.ajax({
+                                url: "/accountCapital/capitalTransfer/smsCode",
+                                type: "post",
+                                success: function (d) {
+                                    //var parsedJson = d;
+                                    //console.log(parsedJson)
+                                    //$("#smsCodes").val(1111)
+                                    
+                                }
+                           });
+                            sastime();
+                        }
+                
+         
+    	}
+
+
+    var wait = 60;
+    function sastime() {
+        if (wait <= 0) {
+            $(".kouling").removeClass("kouling2").addClass("kouling1");
+            $(".kouling1").text("重新发送")
+            wait = 60;
+        } else {
+            $(".kouling").removeClass("kouling1").addClass("kouling2");
+            $('.kouling2').html("重新发送(" + wait + ")");
+
+
+            wait--;
+            setTimeout(function () {
+                        sastime()
+                    },
+                    1000)
+        }
+    }
+		$(function(){
+			
+		
+			
+			
+			
+			$(".close").click(function(){
+				$(".close1").click();
+			})
+			$(".xiangqing_list1 .btn3").click(function(){
+				$(this).addClass("cur1").siblings().removeClass("cur1");
+			})
+		})
+	</script>
+	<script type="text/javascript">
+var total = "";
+	var pageBar = new Vue({
+        el: '#content',
+        data: {
+            all: 0, //总页数
+            cur: 1,//当前页码
+           res:"",
+           id:"",
+           auditStatus:"",
+           smsCode:"",
+        },
+        components:{
+            'vue-nav':pagenav
+        },
+        watch: {
+            cur: function(oldValue , newValue){
+            }
+        },
+        mounted:function(){
+			this.listenDate(this.cur,0);
+		},
+        methods:{
+            listenDate:function(data,auditStatus){
+            	
+				var _this = this;
+				var pageSize = 10;
+				var applyOrAudit = 1;
+				$(".loading").show();
+            	$(".tab-two").show();
+            	$("#page").show();
+				this.$http.post("/accountCapital/capitalTransfer/getCapitalTransferList",{"pageNum":data,"pageSize":pageSize,"applyOrAudit":2,"auditStatus":auditStatus}).then(function(res){
+					
+					$(".loading").hide();
+					if(res.body.code=="D1007"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 if(res.body.code=="D1006"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 _this.res = res.body.res.res;
+					 console.log(res);
+					 _this.pageTotal = res.body.res.total;
+					 if(auditStatus=="0"){
+	            		$("#row-fluid-list1").show();
+	            		$("#row-fluid-list2").hide();
+	            		if(_this.res==""){
+		            			$(".table_toggle1").show();
+								}else{
+									$(".table_toggle1").hide();
+								}
+		            	}
+	            	if(auditStatus=="1"){
+	            		$("#row-fluid-list1").hide();
+	            		$("#row-fluid-list2").show();
+	            		if(_this.res==""){
+								$(".table_toggle1").show();
+							}else{
+								$(".table_toggle1").hide();
+							}
+	            		
+	            	}
+					 $(".table_toggle").show();
+                    if (data<=1) {
+						total = Math.ceil(_this.pageTotal/10);
+					}
+					   _this.all = total;
+					   _this.cur = data;
+				});
+	        },
+	        tijiao:function(data,applyUser,payAccount,receiveAccountIdcard,amount,id,transferNote){
+	        	this.id=id;
+	        	this.auditStatus=data;
+	        	$(".data").val(data);
+	        	$(".applyUser").text(applyUser);
+	        	$(".payAccount").text(payAccount);
+	        	$(".amount").text(amount/100);
+	        	$(".receiveAccountIdcard").text(receiveAccountIdcard);
+	        	$(".id").val(id);
+	        	$(".transferNote").text(transferNote);
+	        },
+	        baocun:function(){
+	        	var id = this.id;
+	        	var auditStatus = this.auditStatus;
+	        	var smsCode = this.smsCode;
+	        	/*var smsCodes = $("#smsCodes").val();
+	        	if(smsCode==""){
+	        		alert("请发送短信验证码");
+	        		return false;
+	        	}else if(smsCode!=smsCodes){
+	        		alert("输入的验证码有误");
+	        		return false;
+	        	}*/
+	        	this.$http.post("/accountCapital/capitalTransfer/auditCapitalTransfer",
+	        	{"id":id,"auditStatus":auditStatus,"smsCode":smsCode}).then(function(res){
+					//console.log(res);
+					
+					$(".loading").hide();
+					if(res.body.code=="D1007"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 if(res.body.code=="D1006"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 if(res.body.code=="0001"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 if(res.body.code=="0000"){
+					 	alert(res.body.msg);
+					 	 $(".close1").click();
+					 }
+					 //console.log(res)
+					
+					 this.listenDate(1,0);
+					
+				});
+	        }
+	        
+	        
+	        
+            
+        }
+    })
+</script>

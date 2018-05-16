@@ -1,0 +1,312 @@
+<% include ../header.ejs %>
+
+<!--代扣管理--代扣通道管理-->
+<div id="content">
+	<div class="loading">
+		<img src="/images/jiazai.gif" alt="">
+	</div>
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>交易管理</a>
+			<a href="#" class="current">异常订单处理</a>
+		</div>
+		<h1>异常订单处理</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+			<a href="/risk/risk_table1" target="liquidation" class="btn2 ">异常账单</a>
+			<a href="/risk/risk_table2" target="liquidation" class="btn2 ">异常用户还款计划</a>
+			<a href="/risk/risk_table3" target="liquidation" class="btn2 cur1" style="color: #28b779;">异常扣款记录</a>
+			<a href="/risk/risk_table4" target="liquidation" class="btn2">重复扣款记录</a>
+		</div>
+		<div class="row-fluid">
+			<div class="span12">				
+				<div class="widget-box">
+					<div class="widget-content nopadding">
+						<form class="form-horizontal" method="post" action="">
+							<table class="table table-striped">
+								<tbody>
+									<tr class="odd gradeX">
+										<td width="85" style="white-space: nowrap;">时间 :</td>
+										<td width="600" style="white-space: nowrap;">
+											<input type="text" class="input" id="datepicker" readonly="readonly" name="repaymentStart"> -
+											<input type="text" class="input" id="datepicker1" readonly="readonly" name="repaymentEnd">
+										</td>
+										<td width="85" style="white-space: nowrap;"></td>
+										<td width="" style="white-space: nowrap;">
+											<span style="margin-left: 20px">
+											<button type="button" id="submit" class="btn btn-success" @click="listenDate(1)">查找</button>
+                                    	</span>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+
+						</form>
+					</div>
+				</div>
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5></h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">						
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>创建时间</th>
+									<th>业务类型</th>
+									<th>交易订单号</th>
+									<th>商户订单号</th>
+									<th>我方账户</th>
+									<th>支付渠道</th>
+									<th>用户</th>
+									<th>银行</th>
+									<th>银行卡</th>
+									<th>扣款金额</th>
+									<th>状态</th>
+									<th>失败原因</th>
+									<!--<th width="130" style="white-space: nowrap;">操作</th>-->
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+								<tr v-for="msg in collectionList">
+									<td>{{msg.createTime | time}}</td>
+									<td v-text="msg.commodityName"></td>
+									<td v-text="msg.transactionFlowNo"></td>
+									<td v-text="msg.orderId"></td>
+									<td v-text="msg.enterpriseName"></td>
+									<td v-text="msg.channelName"></td>
+									<td v-text="msg.buyers"></td>
+									<td v-text="msg.bankName"></td>
+									<td v-text="msg.buyersAccount"></td>
+									<td v-text="msg.amount/100"></td>
+
+									<td v-if="msg.status=='0'">待支付</td>
+									<td v-else-if="msg.status=='1'">支付成功</td>
+									<td v-else-if="msg.status=='2'">失败</td>
+									<td v-else>其他</td>
+
+									<td v-text="msg.refundReason"></td>
+
+									<!--<td>
+										 <a href="/basics/particulars" target="liquidation" class="btn_a" @click="tui(msg.orderId)" style="float: left;">详情</a>
+										<div v-if="msg.status=='1' && msg.refundStatus!='1' && msg.refundStatus!='2' && msg.refundStatus!='4'" >
+											
+											<button class="btn btn-info btn-mini float_btn_cen" @click="refund(msg.id)" data-toggle="modal" data-target="#myModal" v-if="msg.refundStatus=='3'">申请退款</button>
+											
+											<button class="btn btn-info btn-mini float_btn_cen" @click="refund(msg.id)" data-toggle="modal" data-target="#myModal" v-if="msg.refundStatus=='5'">申请退款</button>
+											<button class="btn btn-info btn-mini float_btn_cen" @click="refund(msg.id)" data-toggle="modal" data-target="#myModal" v-if="msg.refundStatus=='0'">申请退款</button>
+										</div>
+
+										<div v-else-if="msg.status=='1' && msg.refundStatus!='0' && msg.refundStatus!='3' && msg.refundStatus!='5'"  >
+											<span style="text-align:center;display: block;" v-if="msg.refundStatus=='1'">待审核</span>
+											<span style="text-align:center;display: block;" v-if="msg.refundStatus=='2'">退款中</span>
+											<span style="text-align:center;display: block;" v-if="msg.refundStatus=='4'">已退款</span>
+										</div>
+
+										<div v-else-if="msg.status!='1'">
+
+										</div>
+                                       
+									</td>-->
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="table_toggle2" style="display: none;">暂无数据</div>
+			</div>
+		</div>
+		<div id="page" style="display: none">
+			<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+		</div>
+	</div>
+</div>
+
+<!--<div class="row-fluid">
+  <div id="footer" class="span12"> 2013 &copy; Matrix Admin. More Templates <a href="http://www.mycodes.net/" target="_blank">源码之家</a></div>
+</div>-->
+
+<% include ../footer.ejs %>
+<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+<script type="text/javascript">
+		$(function(){	
+		if ($("#content").height()<1167) {$("#content").height(1167);}
+	})
+</script>
+<script src="/javascripts/jquery-ui.js"></script>
+<script src="/javascripts/vue-2.42.js"></script>
+<script src="/javascripts/public_page.js"></script>
+<script src="/javascripts/time_filter.js"></script>
+<script src="/javascripts/bootstrap.min.js"></script>
+<script src="/javascripts/jquery.flot.min.js"></script>
+<script src="/javascripts/jquery.flot.pie.min.js"></script>
+<script src="/javascripts/jquery.flot.resize.min.js"></script>
+<script src="/javascripts/matrix.js"></script>
+<script src="/javascripts/jquery.peity.min.js"></script>
+<script src="/javascripts/vue-resource.js"></script>
+<script src="/javascripts/public_page.js"></script>
+<script>
+	function dataTime(num) { ////console.log(num)
+		var yugi = function(num) {
+			var now1 = new Date;
+			var getFullYear = now1.getFullYear();
+			var getMonth = now1.getMonth() + 1;
+			var getDate = now1.getDate();
+			var DateTime1 = getFullYear + "-" + getMonth + "-" + getDate;
+			$("#datepicker1").val(DateTime1)
+			var now = new Date;
+			now.setDate(now.getDate() - num);
+			var getFullYear = now.getFullYear();
+			var getMonth = now.getMonth() + 1;
+			var getDate = now.getDate();
+			var DateTime = getFullYear + "-" + getMonth + "-" + getDate;
+			$("#datepicker").val(DateTime)
+			if(num == "1") {
+				$("#datepicker").val(DateTime);
+				$("#datepicker1").val(DateTime);
+			}
+			var timestamp = new Date();
+			//alert(starttimeHaoMiao);
+			var DateTime_starttimeHaoMiao = DateTime;
+			var DateTime_starttimeHaoMiao1 = DateTime1;
+			var starttimeHaoMiao = (new Date(DateTime_starttimeHaoMiao)).getTime();
+			var starttimeHaoMiao1 = (new Date(DateTime_starttimeHaoMiao1)).getTime();
+			$("#starttimeHaoMiao").val(starttimeHaoMiao)
+			$("#starttimeHaoMiao1").val(starttimeHaoMiao1)
+			return now;
+		}
+		yugi(num);
+	}
+
+	$(function() {
+
+		$("#datepicker").datepicker({
+			changeMonth: true,
+			changeYear: true,
+			yearRange: "1900:2050",
+		})
+		$("#datepicker1").datepicker({
+			changeMonth: true,
+			changeYear: true,
+			yearRange: "1900:2050",
+		})
+	});
+</script>
+<script type="text/javascript">
+	var total = "";
+	var pageBar = new Vue({
+		el: '#content',
+		data: {
+			all: 0, //总页数
+			cur: 1, //当前页码
+			data: "",
+			collectionList: "",
+			channelId: "",
+			orderId: "",
+			transactionFlowNo: "",
+			buyersPhone: "",
+			buyers: "",
+			buyersIdCard: ""
+
+		},
+		components: {
+			'vue-nav': pagenav
+		},
+		watch: {
+			cur: function(oldValue, newValue) {
+
+			}
+		},
+		mounted: function() {
+			this.time();
+			this.listenDate(this.cur);
+		},
+		methods: {
+			//分页查询
+			listenDate: function(data) {
+				var _this = this;
+				var pageSize = 10;
+				var data_size = {};				
+				var	url = "/risk/mbTransaction/jsonErrorOrder";
+				var start = parseInt((new Date($("#datepicker").val())).getTime());
+				var end = parseInt((new Date($("#datepicker1").val())).getTime());
+				if(isNaN(start)) {
+					start = "";
+					//alert("开始时间为空");
+					return false
+				}
+				if(isNaN(end)) {
+					end = "";
+					//alert("结束时间为空");
+					return false
+				}
+				if(end - start > 30 * 24 * 60 * 60 * 1000) {
+					alert("时间间隔最多为30天，请重新选择！")
+					return false
+				}
+				data_size = {
+					"pageNum": data,
+					"pageSize": pageSize,
+					"start": start,
+					"end": end
+				};
+				$(".loading").show();
+				$("#page").show();
+				this.$http.post(url, data_size).then(function(res) {
+					$(".loading").hide();
+					//console.log(res)
+					if(res.body.code == "D1007") {
+						alert(res.body.msg);
+						return false;
+					}
+					if(res.body.code == "D1006") {
+						alert(res.body.msg);
+						return false;
+					}
+
+					_this.data = res.body.res.mbTransaction;
+					_this.collectionList = res.body.res.mbTransaction.res;
+					//console.log(_this.collectionList);
+					_this.pageTotal = res.body.res.mbTransaction.total;
+					$(".table_toggle").show();
+					if(_this.collectionList == "") {
+						$(".table_toggle2").show();
+						$("#page").hide();
+					} else {
+						$(".table_toggle2").hide();
+						$("#page").show();
+					}
+					if(data <= 1) {
+						total = Math.ceil(_this.pageTotal / 10);
+					}
+					_this.all = total;
+					_this.cur = data;
+				});
+			},
+			time: function() {
+				var seperator1 = "-";
+
+				var startDate = new Date();
+				startDate.setDate(startDate.getDate() - 7);
+				var startYear = startDate.getFullYear();
+				var startMonth = startDate.getMonth() + 1;
+				if(startMonth < 10) startMonth = "0" + startMonth;
+				var startDay = startDate.getDate();
+				if(startDay < 10) startDay = "0" + startDay;
+				var endDate = new Date();
+				var endYear = endDate.getFullYear();
+				var endMonth = endDate.getMonth() + 1;
+				if(endMonth < 10) endMonth = "0" + endMonth;
+				var endDay = endDate.getDate();
+				if(endDay < 10) endDay = "0" + endDay;
+				var currentdate = startYear + seperator1 + startMonth + seperator1 + startDay;
+				var currentdate1 = endYear + seperator1 + endMonth + seperator1 + endDay;
+				$("#datepicker").val(currentdate);
+				$("#datepicker1").val(currentdate1);
+				$("#datepicker2").val(currentdate);
+				$("#datepicker3").val(currentdate1);
+			},			
+		}
+	})
+</script>

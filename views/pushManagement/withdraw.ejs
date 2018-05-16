@@ -1,0 +1,243 @@
+<% include ../header.ejs %>
+
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>结算审核</a>
+			<a href="#" class="current">玖富提现</a>
+		</div>
+		<h1>玖富提现</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+
+		<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+			<a class="btn2 cur1" href="/push/withdraw" target="liquidation">玖富提现</a>
+		</div>
+
+		<hr>
+		<div class="row-fluid">
+			<div class="widget-box">
+				<div class="widget-content nopadding">
+					<form class="form-horizontal" method="post" action="">
+						<table class="table table-striped">
+							<tbody>
+								<tr>
+									<td width="85" style="white-space: nowrap;">支付状态 :</td>
+									<td width="" style="white-space: nowrap;">
+										<select name="" v-model="status">
+											<option value="">请选择</option>
+											<option value="0">待提现</option>
+											<option value="1">提现中</option>
+											<option value="2">提现成功</option>
+											<option value="3">提现失败</option>
+											<option value="4">玖富提现中</option>
+											<option value="5">玖富提现已提交账务</option>
+										</select>
+									</td>
+									<td width="85" style="white-space: nowrap;">玖富CODE	 :</td>
+									<td width="" style="white-space: nowrap;">
+										<input type="text" class="input" name="" v-model="channelNo">
+									</td>
+									<td width="85" style="white-space: nowrap;"></td>
+									<td width="" style="white-space: nowrap;">
+										<span style="margin-left: 20px">
+											<button type="button" id="submit" class="btn btn-success" @click="listenDate(1)">查找</button>
+	                                    	<button type="button" id="submit" class="btn btn-success" @click="resets()" >重置</button>
+                                    	</span>
+									</td>
+								</tr>
+
+							</tbody>
+						</table>
+					</form>
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row-fluid tab-two" style="display: none">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5>订单明细<span style="position: absolute; right: 10px; top: 4px;"><button type="button" @click="withdraw()" class="btn btn-primary">提现</button> </span></h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th><button class="btn btn-primary btn-mini" @click="allChecked">全选</button></th>
+									<th>ID</th>
+									<th>玖富CODE</th>
+									<th>提现金额</th>
+									<th>提现状态</th>
+									<th>关联CASHID</th>
+									<th>发起提现时间</th>
+									<th>提现完成时间	</th>
+									<th>提现失败原因</th>
+									<th>创建时间</th>
+									<th>用户姓名	</th>
+									<th>提现操作人</th>
+									<th>用户手机号</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+								<tr v-for="msg in List">
+									<td>
+										<input v-if="msg.status=='2' || msg.status=='4' || msg.status=='1'" type="checkbox" disabled="disabled"/>
+										<input v-else type="checkbox" v-model="inputChecked" v-bind:value="msg.id"/>
+									</td>
+									<td v-text="msg.id"></td>
+									<td v-text="msg.channelNo"></td>
+									<td v-text="msg.amount/100"></td>
+									<td v-if="msg.status==0">待提现</td>
+									<td v-else-if="msg.status==1">提现中</td>
+									<td v-else-if="msg.status==2">提现成功</td>
+									<td v-else-if="msg.status==3">提现失败</td>
+									<td v-else-if="msg.status==4">玖富提现中</td>
+									<td v-else-if="msg.status==5">玖富提现已提交账务</td>
+									<td v-else></div>
+									<td v-text="msg.cashId"></td>
+									<td v-if="msg.startTime==0"></td>
+									<td v-else>{{msg.startTime*1000 | time}}</td>
+									<td v-if="msg.finishTime==0"></td>
+									<td v-else>{{msg.finishTime*1000 | time}}</td>
+									<td v-text="msg.payFailReason"></td>
+									<td>{{msg.createTime | time}}</td>
+									<td v-text="msg.userName"></td>
+									<td v-text="msg.auditUser"></td>
+									<td v-text="msg.userPhone"></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="table_toggle1" style="display: none;">暂无数据</div>
+				</div>
+			</div>
+			<div id="page" style="display: none">
+				<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+			</div>			
+		</div>
+</div>
+	<% include ../footer.ejs %>
+
+	<script src="/javascripts/vue-2.42.js"></script>
+	<script src="/javascripts/vue-resource.js"></script>
+	<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+	<script src="/javascripts/jquery-ui.js"></script>
+
+	<script src="/javascripts/public_page.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+	<script>
+		var total = "";
+		var datasets = "";
+		new Vue({
+			el: '#content',
+			data: {
+				all: 0, //总页数
+				cur: 1, //当前页码
+				status: "",
+				channelNo: "",
+				List: "",
+				newList: [],
+				inputChecked:[]
+			},
+			components: {
+				'vue-nav': pagenav
+			},
+			watch: {
+
+			},
+			mounted: function() {
+//				this.time();
+				this.listenDate(this.cur);
+			},
+			methods: {
+				listenDate: function(data) {
+					$(".loading").show();
+					$(".tab-two").show();
+					$("#page").show();
+					var _this = this;
+					var status = this.status;
+					var channelNo = this.channelNo;
+					var pageSize = 10;
+					this.$http.post("/push/withdrawCash/json", {
+						"pageNum": data,
+						"pageSize": pageSize,
+						"status": status,
+						"channelNo": channelNo,
+					}).then(function(res) {
+						$(".loading").hide();
+						if(res.body.code == "D1007") {
+							alert(res.body.msg);
+							return false;
+						}
+						if(res.body.code == "D1006") {
+							alert(res.body.msg);
+							return false;
+						}
+						_this.List = res.body.res.res;
+						console.log(_this.List)
+						_this.pageTotal = res.body.res.total;
+						_this.totalNum = res.body.res.totalNum;
+						if(_this.rmList == "") {
+							$(".table_toggle1").show();
+						} else {
+							$(".table_toggle1").hide();
+						}
+						$(".table_toggle").show();
+						if(data <= 1) {
+							total = Math.ceil(_this.pageTotal / 10);
+						}
+						_this.all = total;
+						_this.cur = data;
+					});
+
+				},
+				resets: function() {
+					this.status = "";
+					this.channelNo = "";
+				},
+				allChecked: function() {
+					var newList = [];
+					var _this = this;
+					this.List.forEach(function(value,index){
+				        if(value.status=="0" || value.status=="3" || value.status=="5"){
+				            newList.push(value);
+				        }
+				   });
+				   var array = [];
+				    newList.forEach(function(item,index){				    	
+				        array.push(item.id);
+				        _this.inputChecked = array;
+				        console.log(_this.inputChecked);
+				    });
+				},
+				withdraw: function() {
+					if(this.inputChecked==""){
+						alert("请选择至少一条订单")
+					}else{
+						var ids = "";
+						var ids = this.inputChecked.join(",");
+						this.$http.post("/push/withdrawCash/withdrawCash", {
+							"ids": ids,
+						}).then(function(res){
+							if(res.body.code=="0000"){
+								console.log(res.body.res);
+								this.listenDate(this.cur);
+		                	    var aaa=res.body.res;
+		                	    window.open(aaa);
+							}else{
+								alert(res.body.msg);
+							}
+							
+						});
+					}
+				}
+			}
+		})
+	</script>
+
+	<!--Real-time-chart-js-->

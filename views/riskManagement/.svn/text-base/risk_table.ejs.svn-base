@@ -1,0 +1,252 @@
+<% include ../header.ejs %>
+
+<!--代扣管理--代扣通道管理-->
+<div id="content">
+
+	<div class="container-fluid">
+
+		<div class="row-fluid">
+			<div class="span12">
+				<div class="widget-box">
+					<div class="widget-title"> <span class="icon"> <i class="icon-th"></i> </span>
+						<h5></h5>
+					</div>
+					<div class="widget-content nopadding" id="common_list">
+						<table class="table table-bordered table-striped" id="one"  style="display: none;">
+							<thead>
+								<tr>
+									<th>基础订单号</th>
+									<th>账单编号</th>
+									<th>推单编号</th>
+									<th>校验规则编号</th>
+									<th>备注</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+							   <tr v-for="msg in collectionList">
+									<td v-text="msg.cashId"></td>
+									<td v-text="msg.billId"></td>
+									<td v-text="msg.pushId"></td>
+									<td v-text="msg.rule"></td>
+									<td v-text="msg.note"></td>
+								</tr>
+							</tbody>
+						</table>
+						<table class="table table-bordered table-striped" id="two"  style="display: none;">
+							<thead>
+								<tr>
+									<th>基础订单号</th>
+									<th>用户还款计划编号</th>
+									<th>账单编号</th>
+									<th>校验规则编号</th>
+									<th>备注</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+							   <tr v-for="msg in collectionList">
+									<td v-text="msg.cashId"></td>
+									<td v-text="msg.loanId"></td>
+									<td v-text="msg.billId"></td>
+									<td v-text="msg.rule"></td>
+									<td v-text="msg.note"></td>
+								</tr>
+							</tbody>
+						</table>
+						<table class="table table-bordered table-striped" id="three"  style="display: none;">
+							<thead>
+								<tr>
+									<th>基础订单号</th>
+									<th>还款计划金额</th>
+									<th>扣款记录金额</th>
+									<th>备注</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+							   <tr v-for="msg in collectionList">
+									<td v-text="msg.orderId"></td>
+									<td v-text="msg.loanStagesAmount/100"></td>
+									<td v-text="msg.payOrderAmount/100"></td>
+									<td v-text="msg.note"></td>
+								</tr>
+							</tbody>
+						</table>
+						<table class="table table-bordered table-striped" id="four"  style="display: none;">
+							<thead>
+								<tr>
+									<th>基础订单号</th>
+									<th>三方支付流水号</th>
+									<th>扣款记录编号</th>
+									<th>校验规则编号</th>
+									<th>备注</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+							   <tr v-for="msg in collectionList">
+									<td v-text="msg.jc_order_id"></td>
+									<td v-text="msg.order_no"></td>
+									<td v-text="msg.order_id"></td>
+									<td v-text="msg.checkedNo"></td>
+									<td v-text="msg.note"></td>
+								</tr>
+							</tbody>
+						</table>
+						<table class="table table-bordered table-striped" id="five" style="display: none;">
+							<thead>
+								<tr>
+									<th>基础订单号</th>
+									<th>账单编号</th>
+									<th>三方支付流水号</th>
+									<th>校验规则编号</th>
+									<th>备注</th>
+								</tr>
+							</thead>
+							<tbody class="table_toggle">
+							   <tr v-for="msg in collectionList">
+									<td v-text="msg.cashId"></td>
+									<td v-text="msg.billId"></td>
+									<td v-text="msg.mertrandNo"></td>
+									<td v-text="msg.rule"></td>
+									<td v-text="msg.note"></td>
+								</tr>
+							</tbody>
+						</table>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+		<div id="page" style="display: none">
+				<vue-nav :cur.sync="cur" :all.sync="all" v-on:btn-click="listenDate"></vue-nav>
+		</div>
+	</div>
+</div>
+
+<!--<div class="row-fluid">
+  <div id="footer" class="span12"> 2013 &copy; Matrix Admin. More Templates <a href="http://www.mycodes.net/" target="_blank">源码之家</a></div>
+</div>-->
+
+<% include ../footer.ejs %>
+<script src="/javascripts/vue-resource.js"></script>
+<script src="/javascripts/public_page.js"></script>
+<script type="text/javascript">
+var total = "";
+    var pageBar = new Vue({
+        el: '#content',
+        data: {
+            all: 0, //总页数
+            cur: 1,//当前页码
+            data:"",
+            collectionList:"",
+       
+        },
+        components:{
+            'vue-nav':pagenav
+        },
+        watch: {
+            cur: function(oldValue , newValue){
+               
+            }
+        },
+        mounted:function(){
+			this.listenDate(this.cur);
+			
+		},
+        methods:{
+             //分页查询
+			listenDate:function(data){
+				$(".loading").show();
+				$("#page").show();
+				var id=localStorage.getItem("id");
+				var _this = this;
+				var pageSize = 10;
+				var url="";
+				if(id=="1"){
+					url="/risk/cash/getCashBillCheckList";
+				}
+				if(id=="2"){
+					url="/risk/cash/getCashLoanCheckListByRule"
+				}
+				if(id=="3"){
+					url="/risk/rule/ruleThree"
+				}
+				if(id=="4"){
+					url="/risk/rule/ruleFour"
+				}
+				if(id=="5"){
+					url="/risk/cash/getCashPayCheckListByRule"
+				}
+				 ////console.log(deductions_name,qy_name)
+				this.$http.post(url,{"rule":id,"pageNum":data,"pageSize":pageSize}).then(function(res){
+					$(".loading").hide();
+					//console.log(res)
+					 if(res.body.code=="D1007"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 if(res.body.code=="D1006"){
+					 	alert(res.body.msg);
+					 	return false;
+					 }
+					 if(id=="1" || id=="2" || id=="5"){
+					 	_this.data = res.body.res.data;
+					    _this.collectionList = res.body.res.cashList.res;
+					    _this.pageTotal = res.body.res.cashList.total;
+					 }else if(id=="3" || id=="4"){
+					 	_this.data = res.body.res.data;
+					    _this.collectionList = res.body.res.data.res;
+					    _this.pageTotal = res.body.res.data.total;
+					 }
+					 if(id=="1"){$("#one").show();}
+					 if(id=="2"){$("#two").show();}
+					 if(id=="3"){$("#three").show();}
+					 if(id=="4"){$("#four").show();}
+					 if(id=="5"){$("#five").show();}
+					 
+					  
+					  	$(".table_toggle").show();
+					if (data<=1) {
+						total = Math.ceil(_this.pageTotal/10);
+					}
+					   _this.all = total;
+					   _this.cur = data;
+				});
+	        },
+           //详情
+			xiangqing:function(id){
+				localStorage.setItem("id", id);
+			},
+            //启用
+			qi:function(id,status){
+				////console.log(id,status);
+				var _this = this;
+				if(status=="2"){
+					this.$http.post("/risk/rule/updateRule",{"id":id,"status":1}).then(function(res){
+						////console.log(res);
+                	    //alert("请求成功，已启用");
+                	    _this.listenDate(this.cur);
+				    });
+				}else{
+                	//alert("已启用");
+				}
+			},
+			//暂停
+			jin:function(id,status){
+				////console.log(id,status);
+				var _this = this;
+				if(status=="1"){
+					this.$http.post("/risk/rule/updateRule",{"id":id,"status":2}).then(function(res){
+						////console.log(res);
+                	    //alert("请求成功，已暂停");
+                	    _this.listenDate(this.cur);
+				    });
+				    
+				}else{
+					//alert("已暂停");
+				}
+
+			},
+        }
+    })
+</script>

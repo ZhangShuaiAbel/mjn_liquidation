@@ -1,0 +1,277 @@
+<% include ../header.ejs %>
+
+<div id="content">
+	<div id="content-header">
+		<div id="breadcrumb">
+			<a href="#" class="tip-bottom"><i class="icon-home"></i>资金管理</a>
+			<a href="#" class="current">对公转账申请</a>
+		</div>
+		<h1>对公转账申请</h1>
+	</div>
+	<div class="container-fluid">
+		<div class="loading">
+			<img src="/images/jiazai.gif" alt="">
+		</div>
+		<hr>
+		<div class="xiangqing_list" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(205, 205, 205);">
+			<a class="btn2" id="sqjl" href="/accountCapital/cashFlowAnalysis" target="liquidation">申请记录</a>
+			<a class="btn2 cur1" href="/accountCapital/cashFlowAnalysis1" target="liquidation">对公转账申请</a>
+			<a class="btn2" href="/accountCapital/cashFlowAnalysis2" target="liquidation">对私转账申请</a>
+		</div>
+		<hr>
+		<div class="" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<form id="addNewRule1">
+									<div class="widget-content nopadding form-horizontal">
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">我方账户 :</label>
+											<div class="controls">
+												<select name="" v-moderl="payAccountNo" id="">
+													<option value="201611141001247507">想就拿-连连</option>
+												</select>
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">收款账户名 :</label>
+											<div class="controls">
+												<input type="text" v-model="receiveAccount" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">收款账号 :</label>
+											<div class="controls">
+												<input type="text" v-model="receiveBankNo" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">开户行名称 :</label>
+											<div class="controls">
+												<input type="text" v-model="receiveBank" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">银行编号 :</label>
+											<div class="controls">
+												<input type="text" v-model="receiveBankCode" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">付款金额 :</label>
+											<div class="controls">
+												<input type="text" v-model="amount" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px">付款用途 :</label>
+											<div class="controls">
+												<input type="text" v-model="transferNote" />
+											</div>
+										</div>
+										<div class="control-group">
+											<label class="control-label" style="width: 150px"></label>
+											<div class="controls">
+												<button type="button" class="btn btn-default close1" data-dismiss="modal">关闭</button>
+												<input type="button" class="btn btn-primary addimg fileBtn" value="提交" id="" @click="duigong()" />
+											</div>
+										</div>
+
+									</div>
+								</form>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+
+	<% include ../footer.ejs %>
+
+	<script type="text/javascript" src="/javascripts/bower_components/jquery/jquery.min.js"></script>
+
+	<script src="/javascripts/jquery-ui.js"></script>
+	<script src="/javascripts/vue-2.42.js"></script>
+	<script src="/javascripts/vue-resource.js"></script>
+	<script src="/javascripts/public_page.js"></script>
+	<script src="/javascripts/time_filter.js"></script>
+	<script>
+		$(function() {
+			$(".close").click(function() {
+				$(".close1").click();
+			})
+		})
+	</script>
+	<script type="text/javascript">
+		var total = "";
+		var pageBar = new Vue({
+			el: '#content',
+			data: {
+				all: 0, //总页数
+				cur: 1, //当前页码
+				res: "",
+				payAccount: "",
+				receiveAccount: "",
+				receiveBankNo: "",
+				receiveBank: "",
+				receiveBankCode: "",
+				amount: 0,
+				transferNote: "",
+				receiveAccountPhone: "",
+				receiveAccountIdcard: "",
+				payAccountNo: "201611141001247507"
+			},
+			components: {
+				'vue-nav': pagenav
+			},
+			watch: {
+				cur: function(oldValue, newValue) {}
+			},
+			mounted: function() {
+				this.listenDate(this.cur);
+			},
+			methods: {
+				listenDate: function(data) {
+					var _this = this;
+					var pageSize = 10;
+					var applyOrAudit = 0;
+					$(".loading").show();
+					$(".tab-two").show();
+					$("#page").show();
+					this.$http.post("/accountCapital/capitalTransfer/getCapitalTransferList", {
+						"pageNum": data,
+						"pageSize": pageSize,
+						"applyOrAudit": applyOrAudit,
+					}).then(function(res) {
+						//console.log(res);
+						$(".loading").hide();
+						if(res.body.code == "D1007") {
+							alert(res.body.msg);
+							return false;
+						}
+						if(res.body.code == "D1006") {
+							alert(res.body.msg);
+							return false;
+						}
+						_this.res = res.body.res.res;
+						_this.pageTotal = res.body.res.total;
+						if(_this.collectionList == "") {
+							$(".table_toggle1").show();
+						} else {
+							$(".table_toggle1").hide();
+						}
+						$(".table_toggle").show();
+						if(data <= 1) {
+							total = Math.ceil(_this.pageTotal / 10);
+						}
+						_this.all = total;
+						_this.cur = data;
+					});
+				},
+				duigong: function() {
+					var _this = this;
+					var payAccount = this.payAccount;
+					var receiveAccount = this.receiveAccount;
+					var receiveBankNo = this.receiveBankNo;
+					var receiveBank = this.receiveBank;
+					var receiveBankCode = this.receiveBankCode;
+					var amount = this.amount * 100;
+					var transferNote = this.transferNote;
+					var receiveAccountIdcard = this.receiveAccountIdcard;
+					var receiveAccountPhone = this.receiveAccountPhone;
+					var payAccountNo = this.payAccountNo;
+					var number_if = new RegExp("^[0-9]*$");
+					var isNum=/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/;
+					if(payAccountNo == "") {
+						alert("我方账户不能为空");
+						return false
+					}
+					if(receiveAccount == "") {
+						alert("收款账户名不能为空")
+						return false
+					}
+					if(receiveBankNo == "") {
+						alert("收款账号不能为空")
+						return false
+					}
+					if(!number_if.test(receiveBankNo)) {
+						alert("收款账号只能为数字")
+						return false
+					}
+					if(receiveBank == "") {
+						alert("开户行名称不能为空")
+						return false
+					}
+					if(receiveBankCode == "") {
+						alert("银行编号不能为空")
+						return false
+					}
+					if(!number_if.test(receiveBankCode)) {
+						alert("银行编号只能为数字")
+						return false
+					}
+					if(amount == "") {
+						alert("付款金额不能为空")
+						return false
+					}
+					if(!isNum.test(amount)) {
+						alert("付款金额输入有误")
+						return false
+					}
+					if(transferNote == "") {
+						alert("付款用途不能为空")
+						return false
+					}
+					var obj = new Object();
+					obj.payAccount = "想就拿-连连"; //为对象添加属性 
+					obj.receiveAccount = receiveAccount;
+					obj.receiveBankNo = receiveBankNo;
+					obj.receiveBank = receiveBank;
+					obj.receiveBankCode = receiveBankCode;
+					obj.amount = amount;
+					obj.transferNote = transferNote;
+					obj.receiveAccountIdcard = receiveAccountIdcard;
+					obj.receiveAccountPhone = receiveAccountPhone;
+					obj.payAccountNo = payAccountNo;
+					obj.applyType = 1;
+					var capitalTransfer = JSON.stringify(obj)
+					console.log(capitalTransfer)
+					this.$http.post("/accountCapital/capitalTransfer/saveCapitalTransfer", {
+						"capitalTransfer": capitalTransfer
+					}).then(function(res) {
+						///console.log(res);
+						$(".loading").hide();
+						if(res.body.code == "0000") {
+							alert(res.body.msg);
+							window.location.href = "/accountCapital/cashFlowAnalysis";
+							return false;
+						}
+						if(res.body.code == "1") {
+							alert(res.body.msg);
+							return false;
+						}
+						this.listenDate();
+						if(res.body.code == "D1007") {
+							alert(res.body.msg);
+							return false;
+						}
+						if(res.body.code == "D1006") {
+							alert(res.body.msg);
+							return false;
+						}
+						_this.res = res.body.res.res;
+						_this.pageTotal = res.body.res.total;
+
+					});
+				},
+
+			}
+		})
+	</script>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<title>Matrix Admin</title>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="/stylesheets/bootstrap.min.css" />
+		<link rel="stylesheet" href="/stylesheets/bootstrap-responsive.min.css" />
+		<link rel="stylesheet" href="/stylesheets/fullcalendar.css" />
+		<link rel="stylesheet" href="/stylesheets/matrix-style.css" />
+		<link rel="stylesheet" href="/stylesheets/matrix-media.css" />
+		<link href="/stylesheets/font-awesome/css/font-awesome.css" rel="stylesheet" />
+		<link rel="stylesheet" href="/stylesheets/jquery.gritter.css" />
+		<link rel="stylesheet" href="/stylesheets/style.css" />
+
+	</head>
+
+	<body>
+
+		<!--Header-part-->
+		<div id="header">
+			<h2>清结算系统</h2>
+		</div>
+		<!--close-Header-part-->
+
+		<!--top-Header-menu-->
+		<div id="user-nav" class="navbar navbar-inverse">
+			<ul class="nav">
+				<li class="dropdown" id="profile-messages">
+					<a title="" href="#" data-toggle="dropdown" data-target="#profile-messages" class="dropdown-toggle"><i class="icon icon-user"></i> <span class="text">欢迎您登录</span><b class="caret"></b></a>
+					<ul class="dropdown-menu">
+						<li>
+							<a onclick="logout()" id="logout"><i class="icon-check"></i>退出登录</a>
+						</li>
+						<li class="divider"></li>
+						<li>
+							<a href="/password" target="liquidation"><i class="icon-key"></i>修改密码</a>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+		<!--close-top-Header-menu-->
+		<!--start-top-serch-->
+		<!--<div id="search">
+  <input type="text" placeholder="Search here..."/>
+  <button type="submit" class="tip-bottom" title="Search"><i class="icon-search icon-white"></i></button>
+</div>-->
+		<!--close-top-serch-->
+		<!--sidebar-menu-->
+		<div id="sidebar">
+			<a href="#" class="visible-phone"><i class="icon icon-home"></i> Dashboard</a>
+			<ul>
+				<li class="submenu">
+					<a href="#"><i class="icon icon-home"></i> <span>账户资金</span></a>
+					<ul>
+						<li>
+							<a href="/accountCapital/index" target="liquidation">账户资金</a>
+						</li>
+
+						<li>
+							<a href="/accountCapital/accounts" target="liquidation">记账</a>
+						</li>
+						<li>
+							<a href="/accountCapital/capitalApply" target="liquidation">现金流分析</a>
+						</li>
+						<li>
+							<a href="/accountCapital/cashFlowAnalysis" target="liquidation">资金划转申请</a>
+						</li>
+						<li>
+							<a href="/accountCapital/capitalApproval" target="liquidation">资金划转审批</a>
+						</li>
+
+					</ul>
+				</li>
+				<li class="submenu">
+					<a href="#"><i class="icon icon-inbox"></i> <span>交易管理</span></a>
+					<ul>
+						<li>
+							<a href="/basics/basics" target="liquidation">基础订单</a>
+						</li>
+						<li>
+							<a href="/deal/credit" target="liquidation">往来交易</a>
+						</li>
+			
+						<!--<li>
+							<a href="/deal/gatheringDeal" target="liquidation">收款交易查询</a>
+						</li>-->
+						<li>
+							<a href="/deal/abnormalGathering" target="liquidation">异常收款订单</a>
+						</li>
+						<!--<li>
+							<a href="/deal/refundList" target="liquidation">退款订单列表</a>
+						</li>-->
+						<li class="submenu1">
+							<a href="#"><span>推单管理</span></a>
+							<ul style="display: none;padding-left: 15px;">
+								<li>
+									<a href="/push/capitalChannel" target="liquidation">资金渠道管理</a>
+								</li>
+								<li>
+									<a href="/push/pushSingleFlux" target="liquidation">推单流量管理</a>
+								</li>
+							</ul>
+						</li>
+						
+						
+					</ul>
+				</li>
+				<li class="submenu">
+							<a href="#"><i class="icon icon-th"></i> <span>渠道管理</span></a>
+							<ul >
+								<li class="submenu1">
+									<a href="#"><span>支付管理</span></a>
+									<ul style="display: none;padding-left: 15px;">
+										<li>
+											<a href="/pay/PayAisle" target="liquidation">支付通道管理</a>
+										</li>
+										<li>
+											<a href="/pay/checkstand" target="liquidation">收银台配置</a>
+										</li>
+										<li>
+											<a href="/pay/product" target="liquidation">产品管理</a>
+										</li>
+									</ul>
+								</li>
+								<li class="submenu1">
+									<a href="#"><span>代扣管理</span></a>
+									<ul style="display: none;padding-left: 15px;">
+										<li>
+											<a href="/withhold/aisle" target="liquidation">扣款通道管理</a>
+										</li>
+										<li>
+											<a href="/withhold/external" target="liquidation">外部扣款管理</a>
+										</li>
+									</ul>
+								</li>
+							</ul>
+				</li>
+				<!--<li class="submenu">-->
+					<!--<a href="#"><i class="icon icon-pencil"></i> <span>对账管理</span></a>-->
+					<!--<ul>-->
+						<!--<li>-->
+							<!--<a href="/reconciliation/pipeline" target="liquidation">流水查询</a>-->
+						<!--</li>-->
+						<!--<li>-->
+							<!--<a href="/reconciliation/artificialApplyFor" target="liquidation">人工对账申请</a>-->
+						<!--</li>-->
+						<!--<li>-->
+							<!--<a href="/reconciliation/artificialApprove" target="liquidation">人工对账审批</a>-->
+						<!--</li>-->
+
+					<!--</ul>-->
+				<!--</li>-->
+				<li> <a href="/risk/risk" target="liquidation"><i class="icon icon-file"></i> <span>风险管理</span></a> </li>
+				
+				<li> <a href="/channelAnalysis/channelAnalysis"  target="liquidation"><i class="icon icon-fullscreen"></i> <span>代扣渠道分析</span></a> </li>
+                <li class="submenu">
+                    <a href="#"><i class="icon icon-home"></i> <span>对账管理</span></a>
+                    <ul>
+                        <li>
+                            <a href="/flow/statismonth" target="liquidation">账单汇总</a>
+                        </li>
+                        <li>
+                            <a href="/flow/search" target="liquidation">流水查询</a>
+                        </li>
+                        <li>
+                            <a href="/flow/applylist" target="liquidation">人工对账申请</a>
+                        </li>
+                        <li>
+                            <a href="/flow/auditwait" target="liquidation">人工对账审批</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+			<!--<ul>
+
+				<li class="submenu">
+					<a href="#"><i class="icon icon-home"></i> <span>支付管理</span></a>
+					<ul>
+						<li>
+							<a href="/pay/PayAisle" target="liquidation">支付通道管理</a>
+						</li>
+						<li>
+							<a href="/pay/checkstand" target="liquidation">收银台配置</a>
+						</li>
+						<li>
+							<a href="/pay/product" target="liquidation">产品管理</a>
+						</li>
+					</ul>
+				</li>
+
+				<li class="submenu">
+					<a href="#"><i class="icon icon-signal"></i> <span>代扣管理</span></a>
+					<ul>
+						<li>
+							<a href="/withhold/aisle" target="liquidation">扣款通道管理</a>
+						</li>
+						<li>
+							<a href="/withhold/external" target="liquidation">外部扣款管理</a>
+						</li>
+					</ul>
+				</li>
+
+				<li class="submenu">
+					<a href="#"><i class="icon icon-inbox"></i> <span>交易管理</span></a>
+					<ul>
+						<li>
+							<a href="/deal/gatheringDeal" target="liquidation">收款交易查询</a>
+						</li>
+						<li>
+							<a href="/deal/abnormalGathering" target="liquidation">异常收款订单</a>
+						</li>
+						<li>
+							<a href="/deal/refundList" target="liquidation">退款订单列表</a>
+						</li>
+					</ul>
+				</li>
+
+				<li class="submenu">
+					<a href="#"><i class="icon icon-file"></i> <span>推单管理</span></a>
+					<ul>
+						<li>
+							<a href="/push/capitalChannel" target="liquidation">资金渠道管理</a>
+						</li>
+						<li>
+							<a href="/push/pushSingleFlux" target="liquidation">推单流量管理</a>
+						</li>
+					</ul>
+				</li>
+				<li class="submenu">
+					<a href="#"><i class="icon icon-fullscreen"></i> <span>代扣渠道分析</span></a>
+					<ul>
+						<li>
+							<a href="/channelAnalysis/channelAnalysis" target="liquidation">代扣渠道分析</a>
+						</li>
+					</ul>
+				</li>
+				<li class="submenu">
+					<a href="#"><i class="icon icon-th"></i> <span>渠道费用管理</span></a>
+					<ul>
+						<li>
+							<a href="/Channelcost/channelcost" target="liquidation">渠道费用管理</a>
+						</li>
+					</ul>
+				</li>
+			</ul>-->
+		</div>
+
+<script>
+
+
+ function clearAllCookie() {
+                var keys = document.cookie.match(/[^ =;]+(?=\=)/g);
+                //console.log(keys)
+                if(keys) {
+                    for(var i = keys.length; i--;)
+                        document.cookie = keys[i] + '=0;expires=' + new Date(0).toUTCString() ;
+                }
+            }
+	function logout () {
+		$.ajax({
+                    url: "/logout",
+                    type: "post",
+                    success: function (data) {
+                               window.location.href="/login";
+                               	clearAllCookie();
+                    }
+                })
+		// body...
+	}
+</script>
